@@ -4,4 +4,6 @@ export const worldConfig = {
   campusDepth: 128,
   /** Länge der angedeuteten Eingangsstraße außerhalb des Geländes (Felder). */
   entranceRoadLength: 24,
+  /** Feldreihe der Einfahrt am Westrand: Die Eingangsstraße endet vor Feld (0, entranceZ). */
+  entranceZ: 61,
 } as const;

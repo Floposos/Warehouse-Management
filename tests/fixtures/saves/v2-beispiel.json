@@ -6,7 +6,7 @@
   "meta": {
     "name": "Beispiel M1",
     "tick": 10234,
-    "balanceCents": 94750000
+    "balanceCents": 94150000
   },
   "state": {
     "seed": 20260107,
@@ -16,7 +16,7 @@
     },
     "nextId": 3,
     "finance": {
-      "balanceCents": 94750000
+      "balanceCents": 94150000
     },
     "buildings": [
       {
@@ -34,6 +34,80 @@
         "z": 40,
         "builtTick": 9000,
         "paidCents": 5000000
+      }
+    ],
+    "roads": [
+      {
+        "x": 0,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 1,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 2,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 3,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 4,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 5,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 6,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 7,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 8,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 9,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 10,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 11,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
       }
     ]
   }

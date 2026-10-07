@@ -69,7 +69,8 @@ export function demolishBuilding(state: GameState, bus: EventBus, id: number): n
   return refund;
 }
 
-function changeBalance(state: GameState, bus: EventBus, deltaCents: number): void {
+/** Bucht einen Betrag und meldet den neuen Kontostand. */
+export function changeBalance(state: GameState, bus: EventBus, deltaCents: number): void {
   if (deltaCents === 0) return;
   state.finance.balanceCents += deltaCents;
   bus.emit({

@@ -198,7 +198,7 @@ export class AppController {
     } else {
       rotate(this.menuRig, (cameraConfig.menuOrbitDegPerSecond * dtMs) / 1000);
     }
-    this.renderer.syncBuildings(state.buildings);
+    this.renderer.syncWorld(state);
     this.renderer.render(rig);
     this.perf.record({ frameMs: dtMs, simMs, simTicks, drawCalls: this.renderer.drawCalls });
   }

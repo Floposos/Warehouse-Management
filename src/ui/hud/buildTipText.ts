@@ -12,6 +12,12 @@ export function buildTipText(preview: BuildPreview): { text: string; kind: 'ok' 
             kind: 'error',
           }
         : { text: de.build.cost(formatEuro(preview.costCents)), kind: 'ok' };
+    case 'road': {
+      const cost = de.build.roadCost(preview.cells.length, formatEuro(preview.costCents));
+      return preview.reason
+        ? { text: `${de.build.reasons[preview.reason]} · ${cost}`, kind: 'error' }
+        : { text: cost, kind: 'ok' };
+    }
     case 'demolish':
       return { text: de.build.refund(formatEuro(preview.refundCents)), kind: 'ok' };
     case 'nothingToDemolish':

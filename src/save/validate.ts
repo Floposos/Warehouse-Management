@@ -17,18 +17,26 @@ export function validateState(value: unknown): value is GameState {
     return false;
   }
   const buildings = s['buildings'];
-  if (!Array.isArray(buildings)) return false;
-  return buildings.every((b: unknown) => {
-    if (typeof b !== 'object' || b === null) return false;
-    const r = b as Record<string, unknown>;
-    return (
-      isInt(r['id']) &&
-      isInt(r['x']) &&
-      isInt(r['z']) &&
-      isInt(r['builtTick']) &&
-      isInt(r['paidCents']) &&
-      typeof r['type'] === 'string' &&
-      r['type'] in buildingTypes
-    );
+  if (!Array.isArray(buildings) || !Array.isArray(s['roads'])) return false;
+  const roadsOk = (s['roads'] as unknown[]).every((r: unknown) => {
+    if (typeof r !== 'object' || r === null) return false;
+    const t = r as Record<string, unknown>;
+    return isInt(t['x']) && isInt(t['z']) && isInt(t['builtTick']) && isInt(t['paidCents']);
   });
+  return (
+    roadsOk &&
+    buildings.every((b: unknown) => {
+      if (typeof b !== 'object' || b === null) return false;
+      const r = b as Record<string, unknown>;
+      return (
+        isInt(r['id']) &&
+        isInt(r['x']) &&
+        isInt(r['z']) &&
+        isInt(r['builtTick']) &&
+        isInt(r['paidCents']) &&
+        typeof r['type'] === 'string' &&
+        r['type'] in buildingTypes
+      );
+    })
+  );
 }

@@ -113,6 +113,11 @@ export const de = {
     },
     comingSoon: 'Kommt in Kürze.',
     buildings: { testHall: 'Testhalle' },
+    road: 'Straße',
+    roadItemCost: (cost: string): string => `${cost} je Feld`,
+    roadItemTitle: 'Straße ziehen: klicken, ziehen, loslassen (gerade oder mit einem Knick)',
+    roadCost: (fields: number, cost: string): string =>
+      `${fields} ${fields === 1 ? 'Feld' : 'Felder'} · Kosten: ${cost}`,
     itemTitle: (name: string, cost: string): string => `${name} bauen (${cost})`,
     cost: (cost: string): string => `Kosten: ${cost}`,
     refund: (refund: string): string => `Abreißen, Erstattung: ${refund}`,

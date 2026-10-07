@@ -39,3 +39,30 @@ test('Bauen und Abreißen über die Bauleiste (auch in der Pause)', async ({ pag
   await expect(page.getByRole('dialog', { name: 'Spiel pausiert' })).toBeVisible();
   expect(problems).toEqual([]);
 });
+
+test('Straße ziehen und ein Feld abreißen', async ({ page }) => {
+  const problems = collectProblems(page);
+  await page.goto('/');
+  await startNewGame(page);
+  await page.keyboard.press('Space');
+  const balance = page.getByTestId('balance');
+  const tip = page.getByTestId('cursor-tip');
+  const bar = page.getByTestId('build-bar');
+  const size = page.viewportSize() ?? { width: 1280, height: 720 };
+  const start = { x: size.width / 2, y: size.height / 2 + 60 };
+
+  await bar.getByRole('button', { name: 'Straßen' }).click();
+  await bar.getByRole('button', { name: /je Feld/ }).click();
+  await page.mouse.move(start.x, start.y);
+  await expect(tip).toContainText('1 Feld · Kosten: 500 €');
+  await page.mouse.down();
+  await page.mouse.move(start.x + 200, start.y + 40, { steps: 5 });
+  await expect(tip).toContainText(/\d+ Felder · Kosten/);
+  await page.mouse.up();
+  await expect(balance).not.toHaveText('1.000.000 €');
+
+  await bar.getByRole('button', { name: 'Abriss' }).click();
+  await page.mouse.move(start.x, start.y);
+  await expect(tip).toContainText('Erstattung: 500 €');
+  expect(problems).toEqual([]);
+});

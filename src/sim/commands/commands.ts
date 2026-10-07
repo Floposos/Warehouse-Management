@@ -2,6 +2,7 @@ import type { BuildingTypeId } from '../../content/buildings';
 import type { EventBus } from '../core/eventBus';
 import type { GameState } from '../state/gameState';
 import { demolishBuilding, placeBuilding } from './build';
+import { buildRoad, demolishRoad } from './roads';
 
 /**
  * Spieleraktionen als Befehle. Darstellung, UI und Eingabe ändern den Zustand nie direkt,
@@ -11,7 +12,10 @@ export type Command =
   /** Entwicklerbefehl (nicht in der Oberfläche): Kontostand ändern, z. B. für Tests. */
   | { type: 'finance/adjustBalance'; deltaCents: number }
   | { type: 'build/place'; buildingType: BuildingTypeId; x: number; z: number }
-  | { type: 'build/demolish'; buildingId: number };
+  | { type: 'build/demolish'; buildingId: number }
+  /** Straße von (fromX, fromZ) nach (toX, toZ), gerade oder L-Form; `xFirst` = Knick-Richtung. */
+  | { type: 'road/build'; fromX: number; fromZ: number; toX: number; toZ: number; xFirst: boolean }
+  | { type: 'road/demolish'; x: number; z: number };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
@@ -36,6 +40,16 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
     }
     case 'build/demolish': {
       const refund = demolishBuilding(state, bus, command.buildingId);
+      return refund === null ? reject(bus, command, 'notFound') : { ok: true };
+    }
+    case 'road/build': {
+      const from = { x: command.fromX, z: command.fromZ };
+      const to = { x: command.toX, z: command.toZ };
+      const check = buildRoad(state, bus, from, to, command.xFirst);
+      return check.ok ? { ok: true } : reject(bus, command, check.reason);
+    }
+    case 'road/demolish': {
+      const refund = demolishRoad(state, bus, command.x, command.z);
       return refund === null ? reject(bus, command, 'notFound') : { ok: true };
     }
   }

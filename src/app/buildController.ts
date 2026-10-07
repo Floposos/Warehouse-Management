@@ -1,11 +1,17 @@
 import { installBuildPointer } from '../input/buildPointer';
-import { previewAt, type BuildPreview, type BuildTool } from '../input/buildTool';
+import {
+  previewAt,
+  ROAD_GHOST_HEIGHT,
+  type BuildPreview,
+  type BuildTool,
+} from '../input/buildTool';
 import type { GameRenderer } from '../render/scene/gameRenderer';
 import type { Ghost } from '../render/views/ghostView';
 import { BuildBar } from '../ui/hud/buildBar';
 import { buildTipText } from '../ui/hud/buildTipText';
 import { CursorTip } from '../ui/hud/cursorTip';
 import { de } from '../ui/texts/de';
+import type { Cell } from '../sim/world/roadLine';
 import type { GameSession } from './gameSession';
 
 /**
@@ -15,6 +21,8 @@ import type { GameSession } from './gameSession';
 export class BuildController {
   private tool: BuildTool | null = null;
   private pointer: { x: number; y: number } | null = null;
+  /** Startfeld beim Ziehen einer Straße. */
+  private dragStart: Cell | null = null;
   private readonly bar: BuildBar;
   private readonly tip: CursorTip;
 
@@ -28,7 +36,8 @@ export class BuildController {
     this.tip = new CursorTip(ui);
     installBuildPointer(canvas, {
       move: (x, y) => (this.pointer = { x, y }),
-      click: (x, y) => this.click(x, y),
+      down: (x, y) => this.down(x, y),
+      up: (x, y) => this.up(x, y),
       leave: () => (this.pointer = null),
     });
   }
@@ -44,13 +53,18 @@ export class BuildController {
 
   setTool(tool: BuildTool | null): void {
     this.tool = tool;
+    this.dragStart = null;
     this.bar.setTool(tool);
     this.canvas.classList.toggle('is-building', tool !== null);
     if (!tool) this.clearPreview();
   }
 
-  /** Esc: bricht ein aktives Werkzeug ab. Liefert true, wenn etwas abgebrochen wurde. */
+  /** Esc: bricht erst ein laufendes Ziehen, dann das Werkzeug ab. True = Esc verbraucht. */
   cancel(): boolean {
+    if (this.dragStart) {
+      this.dragStart = null;
+      return true;
+    }
     if (!this.tool) return false;
     this.setTool(null);
     return true;
@@ -72,33 +86,58 @@ export class BuildController {
     const session = this.session();
     if (!this.tool || !session) return null;
     const ground = this.renderer.pickGround(clientX, clientY);
-    return ground ? previewAt(session.state, this.tool, ground.x, ground.z) : null;
+    return ground ? previewAt(session.state, this.tool, ground.x, ground.z, this.dragStart) : null;
   }
 
-  private click(clientX: number, clientY: number): void {
+  private down(clientX: number, clientY: number): void {
+    this.pointer = { x: clientX, y: clientY };
+    if (this.tool?.kind === 'road') {
+      const ground = this.renderer.pickGround(clientX, clientY);
+      if (ground) this.dragStart = { x: Math.floor(ground.x), z: Math.floor(ground.z) };
+      return;
+    }
+    this.commit(this.previewAt(clientX, clientY));
+  }
+
+  /** Straße: Loslassen baut die gezogene Strecke. */
+  private up(clientX: number, clientY: number): void {
+    if (this.tool?.kind !== 'road' || !this.dragStart) return;
     const preview = this.previewAt(clientX, clientY);
+    this.dragStart = null;
+    this.commit(preview);
+  }
+
+  private commit(preview: BuildPreview | null): void {
     if (!preview || preview.kind === 'nothingToDemolish') return;
-    if (preview.kind === 'place' && preview.reason) return;
+    if ((preview.kind === 'place' || preview.kind === 'road') && preview.reason) return;
     this.session()?.command(preview.command);
   }
 
   private clearPreview(): void {
-    this.renderer.setGhost(null);
+    this.renderer.setGhost([]);
     this.tip.hide();
   }
 }
 
-function toGhost(preview: BuildPreview): Ghost | null {
+function toGhost(preview: BuildPreview): Ghost[] {
   switch (preview.kind) {
-    case 'place':
-      return {
-        footprint: preview.footprint,
-        height: preview.height,
-        style: preview.reason ? 'invalid' : 'valid',
-      };
+    case 'place': {
+      const style = preview.reason ? 'invalid' : 'valid';
+      return [{ footprint: preview.footprint, height: preview.height, style }];
+    }
+    case 'road': {
+      // Ohne konkretes Hindernis (z. B. Geld fehlt) ist die ganze Strecke rot.
+      const blocked = new Set(preview.blocked.map((c) => `${c.x},${c.z}`));
+      const allRed = preview.reason !== null && blocked.size === 0;
+      return preview.cells.map((c) => ({
+        footprint: { x: c.x, z: c.z, width: 1, depth: 1 },
+        height: ROAD_GHOST_HEIGHT,
+        style: allRed || blocked.has(`${c.x},${c.z}`) ? 'invalid' : 'valid',
+      }));
+    }
     case 'demolish':
-      return { footprint: preview.footprint, height: preview.height, style: 'demolish' };
+      return [{ footprint: preview.footprint, height: preview.height, style: 'demolish' }];
     case 'nothingToDemolish':
-      return null;
+      return [];
   }
 }

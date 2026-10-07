@@ -15,7 +15,9 @@ export type SimEvent =
       z: number;
       costCents: number;
     }
-  | { type: 'build/demolished'; id: number; refundCents: number };
+  | { type: 'build/demolished'; id: number; refundCents: number }
+  | { type: 'road/built'; cells: { x: number; z: number }[]; costCents: number }
+  | { type: 'road/demolished'; x: number; z: number; refundCents: number };
 
 export type SimEventType = SimEvent['type'];
 export type SimEventOf<T extends SimEventType> = Extract<SimEvent, { type: T }>;

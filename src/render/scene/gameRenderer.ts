@@ -9,11 +9,12 @@ import {
   WebGLRenderer,
 } from 'three';
 import { worldConfig } from '../../config/world';
-import type { Building } from '../../sim/state/gameState';
+import type { GameState } from '../../sim/state/gameState';
 import { cameraPosition, type CameraRig } from '../camera/cameraRig';
 import { GroundPicker } from '../camera/groundPicker';
 import { BuildingsView } from '../views/buildingsView';
 import { GhostView, type Ghost } from '../views/ghostView';
+import { RoadsView } from '../views/roadsView';
 import { palette } from './palette';
 import { createTerrain } from './terrain';
 
@@ -23,6 +24,7 @@ export class GameRenderer {
   private readonly renderer: WebGLRenderer;
   private readonly scene = new Scene();
   private readonly buildings = new BuildingsView();
+  private readonly roads = new RoadsView();
   private readonly ghost = new GhostView();
   private readonly picker: GroundPicker;
 
@@ -35,7 +37,7 @@ export class GameRenderer {
     // Dunst am Horizont: das Umland läuft weich aus.
     this.scene.fog = new Fog(palette.sky, 260, 900);
     this.addLights();
-    this.scene.add(createTerrain(), this.buildings.root, this.ghost.root);
+    this.scene.add(createTerrain(), this.roads.root, this.buildings.root, this.ghost.root);
     this.picker = new GroundPicker(this.camera, canvas);
     this.resize();
   }
@@ -60,12 +62,14 @@ export class GameRenderer {
     this.scene.add(sun, sun.target);
   }
 
-  syncBuildings(buildings: readonly Building[]): void {
-    this.buildings.sync(buildings);
+  /** Gleicht die Szene mit dem Zustand ab (baut nur bei Änderungen neu). */
+  syncWorld(state: Readonly<GameState>): void {
+    this.buildings.sync(state.buildings);
+    this.roads.sync(state.roads);
   }
 
   /** Vorschau des Bauwerkzeugs; null blendet sie aus. */
-  setGhost(ghost: Ghost | null): void {
+  setGhost(ghost: readonly Ghost[]): void {
     this.ghost.show(ghost);
   }
 

@@ -12,8 +12,8 @@ import {
 import { worldConfig } from '../../config/world';
 import { palette } from './palette';
 
-/** Lage der angedeuteten Eingangsstraße: Westrand, Feldreihe z = 61. */
-export const ENTRANCE_ROAD_Z = 61;
+/** Lage der Eingangsstraße: Westrand, Feldreihe aus der Konfiguration. */
+const ENTRANCE_ROAD_Z = worldConfig.entranceZ;
 const MAJOR_EVERY = 8;
 
 /** Gelände: Umland, Campus-Fläche mit Raster, Rand und angedeutete Eingangsstraße. */

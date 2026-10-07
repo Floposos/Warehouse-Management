@@ -14,6 +14,14 @@ export interface Building {
   paidCents: number;
 }
 
+/** Ein Straßenfeld (1 Feld = Straßenbreite). Verbindungsstücke ergeben sich aus den Nachbarn. */
+export interface RoadTile {
+  x: number;
+  z: number;
+  builtTick: number;
+  paidCents: number;
+}
+
 /**
  * Der komplette Spielzustand: nur JSON-fähige Werte, Tabellen nach ID geordnet,
  * Verweise nur über IDs. Speichern = diesen Zustand serialisieren.
@@ -28,6 +36,7 @@ export interface GameState {
   nextId: number;
   finance: { balanceCents: number };
   buildings: Building[];
+  roads: RoadTile[];
 }
 
 /** Lage der Test-Halle aus M0 (nahe der Eingangsstraße, Mitte der Westseite). */
@@ -41,5 +50,6 @@ export function createInitialState(seed: number): GameState {
     nextId: 2,
     finance: { balanceCents: economyConfig.startingBalanceCents },
     buildings: [{ id: 1, type: 'testHall', ...TEST_HALL, builtTick: 0, paidCents: 0 }],
+    roads: [],
   };
 }

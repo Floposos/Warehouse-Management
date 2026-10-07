@@ -75,3 +75,13 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Abriss: Gebäude unter der Maus rot markiert mit Erstattung; am selben Spieltag 100 %, ab dem nächsten 50 %; leere Fläche zeigt „Hier steht nichts zum Abreißen“.
 - [ ] Esc beendet das Werkzeug; erst das nächste Esc öffnet das Menü. Rechte/mittlere Maustaste bewegen weiter die Kamera.
 - [ ] Spielstand aus 0.1.0 lädt; gebaute Hallen bleiben nach Speichern/Laden erhalten.
+
+### Straßen (seit 0.2.0-dev, T1.2)
+
+- [ ] Straße ziehen: Vorschau folgt der Maus, gerade oder mit einem Knick; Länge und Kosten am Mauszeiger; Loslassen baut.
+- [ ] Durch ein Gebäude oder über den Rand: betroffene Felder rot, Loslassen baut nichts. Zu wenig Geld: ganze Strecke rot.
+- [ ] Über vorhandene Straßen ziehen: vorhandene Felder kosten nichts.
+- [ ] Kurven, T-Stücke, Kreuzungen sehen richtig aus; das Randfeld an der Eingangsstraße schließt nahtlos an.
+- [ ] Esc während des Ziehens bricht nur das Ziehen ab; zweites Esc beendet das Werkzeug.
+- [ ] Abriss eines Straßenfelds: Lücke sauber, Nachbarn passen ihre Form an.
+- [ ] Viele Straßen (z. B. 20 lange Strecken): weiterhin flüssig (F3).

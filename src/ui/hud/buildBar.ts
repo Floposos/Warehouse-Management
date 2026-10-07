@@ -1,3 +1,4 @@
+import { buildConfig } from '../../config/build';
 import { buildingTypes, type BuildingTypeId } from '../../content/buildings';
 import type { BuildTool } from '../../input/buildTool';
 import { formatEuro } from '../../shared/format';
@@ -71,7 +72,8 @@ export class BuildBar {
     const tab = this.openTab;
     this.panel.hidden = tab === null || tab === 'demolish';
     if (tab === 'zones') this.panel.append(...this.buildingItems());
-    else if (tab === 'roads' || tab === 'vehicles') {
+    else if (tab === 'roads') this.panel.append(this.roadItem());
+    else if (tab === 'vehicles') {
       this.panel.append(el('span', 'buildbar-empty', de.build.comingSoon));
     }
   }
@@ -80,18 +82,33 @@ export class BuildBar {
     return (Object.keys(buildingTypes) as BuildingTypeId[]).map((type) => {
       const name = de.build.buildings[type];
       const cost = formatEuro(buildingCost(type));
-      const item = button('', () => this.selectBuilding(type), 'btn buildbar-item');
-      item.append(el('span', 'buildbar-item-name', name), el('span', 'buildbar-item-cost', cost));
-      item.title = de.build.itemTitle(name, cost);
       const active = this.tool?.kind === 'place' && this.tool.buildingType === type;
-      item.classList.toggle('is-active', active);
-      item.setAttribute('aria-pressed', String(active));
-      return item;
+      return this.item(name, cost, de.build.itemTitle(name, cost), active, {
+        kind: 'place',
+        buildingType: type,
+      });
     });
   }
 
-  private selectBuilding(type: BuildingTypeId): void {
-    const active = this.tool?.kind === 'place' && this.tool.buildingType === type;
-    this.onTool(active ? null : { kind: 'place', buildingType: type });
+  private roadItem(): HTMLElement {
+    const cost = de.build.roadItemCost(formatEuro(buildConfig.roadCostPerTileCents));
+    const active = this.tool?.kind === 'road';
+    return this.item(de.build.road, cost, de.build.roadItemTitle, active, { kind: 'road' });
+  }
+
+  /** Eintrag im aufgeklappten Reiter; erneuter Klick auf den aktiven Eintrag beendet das Werkzeug. */
+  private item(
+    name: string,
+    cost: string,
+    title: string,
+    active: boolean,
+    tool: BuildTool,
+  ): HTMLElement {
+    const item = button('', () => this.onTool(active ? null : tool), 'btn buildbar-item');
+    item.append(el('span', 'buildbar-item-name', name), el('span', 'buildbar-item-cost', cost));
+    item.title = title;
+    item.classList.toggle('is-active', active);
+    item.setAttribute('aria-pressed', String(active));
+    return item;
   }
 }

@@ -17,6 +17,19 @@ describe('Bau-Tooltip', () => {
     });
   });
 
+  it('zeigt bei Straßen Länge und Kosten', () => {
+    const cells = [
+      { x: 0, z: 0 },
+      { x: 1, z: 0 },
+    ];
+    const road = { kind: 'road' as const, cells, blocked: [], costCents: 50_000, command };
+    expect(buildTipText({ ...road, reason: null })).toEqual({
+      text: '2 Felder · Kosten: 500 €',
+      kind: 'ok',
+    });
+    expect(buildTipText({ ...road, reason: 'occupied' }).kind).toBe('error');
+  });
+
   it('zeigt beim Abriss die Erstattung', () => {
     expect(
       buildTipText({ kind: 'demolish', footprint, height: 2, refundCents: 2_500_000, command }),

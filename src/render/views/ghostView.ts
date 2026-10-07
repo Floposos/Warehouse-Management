@@ -1,12 +1,4 @@
-import {
-  BoxGeometry,
-  EdgesGeometry,
-  Group,
-  LineBasicMaterial,
-  LineSegments,
-  Mesh,
-  MeshBasicMaterial,
-} from 'three';
+import { BoxGeometry, Color, InstancedMesh, MeshBasicMaterial, Object3D } from 'three';
 import type { Footprint } from '../../sim/world/grid';
 import { palette } from '../scene/palette';
 
@@ -19,45 +11,43 @@ export interface Ghost {
   style: GhostStyle;
 }
 
-const COLORS: Record<GhostStyle, number> = {
-  valid: palette.ghostValid,
-  invalid: palette.ghostInvalid,
-  demolish: palette.ghostDemolish,
+const COLORS: Record<GhostStyle, Color> = {
+  valid: new Color(palette.ghostValid),
+  invalid: new Color(palette.ghostInvalid),
+  demolish: new Color(palette.ghostDemolish),
 };
+/** Mehr Teile zeigt die Vorschau nicht (längste Straße quer über das Gelände: 255 Felder). */
+const MAX_PARTS = 512;
 
-/** Durchscheinendes „Geisterbild“ eines Gebäudes bzw. Markierung beim Abriss. */
+/** Durchscheinendes „Geisterbild“: Gebäude, Straßenfelder oder Abriss-Markierung. */
 export class GhostView {
-  readonly root = new Group();
-  private readonly fill = new MeshBasicMaterial({
-    transparent: true,
-    opacity: 0.45,
-    depthWrite: false,
-  });
-  private readonly line = new LineBasicMaterial();
-  private readonly box: Mesh;
-  private readonly edges: LineSegments;
+  readonly root: InstancedMesh;
+  private readonly dummy = new Object3D();
 
   constructor() {
-    const geometry = new BoxGeometry(1, 1, 1);
-    this.box = new Mesh(geometry, this.fill);
-    this.edges = new LineSegments(new EdgesGeometry(geometry), this.line);
-    this.box.renderOrder = 10;
-    this.root.add(this.box, this.edges);
-    this.root.visible = false;
+    const material = new MeshBasicMaterial({ transparent: true, opacity: 0.45, depthWrite: false });
+    this.root = new InstancedMesh(new BoxGeometry(1, 1, 1), material, MAX_PARTS);
+    this.root.renderOrder = 10;
+    this.root.frustumCulled = false;
+    // Farben gleich anlegen: nachträglich erzeugte Instanzfarben würde das Material übersehen.
+    for (let i = 0; i < MAX_PARTS; i++) this.root.setColorAt(i, COLORS.valid);
+    this.root.count = 0;
   }
 
-  show(ghost: Ghost | null): void {
-    if (!ghost) {
-      this.root.visible = false;
-      return;
+  show(parts: readonly Ghost[]): void {
+    const count = Math.min(parts.length, MAX_PARTS);
+    for (let i = 0; i < count; i++) {
+      const { footprint: f, height, style } = parts[i] as Ghost;
+      // Beim Abriss etwas größer, damit die Markierung das Objekt sichtbar umschließt.
+      const pad = style === 'demolish' ? 0.15 : 0.02;
+      this.dummy.position.set(f.x + f.width / 2, (height + pad) / 2, f.z + f.depth / 2);
+      this.dummy.scale.set(f.width + pad, height + pad, f.depth + pad);
+      this.dummy.updateMatrix();
+      this.root.setMatrixAt(i, this.dummy.matrix);
+      this.root.setColorAt(i, COLORS[style]);
     }
-    const { footprint: f, height, style } = ghost;
-    // Leicht größer als das Gebäude, damit die Markierung beim Abriss sichtbar umschließt.
-    const pad = style === 'demolish' ? 0.15 : 0.02;
-    this.root.position.set(f.x + f.width / 2, (height + pad) / 2, f.z + f.depth / 2);
-    this.root.scale.set(f.width + pad, height + pad, f.depth + pad);
-    this.fill.color.setHex(COLORS[style]);
-    this.line.color.setHex(COLORS[style]);
-    this.root.visible = true;
+    this.root.count = count;
+    this.root.instanceMatrix.needsUpdate = true;
+    if (this.root.instanceColor) this.root.instanceColor.needsUpdate = true;
   }
 }

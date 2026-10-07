@@ -11,7 +11,10 @@ describe('Migration v1 → v2', () => {
     };
     expect(migrateV1ToV2(v1)).toEqual({
       saveVersion: 1,
-      state: { buildings: [{ id: 1, type: 'testHall', x: 12, z: 58, builtTick: 0, paidCents: 0 }] },
+      state: {
+        buildings: [{ id: 1, type: 'testHall', x: 12, z: 58, builtTick: 0, paidCents: 0 }],
+        roads: [],
+      },
     });
   });
 
