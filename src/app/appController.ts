@@ -21,6 +21,7 @@ import { de } from '../ui/texts/de';
 import { BuildController } from './buildController';
 import { FinanceFeedback } from './financeFeedback';
 import { startFrameLoop } from './frameLoop';
+import { SelectionController } from './selectionController';
 import { GameSession } from './gameSession';
 import { SaveController } from './saveController';
 
@@ -46,6 +47,7 @@ export class AppController {
   private readonly mainMenu: MainMenu;
   private readonly perf: PerfOverlay;
   readonly build: BuildController;
+  readonly selection: SelectionController;
   private readonly financeFeedback: FinanceFeedback;
   readonly saves: SaveController;
 
@@ -98,10 +100,17 @@ export class AppController {
       () => this.session,
       () => this.buyTruck(),
     );
+    this.selection = new SelectionController(
+      ui,
+      canvas,
+      renderer,
+      () => this.session,
+      () => this.build.activeTool !== null,
+    );
     this.financeFeedback = new FinanceFeedback(ui, renderer);
     installGameShortcuts({
       isActive: () => this.mode === 'game' && !isDialogOpen(),
-      cancelTool: () => this.build.cancel(),
+      cancelTool: () => this.build.cancel() || this.selection.cancel(),
       togglePause: () => this.session?.togglePause(),
       setSpeed: (s) => this.setSpeed(s),
       openMenu: () => this.openPauseMenu(),
@@ -134,6 +143,7 @@ export class AppController {
   /** Startet ein Spiel mit dem gegebenen Zustand (neu oder geladen). */
   startGame(state: GameState): void {
     this.session = new GameSession(state);
+    this.selection.select(null);
     this.financeFeedback.attach(this.session);
     Object.assign(this.rig, createRig(START_VIEW.x, START_VIEW.z));
     this.mode = 'game';
@@ -146,6 +156,7 @@ export class AppController {
   showMenu(): void {
     this.mode = 'menu';
     this.session = null;
+    this.selection.select(null);
     this.financeFeedback.attach(null);
     this.cameraInput.enabled = false;
     this.cameraInput.releaseAll();
@@ -233,6 +244,7 @@ export class AppController {
       this.cameraInput.update(dtMs / 1000);
       this.topbar.update(state, this.session.speed);
       this.build.update();
+      this.selection.update(performance.now());
     } else {
       rotate(this.menuRig, (cameraConfig.menuOrbitDegPerSecond * dtMs) / 1000);
     }

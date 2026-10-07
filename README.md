@@ -2,7 +2,7 @@
 
 3D-Logistik-Managementspiel im Browser: Du leitest aus der Vogelperspektive einen großen Logistik-Campus, baust Straßen, Zonen und Hallen und bringst Waren durch mehrstufige Produktketten bis zum Export. Low-Poly-Grafik, Oberfläche komplett auf Deutsch.
 
-**Aktueller Stand:** M0 Grundgerüst fertig zum Test (Version `0.1.0`): Hauptmenü, Campus mit Kamera, laufende Zeit mit Pause/1x/2x/4x, Speichern/Laden/Export/Import und Autosave.
+**Aktueller Stand:** M1 Bauen & erster Warenfluss fertig zum Test (Version `0.2.0`): Straßen, Lieferorte A/B/C und Export-Ausfahrt bauen, Rohware einkaufen, Produktkette, eigene LKW mit Automatik oder fester Tour, Kasse und Infofenster. Dazu aus M0: Hauptmenü, Kamera, Zeitsteuerung, Speichern/Laden und Autosave.
 
 ## Spielen
 

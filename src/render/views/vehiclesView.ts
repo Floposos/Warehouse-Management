@@ -9,6 +9,12 @@ export class VehiclesView {
   readonly root = new Group();
   private readonly models = new Map<number, Group>();
 
+  /** Aktuelle Lage (Modellmitte auf dem Boden) eines Fahrzeugs; null = unbekannt. */
+  positionOf(id: number): { x: number; z: number } | null {
+    const model = this.models.get(id);
+    return model ? { x: model.position.x, z: model.position.z } : null;
+  }
+
   sync(vehicles: readonly Vehicle[], alpha: number): void {
     const seen = new Set<number>();
     for (const v of vehicles) {

@@ -7,8 +7,8 @@ export class CursorTip {
   private readonly warning = el('span', 'cursor-tip-warning');
   private readonly hint = el('span', 'cursor-tip-hint');
 
-  constructor(parent: HTMLElement) {
-    this.root.dataset['testid'] = 'cursor-tip';
+  constructor(parent: HTMLElement, testId = 'cursor-tip') {
+    this.root.dataset['testid'] = testId;
     this.root.hidden = true;
     this.root.append(this.main, this.warning, this.hint);
     parent.append(this.root);

@@ -14,6 +14,7 @@ import type { GameState } from '../../sim/state/gameState';
 import { cameraPosition, type CameraRig } from '../camera/cameraRig';
 import { GroundPicker } from '../camera/groundPicker';
 import { BuildingsView } from '../views/buildingsView';
+import { RouteLineView } from '../views/routeLineView';
 import { GhostView, type Ghost } from '../views/ghostView';
 import { RoadsView } from '../views/roadsView';
 import { SitesView } from '../views/sitesView';
@@ -33,6 +34,7 @@ export class GameRenderer {
   private readonly stock = new StockView();
   private readonly vehicles = new VehiclesView();
   private readonly ghost = new GhostView();
+  private readonly routeLine = new RouteLineView();
   private readonly picker: GroundPicker;
   private readonly projected = new Vector3();
 
@@ -53,6 +55,7 @@ export class GameRenderer {
       this.vehicles.root,
       this.buildings.root,
       this.ghost.root,
+      this.routeLine.root,
     );
     this.picker = new GroundPicker(this.camera, canvas);
     this.resize();
@@ -90,6 +93,13 @@ export class GameRenderer {
   /** Vorschau des Bauwerkzeugs; null blendet sie aus. */
   setGhost(ghost: readonly Ghost[]): void {
     this.ghost.show(ghost);
+  }
+
+  /** Fahrweg des ausgewählten Fahrzeugs; ohne Fahrzeug-Id ausblenden. */
+  setRouteLine(vehicleId: number | null, state: Readonly<GameState> | null): void {
+    const v = vehicleId === null ? undefined : state?.vehicles.find((x) => x.id === vehicleId);
+    const pose = v ? this.vehicles.positionOf(v.id) : null;
+    this.routeLine.show(pose && v && v.route.length > 1 ? pose : null, v ? v.route.slice(1) : []);
   }
 
   /** Bodenpunkt unter einer Bildschirmposition (Kamera vom letzten Bild). */

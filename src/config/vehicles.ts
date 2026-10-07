@@ -18,6 +18,8 @@ export const vehicleConfig = {
   truckMinLoad: 5,
   /** Automatik: so oft sucht ein wartender LKW nach Arbeit (Schritte). */
   truckIdleCheckTicks: 25,
+  /** Höchstzahl der Halte einer festen Tour. */
+  tourMaxStops: 12,
   /** Abladen bzw. Aufladen je Halt (Schritte). */
   handlingTicks: 20,
   /** Wartezeit, bevor ein Fahrzeug ohne Weg oder ein Auftrag ohne Platz es erneut versucht. */

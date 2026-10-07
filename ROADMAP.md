@@ -32,7 +32,7 @@ Ablauf: T0.1 → (T0.2, T0.3, T0.4 parallel) → (T0.5, T0.6a parallel) → T0.6
 | T0.6b Speicher-Oberfläche und Autosave               | im Test | Speichern-/Laden-Dialoge mit Rückfragen; Export/Import; Chrome/Edge-Sicherungsdatei; Firefox-Backups + Hinweis alle 30 min; Signal „Gespeichert“                                                              |
 | T0.7 Integration und Abnahme                         | im Test | Checkliste in Chrome, Edge, Firefox; Release v0.1.0 mit ZIP; Meilenstein-Bericht                                                                                                                              |
 
-## M1 Bauen & erster Warenfluss (0.2.0) – in Arbeit
+## M1 Bauen & erster Warenfluss (0.2.0) – im Test
 
 Ablauf: T1.1 → (T1.2, T1.3, T1.6 parallel) → T1.4 → T1.5 → (T1.5b, T1.7 parallel) → T1.8. Vorher Folgefragen (siehe DESIGN.md).
 
@@ -43,10 +43,10 @@ Ablauf: T1.1 → (T1.2, T1.3, T1.6 parallel) → T1.4 → T1.5 → (T1.5b, T1.7 
 | T1.3 Lieferorte A, B, C, Export (fertig)        | Frei aufziehbare Zonen, Größe = Kapazität; Farbe/Symbol; Zufahrt an Straße, sonst Warnsymbol; Lager mit Kapazität aus `config/`                                     |
 | T1.4 Warenzufluss und Produktkette (fertig)     | Daueraufträge und Einzelbestellungen; Zulieferer-LKW sichtbar; Rezept A+B → Kombi; volle Lager stoppen sichtbar; Export zum festen Preis                            |
 | T1.5 LKW kaufen und automatisch fahren (fertig) | LKW kaufen; fährt rechts, lädt/entlädt mit sichtbarer Ladung; findet Aufgaben selbst; Stillstand mit Grund; Kauf + Tages- + Kilometerkosten                         |
-| T1.5b Feste Touren                              | Tour mit Haltestellen und Aktion je Halt anlegen/ändern/löschen; Umschalten Automatik/Tour; wird gespeichert                                                        |
+| T1.5b Feste Touren (fertig)                     | Tour mit Haltestellen und Aktion je Halt anlegen/ändern/löschen; Umschalten Automatik/Tour; wird gespeichert                                                        |
 | T1.6 Kasse (fertig)                             | Startkapital; Buchungen mit Kategorien; Übersicht heute/Monat; schwebende +/−-Beträge                                                                               |
-| T1.7 Auswahl und Infopanels                     | Klick wählt aus; Panels für Gebäude (Bestand, Kapazität, Status) und Fahrzeuge (Ladung, Status, Ziel, Route); Tooltip; live                                         |
-| T1.8 Migration und Abnahme                      | M0-Spielstand lädt (v1 → v2); Speichern mitten im Warenfluss setzt exakt fort; Release v0.2.0                                                                       |
+| T1.7 Auswahl und Infopanels (fertig)            | Klick wählt aus; Panels für Gebäude (Bestand, Kapazität, Status) und Fahrzeuge (Ladung, Status, Ziel, Route); Tooltip; live                                         |
+| T1.8 Migration und Abnahme (fertig)             | M0-Spielstand lädt (v1 → v2); Speichern mitten im Warenfluss setzt exakt fort; Release v0.2.0                                                                       |
 
 ## M2–M9 (Skizze)
 

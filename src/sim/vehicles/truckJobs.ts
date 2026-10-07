@@ -52,12 +52,13 @@ const PRIORITY: readonly { product: ProductId; from: 'A' | 'B' | 'C' }[] = [
 
 export interface PlannedJob {
   job: Job;
-  route: Cell[];
+  /** Zufahrt der Quelle. */
+  target: Cell;
 }
 
 /**
  * Automatik: sucht die dringendste machbare Fahrt (Quelle mit dem meisten abholbereiten
- * Bestand, erreichbares Ziel mit Platz) und den Weg zur Quelle. null = nichts zu tun.
+ * Bestand, erreichbares Ziel mit Platz). null = nichts zu tun.
  */
 export function findJob(
   state: GameState,
@@ -89,7 +90,7 @@ export function findJob(
         if (quantity < 1) continue;
         return {
           job: { product, fromId: source.zone.id, toId: drop.site.id, quantity },
-          route: toPickup,
+          target: pickup,
         };
       }
     }

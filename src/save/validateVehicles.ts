@@ -2,7 +2,7 @@ import { isInt, isProduct, isRecord } from './validateShapes';
 
 const SUPPLIER_PHASES = ['toSite', 'handling', 'toExit', 'noRoute'];
 const TRUCK_PHASES = ['idle', 'toPickup', 'loading', 'toDropoff', 'unloading'];
-const IDLE_REASONS = [null, 'noJob', 'noRoute', 'noDestination'];
+const IDLE_REASONS = [null, 'noJob', 'noRoute', 'noDestination', 'noTour'];
 
 const isCargo = (c: unknown): boolean =>
   c === null || (isRecord(c) && isProduct(c['product']) && isInt(c['quantity']));

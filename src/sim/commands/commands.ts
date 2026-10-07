@@ -4,6 +4,8 @@ import type { ZoneKind } from '../../content/zones';
 import type { EventBus } from '../core/eventBus';
 import { book } from '../finance/ledger';
 import { buyTruck } from '../vehicles/buyTruck';
+import { setTruckMode, setTruckTour } from '../vehicles/truckCommands';
+import type { TourStop } from '../vehicles/types';
 import { cancelOrder, createOrder, type OrderInterval } from '../goods/orders';
 import type { GameState } from '../state/gameState';
 import { demolishBuilding, placeBuilding } from './build';
@@ -39,7 +41,11 @@ export type Command =
   /** Rohware bestellen: einmalig (`once`) oder als Dauerauftrag. Erste Lieferung sofort. */
   | { type: 'order/create'; product: RawProductId; quantity: number; interval: OrderInterval }
   | { type: 'order/cancel'; orderId: number }
-  | { type: 'vehicle/buyTruck' };
+  | { type: 'vehicle/buyTruck' }
+  /** Automatik oder feste Tour. */
+  | { type: 'vehicle/setMode'; truckId: number; mode: 'auto' | 'tour' }
+  /** Tour komplett ersetzen (Oberfläche bearbeitet eine Kopie und schickt sie ganz). */
+  | { type: 'vehicle/setTour'; truckId: number; stops: TourStop[] };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
@@ -91,6 +97,14 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
     case 'vehicle/buyTruck': {
       const result = buyTruck(state, bus);
       return typeof result === 'string' ? reject(bus, command, result) : { ok: true };
+    }
+    case 'vehicle/setMode':
+      return setTruckMode(state, command.truckId, command.mode)
+        ? { ok: true }
+        : reject(bus, command, 'notFound');
+    case 'vehicle/setTour': {
+      const rejection = setTruckTour(state, command.truckId, command.stops);
+      return rejection ? reject(bus, command, rejection) : { ok: true };
     }
     case 'road/demolish': {
       const refund = demolishRoad(state, bus, command.x, command.z);

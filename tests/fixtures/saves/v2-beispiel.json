@@ -1,7 +1,7 @@
 {
   "format": "logistikum-save",
   "saveVersion": 2,
-  "gameVersion": "0.2.0-dev",
+  "gameVersion": "0.2.0",
   "createdAt": "2026-10-07T18:00:00.000Z",
   "meta": {
     "name": "Beispiel M1",

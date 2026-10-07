@@ -44,7 +44,7 @@ export interface TourStop {
 }
 
 /** Warum ein LKW steht. Texte in ui/texts/de.ts. */
-export type TruckIdleReason = 'noJob' | 'noRoute' | 'noDestination';
+export type TruckIdleReason = 'noJob' | 'noRoute' | 'noDestination' | 'noTour';
 
 /** Eigener LKW (T1.5): sucht sich in der Automatik selbst Aufträge oder fährt eine feste Tour. */
 export interface Truck extends VehicleBase {
