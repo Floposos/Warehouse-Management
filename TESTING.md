@@ -30,3 +30,14 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Download-Version: startet per Doppelklick genauso, ohne Download-Knopf.
 - [ ] Browser-Konsole (F12): keine Fehler, keine Warnungen.
 - [ ] Fenstergröße ändern: Szene passt sich an, nichts verzerrt.
+
+### Campus und Kamera (seit 0.1.0-dev, T0.4)
+
+- [ ] Gelände mit Raster, hellem Rand und Eingangsstraße an der Westseite; Test-Halle sitzt genau auf Rasterlinien.
+- [ ] Rechte Maustaste ziehen: dreht (links/rechts) und neigt (hoch/runter) stufenlos.
+- [ ] Mittlere Maustaste ziehen: verschiebt die Karte. Mausrad: zoomt.
+- [ ] WASD/Pfeile verschieben, Q/E drehen, R/F neigen, +/− zoomen.
+- [ ] Maus an den Bildschirmrand: Karte scrollt; über Bedienelementen nicht.
+- [ ] Neigen geht nie unter den Boden, Zoom hat Grenzen, Verschieben bleibt im Gelände.
+- [ ] Linke Maustaste bewegt die Kamera nicht. Rechtsklick öffnet kein Kontextmenü.
+- [ ] F3 blendet die Leistungsanzeige ein und aus; Bilder/s um 60 auf einem normalen Laptop.

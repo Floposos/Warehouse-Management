@@ -6,4 +6,8 @@ export const de = {
     download: 'Download (ZIP)',
     noWebgl: 'Dein Browser kann leider keine 3D-Grafik (WebGL) anzeigen.',
   },
+  perf: {
+    line: (fps: number, simMsPerTick: number, drawCalls: number): string =>
+      `${fps.toFixed(0)} Bilder/s · Simulation ${simMsPerTick.toFixed(2)} ms/Schritt · ${drawCalls} Zeichenaufrufe`,
+  },
 } as const;

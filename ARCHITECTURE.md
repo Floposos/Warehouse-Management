@@ -79,7 +79,10 @@ Warum: Die Logik bleibt ohne Browser testbar, Grafik- und UI-Änderungen können
 - Ziel ca. 60 Bilder/s auf einem Büro-Laptop (Chrome, Edge, Firefox aktuell).
 - Instancing (InstancedMesh) für gleichartige Objekte von Anfang an; Detailstufen vorbereitet.
 - Low-Poly-Modelle aus Code, keine externen Modelldateien. Farbstil „Hell & freundlich“.
-- Einblendbare Leistungsanzeige (ab T0.4), Leistungstest der Simulation mit vielen Fahrzeugen (ab M2).
+- Einblendbare Leistungsanzeige (`ui/hud/perfOverlay.ts`, F3), Leistungstest der Simulation mit vielen Fahrzeugen (ab M2).
+- Koordinaten: 1 Welteinheit = 1 Feld; Campus von (0, 0) bis (128, 128) in x/z, y nach oben. Gebäude-`x`/`z` = Feld der linken oberen Ecke.
+- `render/scene/gameRenderer.ts` besitzt Renderer, Szene, Licht und Kamera; `terrain.ts` Gelände, Raster, Rand, Eingangsstraße; `views/` spiegeln den Zustand (z. B. `buildingsView.ts`), `models/` erzeugen Low-Poly-Modelle.
+- Kamera: `render/camera/cameraRig.ts` hält Blickpunkt, Abstand, Drehung, Neigung als reine Zahlen mit Grenzen (getestet); `input/cameraInput.ts` übersetzt Maus/Tastatur/Rand-Scrollen. Grenzen und Geschwindigkeiten in `config/camera.ts`.
 
 ## Speichern (Plan, Umsetzung ab T0.6a)
 

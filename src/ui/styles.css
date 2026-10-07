@@ -79,3 +79,16 @@ body {
   border-radius: 8px;
   background: #fff3f0;
 }
+
+.perf-overlay {
+  position: absolute;
+  left: 12px;
+  bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(44, 58, 74, 0.75);
+  color: #fff;
+  font:
+    12px ui-monospace,
+    monospace;
+}
