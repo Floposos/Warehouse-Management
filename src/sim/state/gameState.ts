@@ -8,6 +8,10 @@ export interface Building {
   type: BuildingTypeId;
   x: number;
   z: number;
+  /** Schritt, in dem gebaut wurde (für die Abriss-Erstattung am selben Spieltag). */
+  builtTick: number;
+  /** Bezahlter Baupreis in Cent (Grundlage der Erstattung). */
+  paidCents: number;
 }
 
 /**
@@ -36,6 +40,6 @@ export function createInitialState(seed: number): GameState {
     rng: createRngState(seed),
     nextId: 2,
     finance: { balanceCents: economyConfig.startingBalanceCents },
-    buildings: [{ id: 1, type: 'testHall', ...TEST_HALL }],
+    buildings: [{ id: 1, type: 'testHall', ...TEST_HALL, builtTick: 0, paidCents: 0 }],
   };
 }

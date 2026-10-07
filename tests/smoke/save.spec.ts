@@ -54,7 +54,7 @@ test('Exportieren und Importieren', async ({ page }) => {
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/^logistikum-.*\.json$/);
   const text = readFileSync((await download.path()) ?? '', 'utf8');
-  expect(JSON.parse(text)).toMatchObject({ format: 'logistikum-save', saveVersion: 1 });
+  expect(JSON.parse(text)).toMatchObject({ format: 'logistikum-save', saveVersion: 2 });
   await page.getByRole('button', { name: 'Schließen' }).click();
 
   await page.reload();
@@ -91,14 +91,17 @@ test('Autosave legt Sicherungen an und zeigt „Automatisch gespeichert“', asy
   await page.goto('/');
   await startNewGame(page);
   await page.waitForTimeout(300);
-  await page.evaluate(() =>
-    (
-      window as unknown as { __logistikum: { saves: { autosave(): Promise<void> } } }
-    ).__logistikum.saves.autosave(),
-  );
-  await expect(
-    page.getByTestId('toast').filter({ hasText: 'Automatisch gespeichert' }),
-  ).toBeVisible();
+  // Erzwungen speichern: Ohne Spielfortschritt seit Spielstart überspringt der Autosave
+  // (auf langsamen Testrechnern ist nach 300 ms evtl. noch kein Schritt gelaufen).
+  // Den Hinweis direkt danach auslesen, er verschwindet nach wenigen Sekunden.
+  const toastText = await page.evaluate(async () => {
+    const app = (
+      window as unknown as { __logistikum: { saves: { autosave(force: boolean): Promise<void> } } }
+    ).__logistikum;
+    await app.saves.autosave(true);
+    return [...document.querySelectorAll('[data-testid="toast"]')].map((t) => t.textContent);
+  });
+  expect(toastText.join(' ')).toContain('Automatisch gespeichert');
   await openPauseItem(page, 'Laden');
   await expect(page.getByRole('button', { name: 'Laden: Automatische Sicherung' })).toHaveCount(1);
 });

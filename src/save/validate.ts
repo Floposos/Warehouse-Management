@@ -25,6 +25,8 @@ export function validateState(value: unknown): value is GameState {
       isInt(r['id']) &&
       isInt(r['x']) &&
       isInt(r['z']) &&
+      isInt(r['builtTick']) &&
+      isInt(r['paidCents']) &&
       typeof r['type'] === 'string' &&
       r['type'] in buildingTypes
     );
