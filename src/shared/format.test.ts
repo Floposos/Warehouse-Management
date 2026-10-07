@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDateDe, formatDateTimeDe, formatEuro } from './format';
+import { formatDateDe, formatDateTimeDe, formatEuro, formatSignedEuro } from './format';
 
 describe('formatDateDe', () => {
   it('formatiert ein ISO-Datum deutsch', () => {
@@ -26,5 +26,13 @@ describe('formatEuro', () => {
 describe('formatDateTimeDe', () => {
   it('zeigt Datum und Uhrzeit in Berliner Zeit', () => {
     expect(formatDateTimeDe('2026-10-07T16:05:00Z')).toBe('07.10.2026, 18:05');
+  });
+});
+
+describe('formatSignedEuro', () => {
+  it('zeigt Plus und echtes Minuszeichen', () => {
+    expect(formatSignedEuro(50_000)).toBe('+500 €');
+    expect(formatSignedEuro(-5_000_000)).toBe('−50.000 €');
+    expect(formatSignedEuro(0)).toBe('0 €');
   });
 });

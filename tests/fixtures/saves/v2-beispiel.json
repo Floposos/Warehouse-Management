@@ -1,0 +1,275 @@
+{
+  "format": "logistikum-save",
+  "saveVersion": 2,
+  "gameVersion": "0.2.0",
+  "createdAt": "2026-10-07T18:00:00.000Z",
+  "meta": {
+    "name": "Beispiel M1",
+    "tick": 10234,
+    "balanceCents": 93310000
+  },
+  "state": {
+    "seed": 20260107,
+    "tick": 10234,
+    "rng": {
+      "s": 20260107
+    },
+    "nextId": 8,
+    "finance": {
+      "balanceCents": 93310000,
+      "recent": [
+        {
+          "tick": 9000,
+          "category": "build",
+          "amountCents": -5000000
+        },
+        {
+          "tick": 9500,
+          "category": "build",
+          "amountCents": -600000
+        },
+        {
+          "tick": 9600,
+          "category": "build",
+          "amountCents": -240000
+        },
+        {
+          "tick": 9700,
+          "category": "build",
+          "amountCents": -600000
+        }
+      ],
+      "today": {
+        "key": 3,
+        "incomeCents": {
+          "build": 0,
+          "vehicles": 0,
+          "operations": 0,
+          "rawGoods": 0,
+          "exportRevenue": 0
+        },
+        "expenseCents": {
+          "build": 6440000,
+          "vehicles": 0,
+          "operations": 0,
+          "rawGoods": 0,
+          "exportRevenue": 0
+        }
+      },
+      "month": {
+        "key": 24000,
+        "incomeCents": {
+          "build": 0,
+          "vehicles": 0,
+          "operations": 0,
+          "rawGoods": 0,
+          "exportRevenue": 0
+        },
+        "expenseCents": {
+          "build": 6440000,
+          "vehicles": 0,
+          "operations": 0,
+          "rawGoods": 0,
+          "exportRevenue": 0
+        }
+      }
+    },
+    "buildings": [
+      {
+        "id": 1,
+        "type": "testHall",
+        "x": 12,
+        "z": 58,
+        "builtTick": 0,
+        "paidCents": 0
+      },
+      {
+        "id": 2,
+        "type": "testHall",
+        "x": 40,
+        "z": 40,
+        "builtTick": 9000,
+        "paidCents": 5000000
+      }
+    ],
+    "roads": [
+      {
+        "x": 0,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 1,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 2,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 3,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 4,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 5,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 6,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 7,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 8,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 9,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 10,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      },
+      {
+        "x": 11,
+        "z": 61,
+        "builtTick": 9500,
+        "paidCents": 50000
+      }
+    ],
+    "zones": [
+      {
+        "id": 3,
+        "kind": "A",
+        "x": 2,
+        "z": 62,
+        "width": 4,
+        "depth": 3,
+        "gate": "N",
+        "builtTick": 9600,
+        "paidCents": 240000,
+        "stock": {
+          "rawA": 30
+        },
+        "work": 0
+      },
+      {
+        "id": 4,
+        "kind": "B",
+        "x": 6,
+        "z": 57,
+        "width": 5,
+        "depth": 4,
+        "gate": "S",
+        "builtTick": 9700,
+        "paidCents": 600000,
+        "stock": {
+          "rawA": 4,
+          "rawB": 12,
+          "combo": 3
+        },
+        "work": 17
+      }
+    ],
+    "orders": [
+      {
+        "id": 5,
+        "product": "rawB",
+        "quantity": 20,
+        "interval": "daily",
+        "nextTick": 12000,
+        "blocked": null
+      }
+    ],
+    "vehicles": [
+      {
+        "id": 6,
+        "kind": "supplier",
+        "route": [
+          {
+            "x": 5,
+            "z": 61
+          },
+          {
+            "x": 6,
+            "z": 61
+          },
+          {
+            "x": 7,
+            "z": 61
+          },
+          {
+            "x": 8,
+            "z": 61
+          }
+        ],
+        "progress": 300,
+        "cargo": {
+          "product": "rawB",
+          "quantity": 20
+        },
+        "phase": "toSite",
+        "targetId": 4,
+        "timer": 0,
+        "paidCents": 60000
+      },
+      {
+        "id": 7,
+        "kind": "truck",
+        "route": [
+          {
+            "x": 5,
+            "z": 61
+          }
+        ],
+        "progress": 0,
+        "cargo": {
+          "product": "rawA",
+          "quantity": 20
+        },
+        "timer": 0,
+        "phase": "toDropoff",
+        "job": {
+          "product": "rawA",
+          "fromId": 3,
+          "toId": 4,
+          "quantity": 20
+        },
+        "idleReason": null,
+        "odometer": 0,
+        "mode": "auto",
+        "tour": [],
+        "tourIndex": 0
+      }
+    ]
+  }
+}

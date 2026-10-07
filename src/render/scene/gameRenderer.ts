@@ -6,12 +6,20 @@ import {
   PCFShadowMap,
   PerspectiveCamera,
   Scene,
+  Vector3,
   WebGLRenderer,
 } from 'three';
 import { worldConfig } from '../../config/world';
-import type { Building } from '../../sim/state/gameState';
+import type { GameState } from '../../sim/state/gameState';
 import { cameraPosition, type CameraRig } from '../camera/cameraRig';
+import { GroundPicker } from '../camera/groundPicker';
 import { BuildingsView } from '../views/buildingsView';
+import { RouteLineView } from '../views/routeLineView';
+import { GhostView, type Ghost } from '../views/ghostView';
+import { RoadsView } from '../views/roadsView';
+import { SitesView } from '../views/sitesView';
+import { StockView } from '../views/stockView';
+import { VehiclesView } from '../views/vehiclesView';
 import { palette } from './palette';
 import { createTerrain } from './terrain';
 
@@ -21,6 +29,14 @@ export class GameRenderer {
   private readonly renderer: WebGLRenderer;
   private readonly scene = new Scene();
   private readonly buildings = new BuildingsView();
+  private readonly roads = new RoadsView();
+  private readonly sites = new SitesView();
+  private readonly stock = new StockView();
+  private readonly vehicles = new VehiclesView();
+  private readonly ghost = new GhostView();
+  private readonly routeLine = new RouteLineView();
+  private readonly picker: GroundPicker;
+  private readonly projected = new Vector3();
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     this.renderer = new WebGLRenderer({ canvas, antialias: true });
@@ -31,7 +47,17 @@ export class GameRenderer {
     // Dunst am Horizont: das Umland läuft weich aus.
     this.scene.fog = new Fog(palette.sky, 260, 900);
     this.addLights();
-    this.scene.add(createTerrain(), this.buildings.root);
+    this.scene.add(
+      createTerrain(),
+      this.roads.root,
+      this.sites.root,
+      this.stock.root,
+      this.vehicles.root,
+      this.buildings.root,
+      this.ghost.root,
+      this.routeLine.root,
+    );
+    this.picker = new GroundPicker(this.camera, canvas);
     this.resize();
   }
 
@@ -55,8 +81,41 @@ export class GameRenderer {
     this.scene.add(sun, sun.target);
   }
 
-  syncBuildings(buildings: readonly Building[]): void {
-    this.buildings.sync(buildings);
+  /** Gleicht die Szene mit dem Zustand ab (baut nur bei Änderungen neu). */
+  syncWorld(state: Readonly<GameState>, alpha = 0): void {
+    this.buildings.sync(state.buildings);
+    this.roads.sync(state.roads);
+    this.sites.sync(state);
+    this.stock.sync(state.zones);
+    this.vehicles.sync(state.vehicles, alpha);
+  }
+
+  /** Vorschau des Bauwerkzeugs; null blendet sie aus. */
+  setGhost(ghost: readonly Ghost[]): void {
+    this.ghost.show(ghost);
+  }
+
+  /** Fahrweg des ausgewählten Fahrzeugs; ohne Fahrzeug-Id ausblenden. */
+  setRouteLine(vehicleId: number | null, state: Readonly<GameState> | null): void {
+    const v = vehicleId === null ? undefined : state?.vehicles.find((x) => x.id === vehicleId);
+    const pose = v ? this.vehicles.positionOf(v.id) : null;
+    this.routeLine.show(pose && v && v.route.length > 1 ? pose : null, v ? v.route.slice(1) : []);
+  }
+
+  /** Bodenpunkt unter einer Bildschirmposition (Kamera vom letzten Bild). */
+  pickGround(clientX: number, clientY: number): { x: number; z: number } | null {
+    return this.picker.pick(clientX, clientY);
+  }
+
+  /** Bildschirmposition eines Weltpunkts oder null, wenn er hinter der Kamera liegt. */
+  projectToScreen(x: number, y: number, z: number): { x: number; y: number } | null {
+    const p = this.projected.set(x, y, z).project(this.camera);
+    if (p.z > 1) return null;
+    const rect = this.canvas.getBoundingClientRect();
+    return {
+      x: rect.left + ((p.x + 1) / 2) * rect.width,
+      y: rect.top + ((1 - p.y) / 2) * rect.height,
+    };
   }
 
   render(rig: CameraRig): void {

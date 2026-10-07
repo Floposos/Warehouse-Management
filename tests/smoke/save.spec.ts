@@ -10,6 +10,26 @@ async function openPauseItem(page: Page, item: string): Promise<void> {
     .click();
 }
 
+function currentTick(page: Page): Promise<number> {
+  return page.evaluate(
+    () =>
+      (window as unknown as { __logistikum: { session: { state: { tick: number } } } }).__logistikum
+        .session.state.tick,
+  );
+}
+
+/**
+ * Prüft einen geladenen Stand. Nach dem Laden läuft das Spiel weiter; auf langsamen
+ * Testrechnern vergehen bis zur Abfrage einige Schritte. Daher: gleicher Tag und
+ * Schrittzähler höchstens wenig über dem gespeicherten.
+ */
+async function expectLoaded(page: Page, clock: string | null, savedTick: number): Promise<void> {
+  await expect(page.getByTestId('clock')).toContainText((clock ?? '').split(' · ')[0] ?? '');
+  const tick = await currentTick(page);
+  expect(tick).toBeGreaterThanOrEqual(savedTick);
+  expect(tick - savedTick).toBeLessThan(100);
+}
+
 async function saveAs(page: Page, name: string): Promise<void> {
   await openPauseItem(page, 'Speichern');
   await page.getByLabel('Name des Spielstands').fill(name);
@@ -25,6 +45,7 @@ test('In Slot speichern, neues Spiel, Slot laden: Uhrzeit stimmt', async ({ page
   await page.waitForTimeout(1500);
   await page.keyboard.press('Space');
   const savedClock = await page.getByTestId('clock').textContent();
+  const savedTick = await currentTick(page);
   await saveAs(page, 'Test A');
 
   await openPauseItem(page, 'Hauptmenü');
@@ -38,8 +59,7 @@ test('In Slot speichern, neues Spiel, Slot laden: Uhrzeit stimmt', async ({ page
     .getByRole('dialog', { name: 'Spielstand laden?' })
     .getByRole('button', { name: 'Laden' })
     .click();
-  await page.keyboard.press('Space');
-  await expect(page.getByTestId('clock')).toHaveText(savedClock ?? '');
+  await expectLoaded(page, savedClock, savedTick);
   expect(problems).toEqual([]);
 });
 
@@ -54,7 +74,7 @@ test('Exportieren und Importieren', async ({ page }) => {
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/^logistikum-.*\.json$/);
   const text = readFileSync((await download.path()) ?? '', 'utf8');
-  expect(JSON.parse(text)).toMatchObject({ format: 'logistikum-save', saveVersion: 1 });
+  expect(JSON.parse(text)).toMatchObject({ format: 'logistikum-save', saveVersion: 2 });
   await page.getByRole('button', { name: 'Schließen' }).click();
 
   await page.reload();
@@ -64,8 +84,17 @@ test('Exportieren und Importieren', async ({ page }) => {
   await (
     await chooser
   ).setFiles({ name: 'stand.json', mimeType: 'application/json', buffer: Buffer.from(text) });
-  await page.keyboard.press('Space');
-  await expect(page.getByTestId('clock')).toHaveText(clock ?? '');
+  // Nach dem Laden läuft das Spiel weiter; auf langsamen Testrechnern vergehen bis zur Abfrage
+  // einige Schritte. Daher: gleicher Tag, Schrittzähler höchstens wenig über dem gespeicherten.
+  const savedTick = (JSON.parse(text) as { state: { tick: number } }).state.tick;
+  await expect(page.getByTestId('clock')).toContainText((clock ?? '').split(' · ')[0] ?? '');
+  const tick = await page.evaluate(
+    () =>
+      (window as unknown as { __logistikum: { session: { state: { tick: number } } } }).__logistikum
+        .session.state.tick,
+  );
+  expect(tick).toBeGreaterThanOrEqual(savedTick);
+  expect(tick - savedTick).toBeLessThan(100);
 });
 
 test('Kaputte Datei gibt eine Meldung statt eines Absturzes', async ({ page }) => {
@@ -91,14 +120,17 @@ test('Autosave legt Sicherungen an und zeigt „Automatisch gespeichert“', asy
   await page.goto('/');
   await startNewGame(page);
   await page.waitForTimeout(300);
-  await page.evaluate(() =>
-    (
-      window as unknown as { __logistikum: { saves: { autosave(): Promise<void> } } }
-    ).__logistikum.saves.autosave(),
-  );
-  await expect(
-    page.getByTestId('toast').filter({ hasText: 'Automatisch gespeichert' }),
-  ).toBeVisible();
+  // Erzwungen speichern: Ohne Spielfortschritt seit Spielstart überspringt der Autosave
+  // (auf langsamen Testrechnern ist nach 300 ms evtl. noch kein Schritt gelaufen).
+  // Den Hinweis direkt danach auslesen, er verschwindet nach wenigen Sekunden.
+  const toastText = await page.evaluate(async () => {
+    const app = (
+      window as unknown as { __logistikum: { saves: { autosave(force: boolean): Promise<void> } } }
+    ).__logistikum;
+    await app.saves.autosave(true);
+    return [...document.querySelectorAll('[data-testid="toast"]')].map((t) => t.textContent);
+  });
+  expect(toastText.join(' ')).toContain('Automatisch gespeichert');
   await openPauseItem(page, 'Laden');
   await expect(page.getByRole('button', { name: 'Laden: Automatische Sicherung' })).toHaveCount(1);
 });

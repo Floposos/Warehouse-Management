@@ -1,6 +1,12 @@
 import { economyConfig } from '../../config/economy';
 import type { BuildingTypeId } from '../../content/buildings';
+import type { ProductId, RawProductId } from '../../content/products';
+import type { ZoneKind } from '../../content/zones';
 import { createRngState, type RngState } from '../core/rng';
+import { createFinance, type Finance } from '../finance/ledger';
+import type { OrderBlock, OrderInterval } from '../goods/orders';
+import type { Side } from '../world/access';
+import type { Vehicle } from '../vehicles/types';
 
 /** Ein Gebäude auf dem Raster. `x`/`z` = Feld der linken oberen Ecke. */
 export interface Building {
@@ -8,6 +14,48 @@ export interface Building {
   type: BuildingTypeId;
   x: number;
   z: number;
+  /** Schritt, in dem gebaut wurde (für die Abriss-Erstattung am selben Spieltag). */
+  builtTick: number;
+  /** Bezahlter Baupreis in Cent (Grundlage der Erstattung). */
+  paidCents: number;
+}
+
+/** Ein Straßenfeld (1 Feld = Straßenbreite). Verbindungsstücke ergeben sich aus den Nachbarn. */
+export interface RoadTile {
+  x: number;
+  z: number;
+  builtTick: number;
+  paidCents: number;
+}
+
+/** Frei aufgezogene Zone (Lieferort A, B oder C) mit Lager. `x`/`z` = linke obere Ecke. */
+export interface Zone {
+  id: number;
+  kind: ZoneKind;
+  x: number;
+  z: number;
+  width: number;
+  depth: number;
+  /** Tor-Seite, über die LKW ein- und ausfahren. */
+  gate: Side;
+  builtTick: number;
+  paidCents: number;
+  /** Bestand je Ware in Einheiten (nur Waren, die die Zone lagert). */
+  stock: Partial<Record<ProductId, number>>;
+  /** Fortschritt der laufenden Verarbeitung in Schritten (B und C). */
+  work: number;
+}
+
+/** Rohware-Bestellung: einmalig oder als Dauerauftrag. */
+export interface Order {
+  id: number;
+  product: RawProductId;
+  quantity: number;
+  interval: OrderInterval;
+  /** Schritt der nächsten Lieferung. */
+  nextTick: number;
+  /** Warum die fällige Lieferung wartet (null = alles in Ordnung). */
+  blocked: OrderBlock | null;
 }
 
 /**
@@ -22,8 +70,12 @@ export interface GameState {
   rng: RngState;
   /** Nächste freie ID für neue Objekte. */
   nextId: number;
-  finance: { balanceCents: number };
+  finance: Finance;
   buildings: Building[];
+  roads: RoadTile[];
+  zones: Zone[];
+  orders: Order[];
+  vehicles: Vehicle[];
 }
 
 /** Lage der Test-Halle aus M0 (nahe der Eingangsstraße, Mitte der Westseite). */
@@ -35,7 +87,11 @@ export function createInitialState(seed: number): GameState {
     tick: 0,
     rng: createRngState(seed),
     nextId: 2,
-    finance: { balanceCents: economyConfig.startingBalanceCents },
-    buildings: [{ id: 1, type: 'testHall', ...TEST_HALL }],
+    finance: createFinance(economyConfig.startingBalanceCents, 0),
+    buildings: [{ id: 1, type: 'testHall', ...TEST_HALL, builtTick: 0, paidCents: 0 }],
+    roads: [],
+    zones: [],
+    orders: [],
+    vehicles: [],
   };
 }

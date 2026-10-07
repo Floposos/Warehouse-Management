@@ -1,0 +1,204 @@
+/* Bauleiste unten mittig */
+.buildbar {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.buildbar[hidden] {
+  display: none;
+}
+.buildbar-tabs,
+.buildbar-panel {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.buildbar-panel[hidden] {
+  display: none;
+}
+.buildbar-tab.is-active,
+.buildbar-item.is-active {
+  background: var(--active);
+  border-color: var(--active);
+  color: #fff;
+}
+.buildbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 120px;
+}
+.buildbar-item-name {
+  font-weight: 600;
+}
+.buildbar-item-cost {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+.buildbar-empty {
+  padding: 6px 10px;
+  color: var(--muted);
+}
+
+/* Hinweis am Mauszeiger */
+#ui > .cursor-tip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: var(--panel-solid);
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.cursor-tip[hidden] {
+  display: none;
+}
+.cursor-tip.is-error .cursor-tip-main {
+  color: var(--danger);
+  font-weight: 600;
+}
+.cursor-tip-warning {
+  color: #b7791f;
+  font-weight: 600;
+}
+.cursor-tip-warning[hidden] {
+  display: none;
+}
+.cursor-tip-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+#scene.is-building {
+  cursor: crosshair;
+}
+
+/* Schwebende Beträge */
+#ui > .floating-amounts {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.floating-amount {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-weight: 700;
+  color: var(--danger);
+  text-shadow:
+    0 0 3px #fff,
+    0 0 6px #fff;
+  white-space: nowrap;
+  animation: float-up 1.6s ease-out forwards;
+}
+.floating-amount.is-income {
+  color: #2e9e5b;
+}
+@keyframes float-up {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -250%);
+  }
+}
+
+/* Kasse */
+.topbar-balance-button {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.cash-balance {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+}
+.cash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.cash-table th,
+.cash-table td {
+  padding: 4px 8px;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
+}
+.cash-table tr > th:first-child {
+  text-align: left;
+}
+.cash-total {
+  font-weight: 700;
+}
+.is-income {
+  color: #2e9e5b;
+}
+.is-expense {
+  color: var(--danger);
+}
+.is-zero {
+  color: var(--muted);
+}
+.cash-subtitle {
+  margin: 16px 0 6px;
+  font-size: 1rem;
+}
+.cash-recent {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-variant-numeric: tabular-nums;
+}
+.cash-recent li {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--line);
+}
+.cash-empty,
+.cash-when {
+  color: var(--muted);
+}
+
+/* Einkauf */
+.purchase-hint {
+  margin-top: 0;
+  color: var(--muted);
+}
+.purchase-total {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.purchase-order {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.purchase-order-text {
+  display: flex;
+  flex-direction: column;
+}
+.purchase-blocked {
+  color: #b7791f;
+  font-weight: 600;
+}

@@ -1,11 +1,14 @@
+import { migrateV1ToV2 } from './v1-to-v2';
+
 /**
  * Migrationen: je Versionssprung eine Datei (`v1-to-v2.ts` …), hier eingetragen
  * unter der Ausgangsversion. Sie werden der Reihe nach angewendet.
- * Version 1 ist die erste; es gibt noch keine Migration.
  */
 export type Migration = (save: Record<string, unknown>) => Record<string, unknown>;
 
-export const migrations: Readonly<Record<number, Migration>> = {};
+export const migrations: Readonly<Record<number, Migration>> = {
+  1: migrateV1ToV2,
+};
 
 /** Hebt einen Spielstand Schritt für Schritt auf `target`. Fehlt ein Schritt, gibt es einen Fehler. */
 export function migrateSave(

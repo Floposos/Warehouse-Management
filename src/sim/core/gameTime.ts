@@ -51,3 +51,24 @@ export function calendarAt(tick: number): CalendarTime {
 export function isDayStart(tick: number): boolean {
   return tick > 0 && tick % TICKS_PER_DAY === 0;
 }
+
+/**
+ * Derselbe Zeitpunkt einen Monat später (am Monatsende gekürzt, z. B. 31.01. → 29.02.).
+ * Die Uhrzeit wird auf ganze Schritte gerundet.
+ */
+export function addOneMonth(tick: number): number {
+  const date = new Date(START_MS + tick * GAME_MS_PER_TICK);
+  const y = date.getUTCFullYear();
+  const m = date.getUTCMonth() + 1;
+  const lastDay = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  const target = Date.UTC(
+    y,
+    m,
+    Math.min(date.getUTCDate(), lastDay),
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    date.getUTCSeconds(),
+    date.getUTCMilliseconds(),
+  );
+  return Math.round((target - START_MS) / GAME_MS_PER_TICK);
+}

@@ -10,13 +10,15 @@ export interface TopbarActions {
   setSpeed(speed: GameSpeed): void;
   togglePause(): void;
   openMenu(): void;
+  openCash(): void;
+  openPurchase(): void;
 }
 
 /** Kopfleiste: Datum/Uhrzeit, Kontostand, Zeitsteuerung, Menü. Liest nur den Zustand. */
 export class Topbar {
   readonly root = el('div', 'topbar');
   private readonly clock = el('span', 'topbar-clock');
-  private readonly balance = el('span', 'topbar-balance');
+  private readonly balance: HTMLButtonElement;
   private readonly pauseBadge = el('span', 'topbar-paused', de.hud.paused);
   private readonly pauseButton: HTMLButtonElement;
   private readonly speedButtons = new Map<GameSpeed, HTMLButtonElement>();
@@ -25,6 +27,7 @@ export class Topbar {
 
   constructor(parent: HTMLElement, actions: TopbarActions) {
     this.clock.dataset['testid'] = 'clock';
+    this.balance = button('', () => actions.openCash(), 'btn topbar-balance-button');
     this.balance.dataset['testid'] = 'balance';
     this.balance.title = de.hud.balanceTitle;
     this.pauseBadge.hidden = true;
@@ -41,9 +44,11 @@ export class Topbar {
       controls.append(b);
     });
 
+    const purchase = button(de.hud.purchase, () => actions.openPurchase());
+    purchase.title = de.purchase.openTitle;
     const menu = button(de.hud.menu, () => actions.openMenu());
     menu.title = de.hud.menuTitle;
-    this.root.append(this.clock, this.pauseBadge, controls, this.balance, menu);
+    this.root.append(this.clock, this.pauseBadge, controls, this.balance, purchase, menu);
     parent.append(this.root);
   }
 

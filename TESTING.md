@@ -65,3 +65,79 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Autosave nach Intervall: Meldung „Automatisch gespeichert“; höchstens 3 automatische Sicherungen in der Liste; bei Pause ohne Fortschritt kein neuer Autosave.
 - [ ] Chrome/Edge: Sicherungsdatei wählen, wird beim Autosave überschrieben; nach Browser-Neustart Knopf „Zugriff erlauben“ (im Hinweis und im Speichern-Dialog). Auch in der Download-Version (`file://`) prüfen.
 - [ ] Firefox: Abschnitt „Sicherungsdatei“ erklärt, dass es sie nur in Chrome/Edge gibt; nach 30 Minuten Spielzeit Hinweis „Jetzt exportieren“.
+
+### Bauen und Abreißen (seit 0.2.0, T1.1)
+
+- [ ] Bauleiste unten mittig mit Reitern Straßen, Zonen/Gebäude, Fahrzeuge, Abriss; aktiver Reiter blau.
+- [ ] Testhalle gewählt: Geisterbild folgt der Maus rastergenau, grün auf freier Fläche, rot über Gebäuden und am Geländerand; Hinweis zeigt Kosten bzw. Grund.
+- [ ] Zu wenig Geld: rot mit „Nicht genug Geld“, Klick baut nicht.
+- [ ] Klick baut; Kontostand sinkt um die Kosten; Bauen geht auch in der Pause.
+- [ ] Abriss: Gebäude unter der Maus rot markiert mit Erstattung; am selben Spieltag 100 %, ab dem nächsten 50 %; leere Fläche zeigt „Hier steht nichts zum Abreißen“.
+- [ ] Esc beendet das Werkzeug; erst das nächste Esc öffnet das Menü. Rechte/mittlere Maustaste bewegen weiter die Kamera.
+- [ ] Spielstand aus 0.1.0 lädt; gebaute Hallen bleiben nach Speichern/Laden erhalten.
+
+### Straßen (seit 0.2.0, T1.2)
+
+- [ ] Straße ziehen: Vorschau folgt der Maus, gerade oder mit einem Knick; Länge und Kosten am Mauszeiger; Loslassen baut.
+- [ ] Durch ein Gebäude oder über den Rand: betroffene Felder rot, Loslassen baut nichts. Zu wenig Geld: ganze Strecke rot.
+- [ ] Über vorhandene Straßen ziehen: vorhandene Felder kosten nichts.
+- [ ] Kurven, T-Stücke, Kreuzungen sehen richtig aus; das Randfeld an der Eingangsstraße schließt nahtlos an.
+- [ ] Esc während des Ziehens bricht nur das Ziehen ab; zweites Esc beendet das Werkzeug.
+- [ ] Abriss eines Straßenfelds: Lücke sauber, Nachbarn passen ihre Form an.
+- [ ] Viele Straßen (z. B. 20 lange Strecken): weiterhin flüssig (F3).
+
+### Kasse (seit 0.2.0, T1.6)
+
+- [ ] Klick auf den Kontostand öffnet die Kasse; Esc oder „Schließen“ schließt sie.
+- [ ] Bauen und Abreißen erscheinen unter „Bau“ (Ausgaben bzw. Einnahmen) für heute und diesen Monat und in „Letzte Buchungen“; Summe stimmt.
+- [ ] Am nächsten Spieltag ist „Heute“ wieder leer, „Diesen Monat“ nicht; am Monatswechsel beides leer.
+- [ ] Bei offener Kasse und laufendem Spiel aktualisiert sie sich (z. B. nach dem Tageswechsel).
+- [ ] Schwebende Beträge an der Baustelle, rot bei Ausgaben, grün bei Erstattungen; verschwinden nach gut einer Sekunde.
+- [ ] Nach Speichern/Laden sind Buchungen und Summen noch da.
+
+### Lieferorte und Export-Ausfahrt (seit 0.2.0, T1.3)
+
+- [ ] Lieferort A, B, C aufziehen (auch 1 × 1 und in alle Richtungen gezogen); Größe, Lager je Ware und Kosten am Mauszeiger; Kosten je Art unterschiedlich.
+- [ ] Zone über Straße, Gebäude, andere Zone oder den Rand: rot mit Grund.
+- [ ] Jede Zone hat Farbe, Buchstabe und Torbalken; Tor zeigt zu einer angrenzenden Straße, sonst nach Süden.
+- [ ] Ohne Straße vor dem Tor: rotes „!“; Straße an das Tor bauen: „!“ verschwindet; Straße abreißen: „!“ kommt wieder. Straße an einer anderen Seite hilft nicht.
+- [ ] Export-Ausfahrt nur am Geländerand baubar; Tor zeigt ins Gelände; ohne Straße „!“.
+- [ ] Zone abreißen: ganze Zone weg, Erstattung nach Tagesregel.
+
+### Einkauf und Warenfluss (seit 0.2.0, T1.4)
+
+- [ ] „Einkauf“ öffnet das Fenster; Kosten je Lieferung passen zu Ware und Menge.
+- [ ] Einmalige Bestellung: ein Zulieferer kommt, lädt am Tor ab, fährt hinaus; Bestellung verschwindet. Dauerauftrag bleibt mit nächstem Liefertermin.
+- [ ] Zulieferer fahren rechts, biegen sauber ab, verschwinden auf der Eingangsstraße.
+- [ ] Ohne Lieferort / ohne Straße / ohne Geld: Bestellung zeigt den Grund und wird später erneut versucht.
+- [ ] Volles Lager: Lieferung gekürzt bzw. „Lager voll“, Schild „voll“ an der Zone.
+- [ ] Straße während der Fahrt abreißen: LKW wartet; wieder bauen: fährt weiter. Zone abreißen: LKW kehrt um, Ware wird erstattet.
+- [ ] B mit A und B im Lager erzeugt Kombi (Kisten in Lila); C erzeugt Endprodukt (Grün), größere C schneller.
+- [ ] Speichern mit LKW unterwegs, laden: LKW fährt an derselben Stelle weiter.
+
+### Eigene LKW (seit 0.2.0, T1.5)
+
+- [ ] „Fahrzeuge“ → „LKW kaufen“: Hinweis, Kontostand sinkt um den Kaufpreis; ohne Geld Hinweis „Nicht genug Geld“.
+- [ ] Ganze Kette läuft mit 2 LKW von allein: A → B → C → Export, Kontostand steigt über einen Spieltag.
+- [ ] LKW fahren rechts, Ladung als Kisten sichtbar, leer ohne Kisten.
+- [ ] Unter 5 Einheiten fährt kein LKW los; zwei LKW holen nicht dieselbe Ware doppelt.
+- [ ] C voll oder abgerissen: Kombi geht direkt zur Export-Ausfahrt.
+- [ ] Ziel während der Fahrt abreißen: LKW sucht mit Ladung ein neues Ziel.
+- [ ] Tageswechsel: Kasse zeigt unter „Fahrzeuge“ Tages- und Kilometerkosten.
+- [ ] Speichern mit LKW unterwegs (beladen), laden: fährt weiter und liefert ab.
+
+### Auswahl und Infofenster (seit 0.2.0, T1.7)
+
+- [ ] Ohne Bauwerkzeug: Überfahren zeigt den Namen, Klick öffnet das Infofenster; Klick ins Leere, × oder Esc schließt (Esc öffnet dabei nicht das Menü).
+- [ ] Zone: Lager je Ware mit Kapazität ändert sich live; Status passt (B ohne Ware: „Wartet auf Ware“); Tor-Knöpfe legen das Tor um, Anschluss-Hinweis und „!“ passen.
+- [ ] Export-Ausfahrt: zeigt Waren und Preise.
+- [ ] LKW: Status mit Grund (keine Aufgabe, kein Weg, kein Ziel, Tour ohne Halte), Ladung, Ziel; blaues Band zeigt den restlichen Weg.
+- [ ] Mit Bauwerkzeug wählt ein Klick nichts aus.
+
+### Feste Touren (seit 0.2.0, T1.5b)
+
+- [ ] Halte per Liste und per „Orte anklicken“ anhängen; Vorschlag für Aktion und Ware ist sinnvoll.
+- [ ] Aktion/Ware ändern, verschieben, entfernen; unpassende Halte werden mit Hinweis abgelehnt.
+- [ ] „Feste Tour“: LKW fährt die Halte der Reihe nach, aktueller Halt hervorgehoben; danach von vorn.
+- [ ] Umschalten zurück auf „Automatik“ mit Ladung an Bord: Ladung wird sinnvoll abgeliefert.
+- [ ] Speichern und Laden: Tour und Betriebsart bleiben erhalten.

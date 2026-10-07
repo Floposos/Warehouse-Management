@@ -13,10 +13,15 @@ import { Toasts } from '../ui/components/toast';
 import { PerfOverlay } from '../ui/hud/perfOverlay';
 import { Topbar } from '../ui/hud/topbar';
 import { MainMenu } from '../ui/screens/mainMenu';
+import { openCashDialog } from '../ui/screens/cashDialog';
 import { openPauseMenu } from '../ui/screens/pauseMenu';
+import { openPurchaseDialog } from '../ui/screens/purchaseDialog';
 import { openSettingsDialog } from '../ui/screens/settingsDialog';
 import { de } from '../ui/texts/de';
+import { BuildController } from './buildController';
+import { FinanceFeedback } from './financeFeedback';
 import { startFrameLoop } from './frameLoop';
+import { SelectionController } from './selectionController';
 import { GameSession } from './gameSession';
 import { SaveController } from './saveController';
 
@@ -41,6 +46,9 @@ export class AppController {
   private readonly topbar: Topbar;
   private readonly mainMenu: MainMenu;
   private readonly perf: PerfOverlay;
+  readonly build: BuildController;
+  readonly selection: SelectionController;
+  private readonly financeFeedback: FinanceFeedback;
   readonly saves: SaveController;
 
   constructor(
@@ -61,6 +69,8 @@ export class AppController {
       setSpeed: (s) => this.setSpeed(s),
       togglePause: () => this.session?.togglePause(),
       openMenu: () => this.openPauseMenu(),
+      openCash: () => this.openCash(),
+      openPurchase: () => this.openPurchase(),
     });
     this.mainMenu = new MainMenu(
       ui,
@@ -83,8 +93,24 @@ export class AppController {
       autosaveMinutes: () => this.settings.get().autosaveMinutes,
     });
     this.perf = new PerfOverlay(ui);
+    this.build = new BuildController(
+      ui,
+      canvas,
+      renderer,
+      () => this.session,
+      () => this.buyTruck(),
+    );
+    this.selection = new SelectionController(
+      ui,
+      canvas,
+      renderer,
+      () => this.session,
+      () => this.build.activeTool !== null,
+    );
+    this.financeFeedback = new FinanceFeedback(ui, renderer);
     installGameShortcuts({
       isActive: () => this.mode === 'game' && !isDialogOpen(),
+      cancelTool: () => this.build.cancel() || this.selection.cancel(),
       togglePause: () => this.session?.togglePause(),
       setSpeed: (s) => this.setSpeed(s),
       openMenu: () => this.openPauseMenu(),
@@ -117,20 +143,26 @@ export class AppController {
   /** Startet ein Spiel mit dem gegebenen Zustand (neu oder geladen). */
   startGame(state: GameState): void {
     this.session = new GameSession(state);
+    this.selection.select(null);
+    this.financeFeedback.attach(this.session);
     Object.assign(this.rig, createRig(START_VIEW.x, START_VIEW.z));
     this.mode = 'game';
     this.mainMenu.visible = false;
     this.topbar.visible = true;
+    this.build.visible = true;
     this.cameraInput.enabled = true;
   }
 
   showMenu(): void {
     this.mode = 'menu';
     this.session = null;
+    this.selection.select(null);
+    this.financeFeedback.attach(null);
     this.cameraInput.enabled = false;
     this.cameraInput.releaseAll();
     this.mainMenu.visible = true;
     this.topbar.visible = false;
+    this.build.visible = false;
   }
 
   private setSpeed(speed: GameSpeed): void {
@@ -153,6 +185,29 @@ export class AppController {
       settings: () => this.openSettings(resume),
       mainMenu: () => void this.confirmLeave(resume),
     });
+  }
+
+  /** Kasse (Klick auf den Kontostand). */
+  /** LKW kaufen (Bauleiste „Fahrzeuge“), Rückmeldung als Hinweis. */
+  private buyTruck(): void {
+    const result = this.session?.command({ type: 'vehicle/buyTruck' });
+    if (!result) return;
+    this.toasts.show(result.ok ? de.build.truckBought : de.build.truckNoMoney);
+  }
+
+  openCash(): void {
+    if (!this.session || isDialogOpen()) return;
+    openCashDialog(this.ui, () => this.session?.state ?? null);
+  }
+
+  /** Einkauf von Rohware. */
+  openPurchase(): void {
+    if (!this.session || isDialogOpen()) return;
+    openPurchaseDialog(
+      this.ui,
+      () => this.session?.state ?? null,
+      (command) => this.session?.command(command),
+    );
   }
 
   private async confirmLeave(onCancel: () => void): Promise<void> {
@@ -188,10 +243,12 @@ export class AppController {
       rig = this.rig;
       this.cameraInput.update(dtMs / 1000);
       this.topbar.update(state, this.session.speed);
+      this.build.update();
+      this.selection.update(performance.now());
     } else {
       rotate(this.menuRig, (cameraConfig.menuOrbitDegPerSecond * dtMs) / 1000);
     }
-    this.renderer.syncBuildings(state.buildings);
+    this.renderer.syncWorld(state, this.session?.alpha ?? 0);
     this.renderer.render(rig);
     this.perf.record({ frameMs: dtMs, simMs, simTicks, drawCalls: this.renderer.drawCalls });
   }

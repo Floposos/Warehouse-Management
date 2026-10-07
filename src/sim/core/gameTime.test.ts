@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GAME_MS_PER_TICK, TICKS_PER_DAY, calendarAt, isDayStart } from './gameTime';
+import { GAME_MS_PER_TICK, TICKS_PER_DAY, addOneMonth, calendarAt, isDayStart } from './gameTime';
 
 describe('gameTime', () => {
   it('ein Spieltag dauert 5 Minuten Echtzeit bei 1x (3000 Schritte à 100 ms)', () => {
@@ -30,5 +30,15 @@ describe('gameTime', () => {
   it('kennt Schaltjahr 2000 (29. Februar)', () => {
     expect(calendarAt(TICKS_PER_DAY * 59)).toMatchObject({ month: 2, day: 29 });
     expect(calendarAt(TICKS_PER_DAY * 366)).toMatchObject({ year: 2001, month: 1, day: 1 });
+  });
+});
+
+describe('addOneMonth', () => {
+  it('springt auf denselben Tag im Folgemonat, am Monatsende gekürzt', () => {
+    const jan31 = 30 * TICKS_PER_DAY + 100;
+    const next = addOneMonth(jan31);
+    expect(calendarAt(next)).toMatchObject({ month: 2, day: 29 });
+    expect(next % TICKS_PER_DAY).toBe(100);
+    expect(calendarAt(addOneMonth(5 * TICKS_PER_DAY))).toMatchObject({ month: 2, day: 6 });
   });
 });

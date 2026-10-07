@@ -21,6 +21,13 @@ export function formatEuro(cents: number): string {
   return euro.format(Math.round(cents / 100)).replace(/\s/gu, ' ');
 }
 
+/** Betrag mit Vorzeichen für Buchungen, z. B. „+500 €“ oder „−50.000 €“. */
+export function formatSignedEuro(cents: number): string {
+  const abs = formatEuro(Math.abs(cents));
+  if (cents > 0) return `+${abs}`;
+  return cents < 0 ? `\u2212${abs}` : abs;
+}
+
 /** Zweistellig mit führender Null. */
 export function pad2(n: number): string {
   return String(n).padStart(2, '0');
