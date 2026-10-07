@@ -9,3 +9,19 @@ export function formatDateDe(iso: string): string {
     timeZone: 'Europe/Berlin',
   }).format(date);
 }
+
+const euro = new Intl.NumberFormat('de-DE', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+});
+
+/** Formatiert einen Betrag in Cent als ganze Euro, z. B. „1.000.000 €“. */
+export function formatEuro(cents: number): string {
+  return euro.format(Math.round(cents / 100)).replace(/\s/gu, ' ');
+}
+
+/** Zweistellig mit führender Null. */
+export function pad2(n: number): string {
+  return String(n).padStart(2, '0');
+}

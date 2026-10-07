@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDateDe } from './format';
+import { formatDateDe, formatEuro } from './format';
 
 describe('formatDateDe', () => {
   it('formatiert ein ISO-Datum deutsch', () => {
@@ -12,5 +12,13 @@ describe('formatDateDe', () => {
 
   it('liefert einen Strich bei ungültigem Datum', () => {
     expect(formatDateDe('kein Datum')).toBe('–');
+  });
+});
+
+describe('formatEuro', () => {
+  it('formatiert Cent als ganze Euro mit Tausenderpunkten', () => {
+    expect(formatEuro(100_000_000)).toBe('1.000.000 €');
+    expect(formatEuro(-12_345_00)).toBe('-12.345 €');
+    expect(formatEuro(0)).toBe('0 €');
   });
 });

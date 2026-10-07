@@ -84,6 +84,14 @@ Warum: Die Logik bleibt ohne Browser testbar, Grafik- und UI-Änderungen können
 - `render/scene/gameRenderer.ts` besitzt Renderer, Szene, Licht und Kamera; `terrain.ts` Gelände, Raster, Rand, Eingangsstraße; `views/` spiegeln den Zustand (z. B. `buildingsView.ts`), `models/` erzeugen Low-Poly-Modelle.
 - Kamera: `render/camera/cameraRig.ts` hält Blickpunkt, Abstand, Drehung, Neigung als reine Zahlen mit Grenzen (getestet); `input/cameraInput.ts` übersetzt Maus/Tastatur/Rand-Scrollen. Grenzen und Geschwindigkeiten in `config/camera.ts`.
 
+## Ablauf und Oberfläche (seit T0.5)
+
+- `app/startApp.ts` legt Versionsanzeige und Renderer an; `app/appController.ts` schaltet zwischen Hauptmenü (Kamera kreist, Simulation steht) und Spiel um und verbindet Kopfleiste, Menüs, Tastenkürzel und Kamera.
+- `app/gameSession.ts`: Simulation + Takt + Geschwindigkeit (0 = Pause, merkt die letzte Stufe für „Weiter“). `app/frameLoop.ts`: Bildschleife (requestAnimationFrame, max. 250 ms pro Bild).
+- `ui/components/`: `dom.ts` (Helfer), `dialog.ts` (modal, Esc schließt den obersten), `confirm.ts`, `toast.ts`. `ui/hud/topbar.ts` schreibt nur bei geänderter Anzeige. `ui/screens/`: Hauptmenü, Esc-Menü, Einstellungen.
+- Einstellungen: `shared/settings.ts` (Prüfung, Laden/Speichern über injizierten Speicher, localStorage im Browser), Standardwerte in `config/settings.ts`.
+- `input/gameShortcuts.ts`: Leertaste, 1/2/3, Esc; inaktiv im Hauptmenü und bei offenem Dialog.
+
 ## Speichern (Plan, Umsetzung ab T0.6a)
 
 - Format `{ format: "logistikum-save", saveVersion, gameVersion, createdAt, seed, state }`.

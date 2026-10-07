@@ -24,10 +24,10 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 
 ### Start (seit 0.1.0-dev)
 
-- [ ] Seite lädt, Titel „Logistikum“ sichtbar, 3D-Szene mit Rasterboden und Halle wird gezeichnet.
+- [ ] Seite lädt, Hauptmenü links (Neues Spiel, Laden, Einstellungen), dahinter kreist die Kamera über den Campus.
 - [ ] Unten rechts steht Version, Build-Datum und Kurz-Commit; der Commit passt zum erwarteten Stand.
-- [ ] Link-Version: Knopf „Download (ZIP)“ lädt das ZIP herunter.
-- [ ] Download-Version: startet per Doppelklick genauso, ohne Download-Knopf.
+- [ ] Link-Version: Link „Download (ZIP)“ im Hauptmenü lädt das ZIP herunter.
+- [ ] Download-Version: startet per Doppelklick genauso, ohne Download-Link.
 - [ ] Browser-Konsole (F12): keine Fehler, keine Warnungen.
 - [ ] Fenstergröße ändern: Szene passt sich an, nichts verzerrt.
 
@@ -41,3 +41,14 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Neigen geht nie unter den Boden, Zoom hat Grenzen, Verschieben bleibt im Gelände.
 - [ ] Linke Maustaste bewegt die Kamera nicht. Rechtsklick öffnet kein Kontextmenü.
 - [ ] F3 blendet die Leistungsanzeige ein und aus; Bilder/s um 60 auf einem normalen Laptop.
+
+### Zeit, Kopfleiste, Menü, Einstellungen (seit 0.1.0-dev, T0.5)
+
+- [ ] „Neues Spiel“: Kopfleiste zeigt „Sa, 01.01.2000 · 00:00“, Uhr läuft; 1 Spieltag dauert bei 1x 5 Minuten.
+- [ ] Kontostand in Euro mit Tausenderpunkten.
+- [ ] Pause per Klick und Leertaste: „PAUSE“ sichtbar, Uhr steht. Weiter setzt mit der vorherigen Stufe fort.
+- [ ] 1x/2x/4x per Klick und Tasten 1/2/3; aktive Stufe hervorgehoben; 4x läuft sichtbar viermal so schnell.
+- [ ] Esc öffnet „Spiel pausiert“, Spiel pausiert; Esc/„Weiterspielen“ setzt fort. Klick neben den Dialog schließt ihn.
+- [ ] „Hauptmenü“ fragt nach; Abbrechen kehrt ins Spiel zurück.
+- [ ] Einstellungen (aus Hauptmenü und Esc-Menü): Autosave-Intervall, Kamera-Empfindlichkeit (wirkt sofort), Rand-Scrollen an/aus; nach Neuladen noch gesetzt.
+- [ ] Tasten wirken nicht, solange ein Dialog offen ist.
