@@ -15,4 +15,10 @@ export const palette = {
   ghostValid: 0x4cc38a,
   ghostInvalid: 0xe5534b,
   ghostDemolish: 0xe5534b,
+  gate: 0x2c3a4a,
+  zoneLabelBg: '#5f6f80',
+  warningBg: '#e5534b',
+  exportBase: 0xc9d3dd,
+  exportFrame: 0x4f9dde,
+  exportStripe: 0xf08a5d,
 } as const;

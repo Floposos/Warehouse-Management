@@ -92,3 +92,31 @@ test('Kasse zeigt die Bau-Buchung, schwebender Betrag erscheint', async ({ page 
   await expect(dialog).toBeHidden();
   expect(problems).toEqual([]);
 });
+
+test('Zone aufziehen zeigt Größe, Lager und fehlenden Anschluss', async ({ page }) => {
+  const problems = collectProblems(page);
+  await page.goto('/');
+  await startNewGame(page);
+  await page.keyboard.press('Space');
+  const tip = page.getByTestId('cursor-tip');
+  const bar = page.getByTestId('build-bar');
+  const size = page.viewportSize() ?? { width: 1280, height: 720 };
+  const start = { x: size.width / 2 + 100, y: size.height / 2 + 80 };
+
+  await bar.getByRole('button', { name: 'Zonen/Gebäude' }).click();
+  await bar.getByRole('button', { name: /Lieferort A/ }).click();
+  await page.mouse.move(start.x, start.y);
+  await expect(tip).toContainText('1 × 1 Felder');
+  await page.mouse.down();
+  await page.mouse.move(start.x + 80, start.y + 40, { steps: 4 });
+  await expect(tip).toContainText(/Lager \d+ je Ware/);
+  await expect(tip).toContainText('Nicht angeschlossen');
+  await page.mouse.up();
+  const zones = await page.evaluate(
+    () =>
+      (window as unknown as { __logistikum: { session: { state: { zones: unknown[] } } } })
+        .__logistikum.session.state.zones.length,
+  );
+  expect(zones).toBe(1);
+  expect(problems).toEqual([]);
+});

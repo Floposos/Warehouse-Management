@@ -1,11 +1,12 @@
 import { Group } from 'three';
 import { buildingTypes } from '../../content/buildings';
 import type { Building } from '../../sim/state/gameState';
+import { createExportExitModel } from '../models/exportExitModel';
 import { createHallModel } from '../models/hallModel';
 
 /**
- * Spiegelt `state.buildings` in der Szene. In M0 ändern sich Gebäude nur beim Laden,
- * daher genügt ein Neuaufbau bei `sync`. Ab M1 mit Instancing je Typ.
+ * Spiegelt `state.buildings` in der Szene. Gebäude ändern sich selten (Bauen, Abriss, Laden),
+ * daher genügt ein Neuaufbau bei Änderung.
  */
 export class BuildingsView {
   readonly root = new Group();
@@ -18,7 +19,8 @@ export class BuildingsView {
     this.root.clear();
     for (const building of buildings) {
       const type = buildingTypes[building.type];
-      const model = createHallModel(type);
+      const model =
+        building.type === 'exportExit' ? createExportExitModel(type) : createHallModel(type);
       model.position.set(building.x + type.width / 2, 0, building.z + type.depth / 2);
       model.userData['buildingId'] = building.id;
       this.root.add(model);

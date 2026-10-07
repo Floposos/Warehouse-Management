@@ -3,7 +3,11 @@ import { formatEuro } from '../../shared/format';
 import { de } from '../texts/de';
 
 /** Text am Mauszeiger zur Bau-Vorschau. */
-export function buildTipText(preview: BuildPreview): { text: string; kind: 'ok' | 'error' } {
+export function buildTipText(preview: BuildPreview): {
+  text: string;
+  kind: 'ok' | 'error';
+  warning?: string;
+} {
   switch (preview.kind) {
     case 'place':
       return preview.reason
@@ -17,6 +21,16 @@ export function buildTipText(preview: BuildPreview): { text: string; kind: 'ok' 
       return preview.reason
         ? { text: `${de.build.reasons[preview.reason]} · ${cost}`, kind: 'error' }
         : { text: cost, kind: 'ok' };
+    }
+    case 'zone': {
+      const f = preview.footprint;
+      const cost = formatEuro(preview.costCents);
+      const size = de.build.zoneSize(f.width, f.depth, preview.capacity, cost);
+      if (preview.reason)
+        return { text: `${de.build.reasons[preview.reason]} · ${size}`, kind: 'error' };
+      return preview.notConnected
+        ? { text: size, kind: 'ok', warning: de.build.notConnected }
+        : { text: size, kind: 'ok' };
     }
     case 'demolish':
       return { text: de.build.refund(formatEuro(preview.refundCents)), kind: 'ok' };

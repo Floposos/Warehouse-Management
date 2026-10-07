@@ -71,6 +71,13 @@
   color: var(--danger);
   font-weight: 600;
 }
+.cursor-tip-warning {
+  color: #b7791f;
+  font-weight: 600;
+}
+.cursor-tip-warning[hidden] {
+  display: none;
+}
 .cursor-tip-hint {
   font-size: 0.75rem;
   color: var(--muted);

@@ -94,3 +94,12 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Bei offener Kasse und laufendem Spiel aktualisiert sie sich (z. B. nach dem Tageswechsel).
 - [ ] Schwebende Beträge an der Baustelle, rot bei Ausgaben, grün bei Erstattungen; verschwinden nach gut einer Sekunde.
 - [ ] Nach Speichern/Laden sind Buchungen und Summen noch da.
+
+### Lieferorte und Export-Ausfahrt (seit 0.2.0-dev, T1.3)
+
+- [ ] Lieferort A, B, C aufziehen (auch 1 × 1 und in alle Richtungen gezogen); Größe, Lager je Ware und Kosten am Mauszeiger; Kosten je Art unterschiedlich.
+- [ ] Zone über Straße, Gebäude, andere Zone oder den Rand: rot mit Grund.
+- [ ] Jede Zone hat Farbe, Buchstabe und Torbalken; Tor zeigt zu einer angrenzenden Straße, sonst nach Süden.
+- [ ] Ohne Straße vor dem Tor: rotes „!“; Straße an das Tor bauen: „!“ verschwindet; Straße abreißen: „!“ kommt wieder. Straße an einer anderen Seite hilft nicht.
+- [ ] Export-Ausfahrt nur am Geländerand baubar; Tor zeigt ins Gelände; ohne Straße „!“.
+- [ ] Zone abreißen: ganze Zone weg, Erstattung nach Tagesregel.

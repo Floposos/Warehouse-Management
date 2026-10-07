@@ -19,6 +19,7 @@ describe('Migration v1 → v2', () => {
         finance: { balanceCents: 5, recent: [], today: { key: -1 } },
         buildings: [{ id: 1, type: 'testHall', x: 12, z: 58, builtTick: 0, paidCents: 0 }],
         roads: [],
+        zones: [],
       },
     });
   });

@@ -1,9 +1,12 @@
 import type { BuildingTypeId } from '../../content/buildings';
+import type { ZoneKind } from '../../content/zones';
 import type { EventBus } from '../core/eventBus';
 import { book } from '../finance/ledger';
 import type { GameState } from '../state/gameState';
 import { demolishBuilding, placeBuilding } from './build';
 import { buildRoad, demolishRoad } from './roads';
+import type { Side } from '../world/access';
+import { demolishZone, placeZone, setZoneGate } from './zones';
 
 /**
  * Spieleraktionen als Befehle. Darstellung, UI und Eingabe ändern den Zustand nie direkt,
@@ -16,7 +19,20 @@ export type Command =
   | { type: 'build/demolish'; buildingId: number }
   /** Straße von (fromX, fromZ) nach (toX, toZ), gerade oder L-Form; `xFirst` = Knick-Richtung. */
   | { type: 'road/build'; fromX: number; fromZ: number; toX: number; toZ: number; xFirst: boolean }
-  | { type: 'road/demolish'; x: number; z: number };
+  | { type: 'road/demolish'; x: number; z: number }
+  /** Zone als Rechteck zwischen zwei Eckfeldern aufziehen. */
+  /** Zone als Rechteck zwischen zwei Eckfeldern; ohne `gate` wird die Tor-Seite vorgeschlagen. */
+  | {
+      type: 'zone/place';
+      kind: ZoneKind;
+      fromX: number;
+      fromZ: number;
+      toX: number;
+      toZ: number;
+      gate?: Side;
+    }
+  | { type: 'zone/setGate'; zoneId: number; gate: Side }
+  | { type: 'zone/demolish'; zoneId: number };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
@@ -44,6 +60,20 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
       const to = { x: command.toX, z: command.toZ };
       const check = buildRoad(state, bus, from, to, command.xFirst);
       return check.ok ? { ok: true } : reject(bus, command, check.reason);
+    }
+    case 'zone/place': {
+      const from = { x: command.fromX, z: command.fromZ };
+      const to = { x: command.toX, z: command.toZ };
+      const check = placeZone(state, bus, command.kind, from, to, command.gate ?? null);
+      return check.ok ? { ok: true } : reject(bus, command, check.reason);
+    }
+    case 'zone/setGate':
+      return setZoneGate(state, command.zoneId, command.gate)
+        ? { ok: true }
+        : reject(bus, command, 'notFound');
+    case 'zone/demolish': {
+      const refund = demolishZone(state, bus, command.zoneId);
+      return refund === null ? reject(bus, command, 'notFound') : { ok: true };
     }
     case 'road/demolish': {
       const refund = demolishRoad(state, bus, command.x, command.z);

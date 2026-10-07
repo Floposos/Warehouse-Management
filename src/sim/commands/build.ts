@@ -4,11 +4,12 @@ import type { EventBus } from '../core/eventBus';
 import { TICKS_PER_DAY } from '../core/gameTime';
 import { book } from '../finance/ledger';
 import type { GameState } from '../state/gameState';
-import { isInsideCampus } from '../world/grid';
+import { GRID_DEPTH, GRID_WIDTH, isInsideCampus, type Footprint } from '../world/grid';
 import { buildOccupancy, buildingFootprint, isFree } from '../world/occupancy';
 
 /** Gründe, warum etwas nicht gebaut werden kann (Texte in ui/texts/de.ts). */
-export type BuildRejection = 'outOfBounds' | 'occupied' | 'insufficientFunds' | 'unknownType';
+export type BuildRejection =
+  'outOfBounds' | 'occupied' | 'insufficientFunds' | 'unknownType' | 'tooSmall' | 'notAtEdge';
 
 export type BuildCheck =
   { ok: true; costCents: number } | { ok: false; reason: BuildRejection; costCents: number };
@@ -28,12 +29,20 @@ export function checkPlaceBuilding(
   const costCents = buildingCost(type);
   const footprint = buildingFootprint({ type, x, z });
   if (!isInsideCampus(footprint)) return { ok: false, reason: 'outOfBounds', costCents };
+  if ('atEdge' in buildingTypes[type] && !touchesEdge(footprint)) {
+    return { ok: false, reason: 'notAtEdge', costCents };
+  }
   if (!isFree(buildOccupancy(state), footprint))
     return { ok: false, reason: 'occupied', costCents };
   if (state.finance.balanceCents < costCents) {
     return { ok: false, reason: 'insufficientFunds', costCents };
   }
   return { ok: true, costCents };
+}
+
+/** Berührt die Fläche den Geländerand? */
+export function touchesEdge(f: Footprint): boolean {
+  return f.x === 0 || f.z === 0 || f.x + f.width === GRID_WIDTH || f.z + f.depth === GRID_DEPTH;
 }
 
 /** Erstattung beim Abriss: 100 % am selben Spieltag, danach 50 % (gerundet auf Cent). */

@@ -112,7 +112,15 @@ export const de = {
       demolish: 'Abriss',
     },
     comingSoon: 'Kommt in Kürze.',
-    buildings: { testHall: 'Testhalle' },
+    buildings: { testHall: 'Testhalle', exportExit: 'Export-Ausfahrt' },
+    zones: { A: 'Lieferort A', B: 'Lieferort B', C: 'Lieferort C' },
+    zoneItemCost: (cost: string): string => `${cost} je Feld`,
+    zoneItemTitle: (name: string): string =>
+      `${name} aufziehen: klicken, Rechteck ziehen, loslassen (Größe bestimmt den Lagerplatz)`,
+    zoneSize: (w: number, d: number, capacity: number, cost: string): string =>
+      `${w} × ${d} Felder · Lager ${capacity} je Ware · Kosten: ${cost}`,
+    notConnected: 'Nicht angeschlossen: Straße an das Tor bauen',
+    gate: { N: 'Tor Nord', E: 'Tor Ost', S: 'Tor Süd', W: 'Tor West' },
     road: 'Straße',
     roadItemCost: (cost: string): string => `${cost} je Feld`,
     roadItemTitle: 'Straße ziehen: klicken, ziehen, loslassen (gerade oder mit einem Knick)',
@@ -128,6 +136,8 @@ export const de = {
       occupied: 'Fläche ist belegt',
       insufficientFunds: 'Nicht genug Geld',
       unknownType: 'Unbekannter Gebäudetyp',
+      tooSmall: 'Zu klein',
+      notAtEdge: 'Muss am Geländerand stehen',
     },
   },
   cash: {

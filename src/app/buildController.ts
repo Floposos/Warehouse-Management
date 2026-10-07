@@ -1,5 +1,6 @@
 import { installBuildPointer } from '../input/buildPointer';
 import {
+  isDragTool,
   previewAt,
   ROAD_GHOST_HEIGHT,
   type BuildPreview,
@@ -78,8 +79,8 @@ export class BuildController {
       return;
     }
     this.renderer.setGhost(toGhost(preview));
-    const { text, kind } = buildTipText(preview);
-    this.tip.show(text, de.build.escHint, kind, this.pointer.x, this.pointer.y);
+    const { text, kind, warning } = buildTipText(preview);
+    this.tip.show(text, de.build.escHint, kind, this.pointer.x, this.pointer.y, warning);
   }
 
   private previewAt(clientX: number, clientY: number): BuildPreview | null {
@@ -91,7 +92,7 @@ export class BuildController {
 
   private down(clientX: number, clientY: number): void {
     this.pointer = { x: clientX, y: clientY };
-    if (this.tool?.kind === 'road') {
+    if (isDragTool(this.tool)) {
       const ground = this.renderer.pickGround(clientX, clientY);
       if (ground) this.dragStart = { x: Math.floor(ground.x), z: Math.floor(ground.z) };
       return;
@@ -99,9 +100,9 @@ export class BuildController {
     this.commit(this.previewAt(clientX, clientY));
   }
 
-  /** Straße: Loslassen baut die gezogene Strecke. */
+  /** Straße und Zone: Loslassen baut die gezogene Strecke bzw. das Rechteck. */
   private up(clientX: number, clientY: number): void {
-    if (this.tool?.kind !== 'road' || !this.dragStart) return;
+    if (!isDragTool(this.tool) || !this.dragStart) return;
     const preview = this.previewAt(clientX, clientY);
     this.dragStart = null;
     this.commit(preview);
@@ -109,7 +110,7 @@ export class BuildController {
 
   private commit(preview: BuildPreview | null): void {
     if (!preview || preview.kind === 'nothingToDemolish') return;
-    if ((preview.kind === 'place' || preview.kind === 'road') && preview.reason) return;
+    if ('reason' in preview && preview.reason) return;
     this.session()?.command(preview.command);
   }
 
@@ -134,6 +135,10 @@ function toGhost(preview: BuildPreview): Ghost[] {
         height: ROAD_GHOST_HEIGHT,
         style: allRed || blocked.has(`${c.x},${c.z}`) ? 'invalid' : 'valid',
       }));
+    }
+    case 'zone': {
+      const style = preview.reason ? 'invalid' : 'valid';
+      return [{ footprint: preview.footprint, height: ROAD_GHOST_HEIGHT, style }];
     }
     case 'demolish':
       return [{ footprint: preview.footprint, height: preview.height, style: 'demolish' }];

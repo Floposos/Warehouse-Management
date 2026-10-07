@@ -1,4 +1,7 @@
 import { buildingTypes } from '../content/buildings';
+import { productIds } from '../content/products';
+import { zoneTypes } from '../content/zones';
+import { SIDES, type Side } from '../sim/world/access';
 import { BOOKING_CATEGORIES, type BookingCategory } from '../sim/finance/ledger';
 import type { GameState } from '../sim/state/gameState';
 
@@ -29,6 +32,22 @@ function isFinance(v: unknown): boolean {
   return bookingsOk && isTotals(v['today']) && isTotals(v['month']);
 }
 
+function isZone(v: unknown): boolean {
+  if (!isRecord(v)) return false;
+  const ints = ['id', 'x', 'z', 'width', 'depth', 'builtTick', 'paidCents'];
+  const stock = v['stock'];
+  return (
+    ints.every((k) => isInt(v[k])) &&
+    typeof v['kind'] === 'string' &&
+    v['kind'] in zoneTypes &&
+    SIDES.includes(v['gate'] as Side) &&
+    isRecord(stock) &&
+    Object.entries(stock).every(
+      ([p, n]) => (productIds as readonly string[]).includes(p) && isInt(n),
+    )
+  );
+}
+
 /** Prüft die Form des Spielzustands, damit kaputte Dateien nicht ins Spiel gelangen. */
 export function validateState(value: unknown): value is GameState {
   if (typeof value !== 'object' || value === null) return false;
@@ -47,6 +66,7 @@ export function validateState(value: unknown): value is GameState {
     const t = r as Record<string, unknown>;
     return isInt(t['x']) && isInt(t['z']) && isInt(t['builtTick']) && isInt(t['paidCents']);
   });
+  if (!Array.isArray(s['zones']) || !(s['zones'] as unknown[]).every(isZone)) return false;
   return (
     roadsOk &&
     buildings.every((b: unknown) => {

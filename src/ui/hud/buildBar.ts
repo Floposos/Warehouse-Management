@@ -1,5 +1,7 @@
 import { buildConfig } from '../../config/build';
+import { zoneConfig } from '../../config/zones';
 import { buildingTypes, type BuildingTypeId } from '../../content/buildings';
+import { zoneKinds } from '../../content/zones';
 import type { BuildTool } from '../../input/buildTool';
 import { formatEuro } from '../../shared/format';
 import { buildingCost } from '../../sim/commands/build';
@@ -71,7 +73,7 @@ export class BuildBar {
     this.panel.replaceChildren();
     const tab = this.openTab;
     this.panel.hidden = tab === null || tab === 'demolish';
-    if (tab === 'zones') this.panel.append(...this.buildingItems());
+    if (tab === 'zones') this.panel.append(...this.zoneItems(), ...this.buildingItems());
     else if (tab === 'roads') this.panel.append(this.roadItem());
     else if (tab === 'vehicles') {
       this.panel.append(el('span', 'buildbar-empty', de.build.comingSoon));
@@ -86,6 +88,18 @@ export class BuildBar {
       return this.item(name, cost, de.build.itemTitle(name, cost), active, {
         kind: 'place',
         buildingType: type,
+      });
+    });
+  }
+
+  private zoneItems(): HTMLElement[] {
+    return zoneKinds.map((kind) => {
+      const name = de.build.zones[kind];
+      const cost = de.build.zoneItemCost(formatEuro(zoneConfig.costPerFieldCents[kind]));
+      const active = this.tool?.kind === 'zone' && this.tool.zoneKind === kind;
+      return this.item(name, cost, de.build.zoneItemTitle(name), active, {
+        kind: 'zone',
+        zoneKind: kind,
       });
     });
   }

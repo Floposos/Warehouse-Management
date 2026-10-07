@@ -53,6 +53,12 @@ Rohware kommt von abstrakten Zulieferern über Eingangsstraßen (später Schiene
 | 07.10.2026 | LKW-Kosten                  | Kaufpreis + feste Tageskosten + Kilometerkosten                                                                                                                        |
 | 07.10.2026 | Exportpreis M1              | Fester Preis je Ware                                                                                                                                                   |
 | 07.10.2026 | Warendarstellung            | Farbige Kisten auf der Ladefläche + Bestandssymbole an Gebäuden                                                                                                        |
+| 07.10.2026 | Zonen-Größe                 | Keine Mindestgröße; Kapazität skaliert mit der Fläche, je Ware getrennt                                                                                                |
+| 07.10.2026 | Baukosten                   | Je Feld, je Zonenart unterschiedlich; Straße mit eigenem Preis (Euro-Werte im Balancing)                                                                               |
+| 07.10.2026 | Zonen-Anbindung             | Je Zone eine Tor-Seite, über die LKW ein- und ausfahren; Straße muss an das Tor grenzen                                                                                |
+| 07.10.2026 | Feste Touren                | Zonen nacheinander anklicken und Stationen per Liste im Fenster hinzufügen                                                                                             |
+| 07.10.2026 | Export-Ausfahrt             | Frei platzierbares Gebäude am Geländerand                                                                                                                              |
+| 07.10.2026 | Lieferort C                 | Verarbeitet die Kombi zu einem Endprodukt (Name, Dauer, Wert im Balancing)                                                                                             |
 | 07.10.2026 | Kamera-Tasten               | Q/E zoomen (E hinein, Q heraus), R/F neigen, Y/X drehen (ersetzt Q/E drehen), F3 Leistungsanzeige                                                                      |
 | 07.10.2026 | Meilenstein-Reihenfolge     | Aufträge & Finanzen (M5) vor Personal (M6); Insolvenz zu den Finanzen; Kühl-/Gefahrgut-Aufträge nach M8; Ereignis-Grundsystem in M2 (siehe ROADMAP.md)                 |
 

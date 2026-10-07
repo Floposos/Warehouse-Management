@@ -9,6 +9,7 @@ export const buildConfig = {
    */
   buildingCostCents: {
     testHall: 5_000_000,
+    exportExit: 2_000_000,
   },
   /** Straße je Feld in Cent. ANNAHME: Platzhalter (500 €), bis die Preise festgelegt sind. */
   roadCostPerTileCents: 50_000,

@@ -36,17 +36,17 @@ Ablauf: T0.1 → (T0.2, T0.3, T0.4 parallel) → (T0.5, T0.6a parallel) → T0.6
 
 Ablauf: T1.1 → (T1.2, T1.3, T1.6 parallel) → T1.4 → T1.5 → (T1.5b, T1.7 parallel) → T1.8. Vorher Folgefragen (siehe DESIGN.md).
 
-| Aufgabe                                     | Abnahme (Kurzfassung)                                                                                                                                               |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T1.1 Bau-Grundlage (fertig)                 | Bauleiste unten mittig; Vorschau grün/rot mit Grund; Bauen kostet Geld; Abriss mit Erstattung (100 % am selben Tag, sonst 50 %); Esc bricht ab                      |
-| T1.2 Straßen und Wegfindung (fertig)        | Straßen ziehen (gerade/L-Form, Kosten vorab); Kurven, T-Stücke, Kreuzungen automatisch; Ein-/Ausfahrt angeschlossen; kürzester Weg, „kein Weg“, Reaktion auf Abriss |
-| T1.3 Lieferorte A, B, C und Export-Ausfahrt | Frei aufziehbare Zonen, Größe = Kapazität; Farbe/Symbol; Zufahrt an Straße, sonst Warnsymbol; Lager mit Kapazität aus `config/`                                     |
-| T1.4 Warenzufluss und Produktkette          | Daueraufträge und Einzelbestellungen; Zulieferer-LKW sichtbar; Rezept A+B → Kombi; volle Lager stoppen sichtbar; Export zum festen Preis                            |
-| T1.5 LKW kaufen und automatisch fahren      | LKW kaufen; fährt rechts, lädt/entlädt mit sichtbarer Ladung; findet Aufgaben selbst; Stillstand mit Grund; Kauf + Tages- + Kilometerkosten                         |
-| T1.5b Feste Touren                          | Tour mit Haltestellen und Aktion je Halt anlegen/ändern/löschen; Umschalten Automatik/Tour; wird gespeichert                                                        |
-| T1.6 Kasse (fertig)                         | Startkapital; Buchungen mit Kategorien; Übersicht heute/Monat; schwebende +/−-Beträge                                                                               |
-| T1.7 Auswahl und Infopanels                 | Klick wählt aus; Panels für Gebäude (Bestand, Kapazität, Status) und Fahrzeuge (Ladung, Status, Ziel, Route); Tooltip; live                                         |
-| T1.8 Migration und Abnahme                  | M0-Spielstand lädt (v1 → v2); Speichern mitten im Warenfluss setzt exakt fort; Release v0.2.0                                                                       |
+| Aufgabe                                  | Abnahme (Kurzfassung)                                                                                                                                               |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T1.1 Bau-Grundlage (fertig)              | Bauleiste unten mittig; Vorschau grün/rot mit Grund; Bauen kostet Geld; Abriss mit Erstattung (100 % am selben Tag, sonst 50 %); Esc bricht ab                      |
+| T1.2 Straßen und Wegfindung (fertig)     | Straßen ziehen (gerade/L-Form, Kosten vorab); Kurven, T-Stücke, Kreuzungen automatisch; Ein-/Ausfahrt angeschlossen; kürzester Weg, „kein Weg“, Reaktion auf Abriss |
+| T1.3 Lieferorte A, B, C, Export (fertig) | Frei aufziehbare Zonen, Größe = Kapazität; Farbe/Symbol; Zufahrt an Straße, sonst Warnsymbol; Lager mit Kapazität aus `config/`                                     |
+| T1.4 Warenzufluss und Produktkette       | Daueraufträge und Einzelbestellungen; Zulieferer-LKW sichtbar; Rezept A+B → Kombi; volle Lager stoppen sichtbar; Export zum festen Preis                            |
+| T1.5 LKW kaufen und automatisch fahren   | LKW kaufen; fährt rechts, lädt/entlädt mit sichtbarer Ladung; findet Aufgaben selbst; Stillstand mit Grund; Kauf + Tages- + Kilometerkosten                         |
+| T1.5b Feste Touren                       | Tour mit Haltestellen und Aktion je Halt anlegen/ändern/löschen; Umschalten Automatik/Tour; wird gespeichert                                                        |
+| T1.6 Kasse (fertig)                      | Startkapital; Buchungen mit Kategorien; Übersicht heute/Monat; schwebende +/−-Beträge                                                                               |
+| T1.7 Auswahl und Infopanels              | Klick wählt aus; Panels für Gebäude (Bestand, Kapazität, Status) und Fahrzeuge (Ladung, Status, Ziel, Route); Tooltip; live                                         |
+| T1.8 Migration und Abnahme               | M0-Spielstand lädt (v1 → v2); Speichern mitten im Warenfluss setzt exakt fort; Release v0.2.0                                                                       |
 
 ## M2–M9 (Skizze)
 
