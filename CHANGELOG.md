@@ -3,7 +3,7 @@
 Pro Version: Was ist neu, Was wurde behoben, So testest du das, Bekannte Probleme.
 Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 
-## [Unveröffentlicht] – 0.1.0-dev
+## 0.1.0 – M0 Grundgerüst (07.10.2026)
 
 ### Was ist neu
 
@@ -37,6 +37,9 @@ Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 
 ### Bekannte Probleme
 
+- Startkapital 1.000.000 € ist ein Platzhalter; der Betrag wird vor M1 festgelegt.
+- Der Beispiel-Campus im Hauptmenü zeigt bisher nur Gelände, Eingangsstraße und Test-Halle.
+- Sicherungsdatei in der Download-Version (`file://`): Chrome bietet die Funktion dort an; ob der Zugriff nach einem Browser-Neustart erhalten bleibt, ist noch manuell zu prüfen.
 - ANNAHME: Y/X zum Drehen (Q/E sind seit 07.10.2026 Zoom), +/− als zusätzlicher Zoom und F3 für die Leistungsanzeige sind noch nicht bestätigt.
 
 - Der Link funktioniert erst, wenn GitHub Pages im Repo auf „GitHub Actions“ gestellt ist (einmalig: Settings → Pages → Source „GitHub Actions“).
