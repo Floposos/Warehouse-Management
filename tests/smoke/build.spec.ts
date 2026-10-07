@@ -66,3 +66,29 @@ test('Straße ziehen und ein Feld abreißen', async ({ page }) => {
   await expect(tip).toContainText('Erstattung: 500 €');
   expect(problems).toEqual([]);
 });
+
+test('Kasse zeigt die Bau-Buchung, schwebender Betrag erscheint', async ({ page }) => {
+  const problems = collectProblems(page);
+  await page.goto('/');
+  await startNewGame(page);
+  await page.keyboard.press('Space');
+  const bar = page.getByTestId('build-bar');
+  const size = page.viewportSize() ?? { width: 1280, height: 720 };
+  await bar.getByRole('button', { name: 'Zonen/Gebäude' }).click();
+  await bar.getByRole('button', { name: /Testhalle/ }).click();
+  await page.mouse.move(size.width / 2, size.height / 2);
+  await page.mouse.click(size.width / 2, size.height / 2);
+  await expect(page.getByTestId('floating-amount').first()).toHaveText('−50.000 €');
+  await page.keyboard.press('Escape');
+
+  await page.getByTestId('balance').click();
+  const dialog = page.getByRole('dialog', { name: 'Kasse' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByTestId('cash-table').getByRole('row', { name: /^Bau/ })).toContainText(
+    '−50.000 €',
+  );
+  await expect(dialog.locator('.cash-recent li')).toHaveCount(1);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  expect(problems).toEqual([]);
+});

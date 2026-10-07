@@ -6,6 +6,7 @@ import {
   PCFShadowMap,
   PerspectiveCamera,
   Scene,
+  Vector3,
   WebGLRenderer,
 } from 'three';
 import { worldConfig } from '../../config/world';
@@ -27,6 +28,7 @@ export class GameRenderer {
   private readonly roads = new RoadsView();
   private readonly ghost = new GhostView();
   private readonly picker: GroundPicker;
+  private readonly projected = new Vector3();
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     this.renderer = new WebGLRenderer({ canvas, antialias: true });
@@ -76,6 +78,17 @@ export class GameRenderer {
   /** Bodenpunkt unter einer Bildschirmposition (Kamera vom letzten Bild). */
   pickGround(clientX: number, clientY: number): { x: number; z: number } | null {
     return this.picker.pick(clientX, clientY);
+  }
+
+  /** Bildschirmposition eines Weltpunkts oder null, wenn er hinter der Kamera liegt. */
+  projectToScreen(x: number, y: number, z: number): { x: number; y: number } | null {
+    const p = this.projected.set(x, y, z).project(this.camera);
+    if (p.z > 1) return null;
+    const rect = this.canvas.getBoundingClientRect();
+    return {
+      x: rect.left + ((p.x + 1) / 2) * rect.width,
+      y: rect.top + ((1 - p.y) / 2) * rect.height,
+    };
   }
 
   render(rig: CameraRig): void {

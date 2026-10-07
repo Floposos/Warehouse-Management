@@ -1,7 +1,33 @@
 import { buildingTypes } from '../content/buildings';
+import { BOOKING_CATEGORIES, type BookingCategory } from '../sim/finance/ledger';
 import type { GameState } from '../sim/state/gameState';
 
 const isInt = (v: unknown): v is number => typeof v === 'number' && Number.isSafeInteger(v);
+
+const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+
+function isTotals(v: unknown): boolean {
+  if (!isRecord(v) || !isInt(v['key'])) return false;
+  const income = v['incomeCents'];
+  const expense = v['expenseCents'];
+  return (
+    isRecord(income) &&
+    isRecord(expense) &&
+    BOOKING_CATEGORIES.every((c) => isInt(income[c]) && isInt(expense[c]))
+  );
+}
+
+function isFinance(v: unknown): boolean {
+  if (!isRecord(v) || !isInt(v['balanceCents']) || !Array.isArray(v['recent'])) return false;
+  const bookingsOk = (v['recent'] as unknown[]).every(
+    (b) =>
+      isRecord(b) &&
+      isInt(b['tick']) &&
+      isInt(b['amountCents']) &&
+      BOOKING_CATEGORIES.includes(b['category'] as BookingCategory),
+  );
+  return bookingsOk && isTotals(v['today']) && isTotals(v['month']);
+}
 
 /** Prüft die Form des Spielzustands, damit kaputte Dateien nicht ins Spiel gelangen. */
 export function validateState(value: unknown): value is GameState {
@@ -13,9 +39,7 @@ export function validateState(value: unknown): value is GameState {
   if (!isInt(s['nextId']) || typeof rng !== 'object' || rng === null || !isInt(rng['s'])) {
     return false;
   }
-  if (typeof finance !== 'object' || finance === null || !isInt(finance['balanceCents'])) {
-    return false;
-  }
+  if (!isFinance(finance)) return false;
   const buildings = s['buildings'];
   if (!Array.isArray(buildings) || !Array.isArray(s['roads'])) return false;
   const roadsOk = (s['roads'] as unknown[]).every((r: unknown) => {

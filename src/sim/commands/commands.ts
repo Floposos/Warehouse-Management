@@ -1,5 +1,6 @@
 import type { BuildingTypeId } from '../../content/buildings';
 import type { EventBus } from '../core/eventBus';
+import { book } from '../finance/ledger';
 import type { GameState } from '../state/gameState';
 import { demolishBuilding, placeBuilding } from './build';
 import { buildRoad, demolishRoad } from './roads';
@@ -26,12 +27,8 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
       if (!Number.isSafeInteger(command.deltaCents)) {
         return reject(bus, command, 'Betrag muss ganzzahlig in Cent sein');
       }
-      state.finance.balanceCents += command.deltaCents;
-      bus.emit({
-        type: 'finance/balanceChanged',
-        balanceCents: state.finance.balanceCents,
-        deltaCents: command.deltaCents,
-      });
+      // Entwicklerbefehl: als „Betrieb“ gebucht.
+      book(state.finance, state.tick, bus, 'operations', command.deltaCents);
       return { ok: true };
     }
     case 'build/place': {

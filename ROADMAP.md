@@ -44,7 +44,7 @@ Ablauf: T1.1 → (T1.2, T1.3, T1.6 parallel) → T1.4 → T1.5 → (T1.5b, T1.7 
 | T1.4 Warenzufluss und Produktkette          | Daueraufträge und Einzelbestellungen; Zulieferer-LKW sichtbar; Rezept A+B → Kombi; volle Lager stoppen sichtbar; Export zum festen Preis                            |
 | T1.5 LKW kaufen und automatisch fahren      | LKW kaufen; fährt rechts, lädt/entlädt mit sichtbarer Ladung; findet Aufgaben selbst; Stillstand mit Grund; Kauf + Tages- + Kilometerkosten                         |
 | T1.5b Feste Touren                          | Tour mit Haltestellen und Aktion je Halt anlegen/ändern/löschen; Umschalten Automatik/Tour; wird gespeichert                                                        |
-| T1.6 Kasse                                  | Startkapital; Buchungen mit Kategorien; Übersicht heute/Monat; schwebende +/−-Beträge                                                                               |
+| T1.6 Kasse (fertig)                         | Startkapital; Buchungen mit Kategorien; Übersicht heute/Monat; schwebende +/−-Beträge                                                                               |
 | T1.7 Auswahl und Infopanels                 | Klick wählt aus; Panels für Gebäude (Bestand, Kapazität, Status) und Fahrzeuge (Ladung, Status, Ziel, Route); Tooltip; live                                         |
 | T1.8 Migration und Abnahme                  | M0-Spielstand lädt (v1 → v2); Speichern mitten im Warenfluss setzt exakt fort; Release v0.2.0                                                                       |
 

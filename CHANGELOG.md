@@ -9,7 +9,8 @@ Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 
 - Bau-Grundlage (T1.1): Bauleiste unten mittig mit den Reitern Straßen, Zonen/Gebäude, Fahrzeuge und Abriss (Straßen und Fahrzeuge folgen in diesem Meilenstein). Unter „Zonen/Gebäude“ lässt sich vorerst die Testhalle bauen. Mit gewähltem Werkzeug zeigt ein Geisterbild unter dem Mauszeiger, ob gebaut werden kann (grün) oder nicht (rot), daneben ein Hinweis mit Kosten oder Grund („Fläche ist belegt“, „Außerhalb des Geländes“, „Nicht genug Geld“). Linksklick baut, der Kontostand sinkt. „Abriss“ markiert das Gebäude unter dem Mauszeiger rot mit der Erstattung: 100 % am selben Spieltag, danach 50 %. Esc bricht das Werkzeug ab (erst ein zweites Esc öffnet das Menü). Bauen und Abreißen geht auch in der Pause.
 - Straßen und Wegfindung (T1.2): Reiter „Straßen“ → „Straße“, dann klicken, ziehen, loslassen: gerade oder mit einem Knick (L-Form; der Knick folgt der längeren Richtung). Länge und Kosten stehen vorher am Mauszeiger, blockierte Felder sind rot. Vorhandene Straßenfelder werden übernommen und kosten nichts. Kurven, T-Stücke und Kreuzungen fügen sich von selbst zusammen; ein Feld am Westrand auf Höhe der Eingangsstraße ist mit ihr verbunden. Abriss entfernt einzelne Straßenfelder (gleiche Erstattungsregel). Die Wegfindung (für die LKW ab T1.5) findet den kürzesten Weg und erkennt „kein Weg“.
-- ANNAHME: Die Testhalle kostet vorerst 50.000 €, ein Straßenfeld 500 € (Platzhalter in `src/config/build.ts`, bis die Preise festgelegt sind). Die Start-Testhalle war kostenlos und bringt beim Abriss nichts zurück.
+- Kasse (T1.6): Jede Zahlung wird mit Bereich gebucht (Bau, Fahrzeuge, Betrieb, Rohware, Export-Erlös). Klick auf den Kontostand öffnet die Kasse: Kontostand, Einnahmen und Ausgaben je Bereich für heute und diesen Monat (beginnen jeden Tag bzw. Monat bei null) und die letzten Buchungen. Bauen und Abreißen zeigen den Betrag kurz schwebend an der Baustelle (rot Ausgabe, grün Einnahme).
+- ANNAHME: Startkapital bleibt vorerst 1.000.000 €, bis das Balancing feststeht. Die Testhalle kostet vorerst 50.000 €, ein Straßenfeld 500 € (Platzhalter in `src/config/build.ts`, bis die Preise festgelegt sind). Die Start-Testhalle war kostenlos und bringt beim Abriss nichts zurück.
 - Spielstände aus 0.1.0 werden automatisch umgestellt (Spielstand-Version 2).
 
 ### So testest du das
@@ -20,8 +21,9 @@ Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 4. Esc: Geisterbild verschwindet, Menü bleibt zu.
 5. „Straßen“ → „Straße“: an der Eingangsstraße (Westrand) klicken und ins Gelände ziehen, unterwegs Länge und Kosten ablesen, loslassen: Straße liegt, Kontostand sinkt. Eine Abzweigung und eine Kreuzung ziehen: Markierungen passen sich an.
 6. „Abriss“ klicken, über die neue Halle fahren: rote Markierung mit „Erstattung: 50.000 €“; Klick reißt ab, Kontostand steigt wieder. Nach einem Spieltag (5 Minuten bei 1x) gibt es nur noch 50 %.
-7. „Abriss“ über einem Straßenfeld: nur dieses Feld wird markiert und entfernt, die Lücke ist sauber.
-8. Einen Spielstand aus 0.1.0 laden: lädt ohne Meldung.
+7. Nach dem Bauen: über der Baustelle schwebt kurz „−50.000 €“. Kontostand oben anklicken: die Kasse zeigt unter „Bau“ die Ausgaben von heute und diesem Monat und die Buchung in der Liste; Esc schließt.
+8. „Abriss“ über einem Straßenfeld: nur dieses Feld wird markiert und entfernt, die Lücke ist sauber.
+9. Einen Spielstand aus 0.1.0 laden: lädt ohne Meldung.
 
 ## 0.1.0 – M0 Grundgerüst (07.10.2026)
 

@@ -5,4 +5,6 @@
  */
 export const economyConfig = {
   startingBalanceCents: 100_000_000,
+  /** So viele letzte Buchungen merkt sich die Kasse (Liste in der Übersicht). */
+  recentBookings: 50,
 } as const;

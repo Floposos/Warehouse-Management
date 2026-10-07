@@ -16,7 +16,53 @@
     },
     "nextId": 3,
     "finance": {
-      "balanceCents": 94150000
+      "balanceCents": 94150000,
+      "recent": [
+        {
+          "tick": 9000,
+          "category": "build",
+          "amountCents": -5000000
+        },
+        {
+          "tick": 9500,
+          "category": "build",
+          "amountCents": -600000
+        }
+      ],
+      "today": {
+        "key": 3,
+        "incomeCents": {
+          "build": 0,
+          "vehicles": 0,
+          "operations": 0,
+          "rawGoods": 0,
+          "exportRevenue": 0
+        },
+        "expenseCents": {
+          "build": 5600000,
+          "vehicles": 0,
+          "operations": 0,
+          "rawGoods": 0,
+          "exportRevenue": 0
+        }
+      },
+      "month": {
+        "key": 24000,
+        "incomeCents": {
+          "build": 0,
+          "vehicles": 0,
+          "operations": 0,
+          "rawGoods": 0,
+          "exportRevenue": 0
+        },
+        "expenseCents": {
+          "build": 5600000,
+          "vehicles": 0,
+          "operations": 0,
+          "rawGoods": 0,
+          "exportRevenue": 0
+        }
+      }
     },
     "buildings": [
       {

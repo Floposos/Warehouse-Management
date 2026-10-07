@@ -4,7 +4,7 @@ import type { GameState } from '../state/gameState';
 import { GRID_DEPTH, GRID_WIDTH } from '../world/grid';
 import { buildOccupancy, ROAD_CELL } from '../world/occupancy';
 import { roadLine, type Cell } from '../world/roadLine';
-import { changeBalance, demolishRefund, type BuildRejection } from './build';
+import { bookBuild, demolishRefund, type BuildRejection } from './build';
 
 export type RoadCheck =
   | { ok: true; newCells: Cell[]; costCents: number }
@@ -55,7 +55,8 @@ export function buildRoad(
   for (const c of check.newCells) {
     state.roads.push({ x: c.x, z: c.z, builtTick: state.tick, paidCents: paid });
   }
-  changeBalance(state, bus, -check.costCents);
+  const mid = check.newCells[Math.floor(check.newCells.length / 2)] ?? from;
+  bookBuild(state, bus, -check.costCents, { x: mid.x + 0.5, z: mid.z + 0.5 });
   bus.emit({ type: 'road/built', cells: check.newCells, costCents: check.costCents });
   return check;
 }
@@ -72,7 +73,7 @@ export function demolishRoad(state: GameState, bus: EventBus, x: number, z: numb
   if (!tile) return null;
   const refund = demolishRefund(state, tile.builtTick, tile.paidCents);
   state.roads.splice(index, 1);
-  changeBalance(state, bus, refund);
+  bookBuild(state, bus, refund, { x: x + 0.5, z: z + 0.5 });
   bus.emit({ type: 'road/demolished', x, z, refundCents: refund });
   return refund;
 }

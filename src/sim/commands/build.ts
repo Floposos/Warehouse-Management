@@ -2,6 +2,7 @@ import { buildConfig } from '../../config/build';
 import { buildingTypes, type BuildingTypeId } from '../../content/buildings';
 import type { EventBus } from '../core/eventBus';
 import { TICKS_PER_DAY } from '../core/gameTime';
+import { book } from '../finance/ledger';
 import type { GameState } from '../state/gameState';
 import { isInsideCampus } from '../world/grid';
 import { buildOccupancy, buildingFootprint, isFree } from '../world/occupancy';
@@ -53,7 +54,8 @@ export function placeBuilding(
   if (!check.ok) return check;
   const id = state.nextId++;
   state.buildings.push({ id, type, x, z, builtTick: state.tick, paidCents: check.costCents });
-  changeBalance(state, bus, -check.costCents);
+  const size = buildingTypes[type];
+  bookBuild(state, bus, -check.costCents, { x: x + size.width / 2, z: z + size.depth / 2 });
   bus.emit({ type: 'build/placed', id, buildingType: type, x, z, costCents: check.costCents });
   return check;
 }
@@ -64,18 +66,18 @@ export function demolishBuilding(state: GameState, bus: EventBus, id: number): n
   if (!building) return null;
   const refund = demolishRefund(state, building.builtTick, building.paidCents);
   state.buildings.splice(index, 1);
-  changeBalance(state, bus, refund);
+  const f = buildingFootprint(building);
+  bookBuild(state, bus, refund, { x: f.x + f.width / 2, z: f.z + f.depth / 2 });
   bus.emit({ type: 'build/demolished', id, refundCents: refund });
   return refund;
 }
 
-/** Bucht einen Betrag und meldet den neuen Kontostand. */
-export function changeBalance(state: GameState, bus: EventBus, deltaCents: number): void {
-  if (deltaCents === 0) return;
-  state.finance.balanceCents += deltaCents;
-  bus.emit({
-    type: 'finance/balanceChanged',
-    balanceCents: state.finance.balanceCents,
-    deltaCents,
-  });
+/** Bucht Bau-Kosten bzw. Erstattungen (Kategorie „Bau“) mit Ort für die schwebende Anzeige. */
+export function bookBuild(
+  state: GameState,
+  bus: EventBus,
+  amountCents: number,
+  at: { x: number; z: number },
+): void {
+  book(state.finance, state.tick, bus, 'build', amountCents, at);
 }

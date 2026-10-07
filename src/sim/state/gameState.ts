@@ -1,6 +1,7 @@
 import { economyConfig } from '../../config/economy';
 import type { BuildingTypeId } from '../../content/buildings';
 import { createRngState, type RngState } from '../core/rng';
+import { createFinance, type Finance } from '../finance/ledger';
 
 /** Ein Gebäude auf dem Raster. `x`/`z` = Feld der linken oberen Ecke. */
 export interface Building {
@@ -34,7 +35,7 @@ export interface GameState {
   rng: RngState;
   /** Nächste freie ID für neue Objekte. */
   nextId: number;
-  finance: { balanceCents: number };
+  finance: Finance;
   buildings: Building[];
   roads: RoadTile[];
 }
@@ -48,7 +49,7 @@ export function createInitialState(seed: number): GameState {
     tick: 0,
     rng: createRngState(seed),
     nextId: 2,
-    finance: { balanceCents: economyConfig.startingBalanceCents },
+    finance: createFinance(economyConfig.startingBalanceCents, 0),
     buildings: [{ id: 1, type: 'testHall', ...TEST_HALL, builtTick: 0, paidCents: 0 }],
     roads: [],
   };

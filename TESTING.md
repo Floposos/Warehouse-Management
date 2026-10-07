@@ -85,3 +85,12 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Esc während des Ziehens bricht nur das Ziehen ab; zweites Esc beendet das Werkzeug.
 - [ ] Abriss eines Straßenfelds: Lücke sauber, Nachbarn passen ihre Form an.
 - [ ] Viele Straßen (z. B. 20 lange Strecken): weiterhin flüssig (F3).
+
+### Kasse (seit 0.2.0-dev, T1.6)
+
+- [ ] Klick auf den Kontostand öffnet die Kasse; Esc oder „Schließen“ schließt sie.
+- [ ] Bauen und Abreißen erscheinen unter „Bau“ (Ausgaben bzw. Einnahmen) für heute und diesen Monat und in „Letzte Buchungen“; Summe stimmt.
+- [ ] Am nächsten Spieltag ist „Heute“ wieder leer, „Diesen Monat“ nicht; am Monatswechsel beides leer.
+- [ ] Bei offener Kasse und laufendem Spiel aktualisiert sie sich (z. B. nach dem Tageswechsel).
+- [ ] Schwebende Beträge an der Baustelle, rot bei Ausgaben, grün bei Erstattungen; verschwinden nach gut einer Sekunde.
+- [ ] Nach Speichern/Laden sind Buchungen und Summen noch da.

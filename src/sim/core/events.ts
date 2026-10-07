@@ -1,4 +1,5 @@
 import type { BuildingTypeId } from '../../content/buildings';
+import type { BookingCategory, BookingPlace } from '../finance/ledger';
 
 /** Alle Ereignisse der Simulation. Neue Systeme ergänzen hier ihre Ereignistypen. */
 export type SimEvent =
@@ -6,6 +7,12 @@ export type SimEvent =
   | { type: 'time/monthStarted'; year: number; month: number }
   | { type: 'time/yearStarted'; year: number }
   | { type: 'finance/balanceChanged'; balanceCents: number; deltaCents: number }
+  | {
+      type: 'finance/booked';
+      category: BookingCategory;
+      amountCents: number;
+      at: BookingPlace | null;
+    }
   | { type: 'command/rejected'; command: string; reason: string }
   | {
       type: 'build/placed';
