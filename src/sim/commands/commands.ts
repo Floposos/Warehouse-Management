@@ -3,6 +3,7 @@ import type { RawProductId } from '../../content/products';
 import type { ZoneKind } from '../../content/zones';
 import type { EventBus } from '../core/eventBus';
 import { book } from '../finance/ledger';
+import { buyTruck } from '../vehicles/buyTruck';
 import { cancelOrder, createOrder, type OrderInterval } from '../goods/orders';
 import type { GameState } from '../state/gameState';
 import { demolishBuilding, placeBuilding } from './build';
@@ -37,7 +38,8 @@ export type Command =
   | { type: 'zone/demolish'; zoneId: number }
   /** Rohware bestellen: einmalig (`once`) oder als Dauerauftrag. Erste Lieferung sofort. */
   | { type: 'order/create'; product: RawProductId; quantity: number; interval: OrderInterval }
-  | { type: 'order/cancel'; orderId: number };
+  | { type: 'order/cancel'; orderId: number }
+  | { type: 'vehicle/buyTruck' };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
@@ -86,6 +88,10 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
         : reject(bus, command, 'invalidOrder');
     case 'order/cancel':
       return cancelOrder(state, command.orderId) ? { ok: true } : reject(bus, command, 'notFound');
+    case 'vehicle/buyTruck': {
+      const result = buyTruck(state, bus);
+      return typeof result === 'string' ? reject(bus, command, result) : { ok: true };
+    }
     case 'road/demolish': {
       const refund = demolishRoad(state, bus, command.x, command.z);
       return refund === null ? reject(bus, command, 'notFound') : { ok: true };

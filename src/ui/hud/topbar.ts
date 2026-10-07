@@ -11,6 +11,7 @@ export interface TopbarActions {
   togglePause(): void;
   openMenu(): void;
   openCash(): void;
+  openPurchase(): void;
 }
 
 /** Kopfleiste: Datum/Uhrzeit, Kontostand, Zeitsteuerung, Menü. Liest nur den Zustand. */
@@ -43,9 +44,11 @@ export class Topbar {
       controls.append(b);
     });
 
+    const purchase = button(de.hud.purchase, () => actions.openPurchase());
+    purchase.title = de.purchase.openTitle;
     const menu = button(de.hud.menu, () => actions.openMenu());
     menu.title = de.hud.menuTitle;
-    this.root.append(this.clock, this.pauseBadge, controls, this.balance, menu);
+    this.root.append(this.clock, this.pauseBadge, controls, this.balance, purchase, menu);
     parent.append(this.root);
   }
 

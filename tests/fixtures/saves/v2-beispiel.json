@@ -14,7 +14,7 @@
     "rng": {
       "s": 20260107
     },
-    "nextId": 7,
+    "nextId": 8,
     "finance": {
       "balanceCents": 93310000,
       "recent": [
@@ -241,6 +241,34 @@
         "targetId": 4,
         "timer": 0,
         "paidCents": 60000
+      },
+      {
+        "id": 7,
+        "kind": "truck",
+        "route": [
+          {
+            "x": 5,
+            "z": 61
+          }
+        ],
+        "progress": 0,
+        "cargo": {
+          "product": "rawA",
+          "quantity": 20
+        },
+        "timer": 0,
+        "phase": "toDropoff",
+        "job": {
+          "product": "rawA",
+          "fromId": 3,
+          "toId": 4,
+          "quantity": 20
+        },
+        "idleReason": null,
+        "odometer": 0,
+        "mode": "auto",
+        "tour": [],
+        "tourIndex": 0
       }
     ]
   }

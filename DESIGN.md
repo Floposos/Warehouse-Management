@@ -58,7 +58,11 @@ Rohware kommt von abstrakten Zulieferern über Eingangsstraßen (später Schiene
 | 07.10.2026 | Zonen-Anbindung             | Je Zone eine Tor-Seite, über die LKW ein- und ausfahren; Straße muss an das Tor grenzen                                                                                |
 | 07.10.2026 | Feste Touren                | Zonen nacheinander anklicken und Stationen per Liste im Fenster hinzufügen                                                                                             |
 | 07.10.2026 | Export-Ausfahrt             | Frei platzierbares Gebäude am Geländerand                                                                                                                              |
-| 07.10.2026 | Lieferort C                 | Verarbeitet die Kombi zu einem Endprodukt (Name, Dauer, Wert im Balancing)                                                                                             |
+| 07.10.2026 | Lieferort C                 | Verarbeitet die Kombi zu einem Endprodukt                                                                                                                              |
+| 07.10.2026 | Verarbeitung in C           | Durchsatz steigt mit der Zonengröße (keine feste Dauer je Einheit)                                                                                                     |
+| 07.10.2026 | Exportwert                  | Kombi und Endprodukt exportierbar; Endprodukt etwas mehr wert als die Kombi                                                                                            |
+| 07.10.2026 | Startkapital M1             | 2.000.000 €                                                                                                                                                            |
+| 07.10.2026 | Rentabilität M1             | Großzügig: man ist schnell im Plus, der Warenfluss wird im Kontostand sichtbar                                                                                         |
 | 07.10.2026 | Kamera-Tasten               | Q/E zoomen (E hinein, Q heraus), R/F neigen, Y/X drehen (ersetzt Q/E drehen), F3 Leistungsanzeige                                                                      |
 | 07.10.2026 | Meilenstein-Reihenfolge     | Aufträge & Finanzen (M5) vor Personal (M6); Insolvenz zu den Finanzen; Kühl-/Gefahrgut-Aufträge nach M8; Ereignis-Grundsystem in M2 (siehe ROADMAP.md)                 |
 
@@ -66,11 +70,9 @@ Rohware kommt von abstrakten Zulieferern über Eingangsstraßen (später Schiene
 
 Werden vor dem jeweiligen Meilenstein als Auswahlfragen gestellt.
 
-**Vor M1**
+**Nach dem M1-Test: M1-Feinjustierung** (Florian, 07.10.2026: „später nochmal befragen“)
 
-- Zonen: Mindestgröße, Kosten je Feld, Zufahrtsregel (wo muss die Straße angrenzen?)
-- Feste Touren: Bedienung (Haltestellen anlegen, Aktion je Halt, Umschalten Automatik/Tour)
-- Konkrete Startkapital-, Bau-, Waren- und Fahrzeugpreise (Balancing-Richtung)
+- Alle Balancing-Platzhalter aus M1 mit Florian durchgehen: Straßen- und Zonenpreise (`src/config/build.ts`, `src/config/zones.ts`), Lagerplatz je Feld (`src/config/zones.ts`), Rohwaren- und Exportpreise sowie Bestellmengen (`src/config/goods.ts`), Verarbeitungsdauer in B und Durchsatz in C (`src/config/production.ts`), LKW-Kosten und Geschwindigkeiten (`src/config/vehicles.ts`). Die vollständige Liste mit Werten steht im M1-Abschlussbericht.
 
 **M2 Flotte & Verkehr**
 

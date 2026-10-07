@@ -103,3 +103,25 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Ohne Straße vor dem Tor: rotes „!“; Straße an das Tor bauen: „!“ verschwindet; Straße abreißen: „!“ kommt wieder. Straße an einer anderen Seite hilft nicht.
 - [ ] Export-Ausfahrt nur am Geländerand baubar; Tor zeigt ins Gelände; ohne Straße „!“.
 - [ ] Zone abreißen: ganze Zone weg, Erstattung nach Tagesregel.
+
+### Einkauf und Warenfluss (seit 0.2.0-dev, T1.4)
+
+- [ ] „Einkauf“ öffnet das Fenster; Kosten je Lieferung passen zu Ware und Menge.
+- [ ] Einmalige Bestellung: ein Zulieferer kommt, lädt am Tor ab, fährt hinaus; Bestellung verschwindet. Dauerauftrag bleibt mit nächstem Liefertermin.
+- [ ] Zulieferer fahren rechts, biegen sauber ab, verschwinden auf der Eingangsstraße.
+- [ ] Ohne Lieferort / ohne Straße / ohne Geld: Bestellung zeigt den Grund und wird später erneut versucht.
+- [ ] Volles Lager: Lieferung gekürzt bzw. „Lager voll“, Schild „voll“ an der Zone.
+- [ ] Straße während der Fahrt abreißen: LKW wartet; wieder bauen: fährt weiter. Zone abreißen: LKW kehrt um, Ware wird erstattet.
+- [ ] B mit A und B im Lager erzeugt Kombi (Kisten in Lila); C erzeugt Endprodukt (Grün), größere C schneller.
+- [ ] Speichern mit LKW unterwegs, laden: LKW fährt an derselben Stelle weiter.
+
+### Eigene LKW (seit 0.2.0-dev, T1.5)
+
+- [ ] „Fahrzeuge“ → „LKW kaufen“: Hinweis, Kontostand sinkt um den Kaufpreis; ohne Geld Hinweis „Nicht genug Geld“.
+- [ ] Ganze Kette läuft mit 2 LKW von allein: A → B → C → Export, Kontostand steigt über einen Spieltag.
+- [ ] LKW fahren rechts, Ladung als Kisten sichtbar, leer ohne Kisten.
+- [ ] Unter 5 Einheiten fährt kein LKW los; zwei LKW holen nicht dieselbe Ware doppelt.
+- [ ] C voll oder abgerissen: Kombi geht direkt zur Export-Ausfahrt.
+- [ ] Ziel während der Fahrt abreißen: LKW sucht mit Ladung ein neues Ziel.
+- [ ] Tageswechsel: Kasse zeigt unter „Fahrzeuge“ Tages- und Kilometerkosten.
+- [ ] Speichern mit LKW unterwegs (beladen), laden: fährt weiter und liefert ab.

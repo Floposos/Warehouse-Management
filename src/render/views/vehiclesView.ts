@@ -1,6 +1,6 @@
 import { Group } from 'three';
 import { vehicleConfig } from '../../config/vehicles';
-import type { Vehicle } from '../../sim/state/gameState';
+import type { Vehicle } from '../../sim/vehicles/types';
 import { createTruckModel, setTruckCargo } from '../models/truckModel';
 import { vehiclePose } from './vehiclePose';
 
@@ -15,17 +15,12 @@ export class VehiclesView {
       seen.add(v.id);
       let model = this.models.get(v.id);
       if (!model) {
-        model = createTruckModel();
+        model = createTruckModel(v.kind);
         model.userData['vehicleId'] = v.id;
         this.models.set(v.id, model);
         this.root.add(model);
       }
-      const moving = v.phase === 'toSite' || v.phase === 'toExit';
-      const pose = vehiclePose(
-        v.route,
-        v.progress,
-        moving ? vehicleConfig.supplierSpeed * alpha : 0,
-      );
+      const pose = vehiclePose(v.route, v.progress, isMoving(v) ? speedOf(v) * alpha : 0);
       if (pose) {
         model.position.set(pose.x, 0, pose.z);
         model.rotation.y = pose.angle;
@@ -38,4 +33,14 @@ export class VehiclesView {
       this.models.delete(id);
     }
   }
+}
+
+function isMoving(v: Vehicle): boolean {
+  return v.kind === 'supplier'
+    ? v.phase === 'toSite' || v.phase === 'toExit'
+    : v.phase === 'toPickup' || v.phase === 'toDropoff';
+}
+
+function speedOf(v: Vehicle): number {
+  return v.kind === 'supplier' ? vehicleConfig.supplierSpeed : vehicleConfig.truckSpeed;
 }

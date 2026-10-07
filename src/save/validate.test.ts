@@ -59,6 +59,32 @@ describe('validateState', () => {
     expect(validateState({ ...state, vehicles: [{ ...vehicle, phase: 'flying' }] })).toBe(false);
   });
 
+  it('prüft eigene LKW samt Auftrag und Tour', () => {
+    const state = createInitialState(1);
+    const truck = {
+      id: 7,
+      kind: 'truck',
+      route: [{ x: 5, z: 61 }],
+      progress: 0,
+      cargo: null,
+      timer: 3,
+      phase: 'toPickup',
+      job: { product: 'rawA', fromId: 2, toId: 3, quantity: 20 },
+      idleReason: null,
+      odometer: 1500,
+      mode: 'tour',
+      tour: [{ siteId: 2, action: 'load', product: 'rawA' }],
+      tourIndex: 0,
+    };
+    expect(validateState({ ...state, vehicles: [truck] })).toBe(true);
+    expect(validateState({ ...state, vehicles: [{ ...truck, phase: 'toSite' }] })).toBe(false);
+    expect(validateState({ ...state, vehicles: [{ ...truck, mode: 'manual' }] })).toBe(false);
+    expect(validateState({ ...state, vehicles: [{ ...truck, idleReason: 'tired' }] })).toBe(false);
+    expect(
+      validateState({ ...state, vehicles: [{ ...truck, tour: [{ siteId: 2, action: 'x' }] }] }),
+    ).toBe(false);
+  });
+
   it('lehnt eine kaputte Kasse ab', () => {
     const state = createInitialState(1);
     expect(validateState({ ...state, finance: { balanceCents: 5 } })).toBe(false);

@@ -176,3 +176,29 @@
 .cash-when {
   color: var(--muted);
 }
+
+/* Einkauf */
+.purchase-hint {
+  margin-top: 0;
+  color: var(--muted);
+}
+.purchase-total {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.purchase-order {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.purchase-order-text {
+  display: flex;
+  flex-direction: column;
+}
+.purchase-blocked {
+  color: #b7791f;
+  font-weight: 600;
+}

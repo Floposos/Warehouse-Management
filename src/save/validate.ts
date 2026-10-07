@@ -6,9 +6,8 @@ import { SIDES, type Side } from '../sim/world/access';
 import { BOOKING_CATEGORIES, type BookingCategory } from '../sim/finance/ledger';
 import type { GameState } from '../sim/state/gameState';
 
-const isInt = (v: unknown): v is number => typeof v === 'number' && Number.isSafeInteger(v);
-
-const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+import { isInt, isRecord } from './validateShapes';
+import { isVehicle } from './validateVehicles';
 
 function isTotals(v: unknown): boolean {
   if (!isRecord(v) || !isInt(v['key'])) return false;
@@ -49,8 +48,6 @@ function isZone(v: unknown): boolean {
   );
 }
 
-const isProduct = (v: unknown): boolean => (productIds as readonly unknown[]).includes(v);
-
 function isOrder(v: unknown): boolean {
   return (
     isRecord(v) &&
@@ -59,27 +56,6 @@ function isOrder(v: unknown): boolean {
     v['product'] in rawProducts &&
     ORDER_INTERVALS.includes(v['interval'] as OrderInterval) &&
     (v['blocked'] === null || typeof v['blocked'] === 'string')
-  );
-}
-
-const PHASES = ['toSite', 'handling', 'toExit', 'noRoute'];
-
-function isVehicle(v: unknown): boolean {
-  if (
-    !isRecord(v) ||
-    !['id', 'progress', 'targetId', 'timer', 'paidCents'].every((k) => isInt(v[k]))
-  ) {
-    return false;
-  }
-  const route = v['route'];
-  const cargo = v['cargo'];
-  return (
-    v['kind'] === 'supplier' &&
-    PHASES.includes(v['phase'] as string) &&
-    Array.isArray(route) &&
-    route.length > 0 &&
-    route.every((c: unknown) => isRecord(c) && isInt(c['x']) && isInt(c['z'])) &&
-    (cargo === null || (isRecord(cargo) && isProduct(cargo['product']) && isInt(cargo['quantity'])))
   );
 }
 

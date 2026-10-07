@@ -11,15 +11,34 @@ export function stores(zone: Zone, product: ProductId): boolean {
   return zoneTypes[zone.kind].stores.includes(product);
 }
 
-/** Ware, die gerade zu dieser Zone unterwegs ist (reservierter Platz). */
+/** Ware, die gerade zu dieser Zone unterwegs ist oder fest eingeplant ist (reservierter Platz). */
 export function incoming(state: GameState, zoneId: number, product: ProductId): number {
   let sum = 0;
   for (const v of state.vehicles) {
-    if (v.targetId === zoneId && v.cargo?.product === product && v.phase !== 'toExit') {
-      sum += v.cargo.quantity;
+    if (v.kind === 'supplier') {
+      if (v.targetId === zoneId && v.cargo?.product === product && v.phase !== 'toExit') {
+        sum += v.cargo.quantity;
+      }
+    } else if (v.job && v.job.toId === zoneId && v.job.product === product) {
+      sum += v.cargo?.quantity ?? v.job.quantity;
     }
   }
   return sum;
+}
+
+/** Ware, die LKW hier schon abholen wollen (noch nicht aufgeladen). */
+export function reservedOut(state: GameState, zoneId: number, product: ProductId): number {
+  let sum = 0;
+  for (const v of state.vehicles) {
+    if (v.kind !== 'truck' || !v.job || v.cargo) continue;
+    if (v.job.fromId === zoneId && v.job.product === product) sum += v.job.quantity;
+  }
+  return sum;
+}
+
+/** Abholbereite Menge (Bestand minus reservierte Abholungen). */
+export function available(state: GameState, zone: Zone, product: ProductId): number {
+  return Math.max(0, stockOf(zone, product) - reservedOut(state, zone.id, product));
 }
 
 /** Freier Platz für eine Ware, abzüglich bereits unterwegs befindlicher Lieferungen. */

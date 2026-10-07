@@ -36,6 +36,7 @@ export type SimEvent =
       quantity: number;
       revenueCents: number;
     }
+  | { type: 'vehicle/bought'; id: number }
   | { type: 'road/built'; cells: { x: number; z: number }[]; costCents: number }
   | { type: 'road/demolished'; x: number; z: number; refundCents: number };
 

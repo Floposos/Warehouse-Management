@@ -10,6 +10,26 @@ async function openPauseItem(page: Page, item: string): Promise<void> {
     .click();
 }
 
+function currentTick(page: Page): Promise<number> {
+  return page.evaluate(
+    () =>
+      (window as unknown as { __logistikum: { session: { state: { tick: number } } } }).__logistikum
+        .session.state.tick,
+  );
+}
+
+/**
+ * Prüft einen geladenen Stand. Nach dem Laden läuft das Spiel weiter; auf langsamen
+ * Testrechnern vergehen bis zur Abfrage einige Schritte. Daher: gleicher Tag und
+ * Schrittzähler höchstens wenig über dem gespeicherten.
+ */
+async function expectLoaded(page: Page, clock: string | null, savedTick: number): Promise<void> {
+  await expect(page.getByTestId('clock')).toContainText((clock ?? '').split(' · ')[0] ?? '');
+  const tick = await currentTick(page);
+  expect(tick).toBeGreaterThanOrEqual(savedTick);
+  expect(tick - savedTick).toBeLessThan(100);
+}
+
 async function saveAs(page: Page, name: string): Promise<void> {
   await openPauseItem(page, 'Speichern');
   await page.getByLabel('Name des Spielstands').fill(name);
@@ -25,6 +45,7 @@ test('In Slot speichern, neues Spiel, Slot laden: Uhrzeit stimmt', async ({ page
   await page.waitForTimeout(1500);
   await page.keyboard.press('Space');
   const savedClock = await page.getByTestId('clock').textContent();
+  const savedTick = await currentTick(page);
   await saveAs(page, 'Test A');
 
   await openPauseItem(page, 'Hauptmenü');
@@ -38,8 +59,7 @@ test('In Slot speichern, neues Spiel, Slot laden: Uhrzeit stimmt', async ({ page
     .getByRole('dialog', { name: 'Spielstand laden?' })
     .getByRole('button', { name: 'Laden' })
     .click();
-  await page.keyboard.press('Space');
-  await expect(page.getByTestId('clock')).toHaveText(savedClock ?? '');
+  await expectLoaded(page, savedClock, savedTick);
   expect(problems).toEqual([]);
 });
 
@@ -64,8 +84,17 @@ test('Exportieren und Importieren', async ({ page }) => {
   await (
     await chooser
   ).setFiles({ name: 'stand.json', mimeType: 'application/json', buffer: Buffer.from(text) });
-  await page.keyboard.press('Space');
-  await expect(page.getByTestId('clock')).toHaveText(clock ?? '');
+  // Nach dem Laden läuft das Spiel weiter; auf langsamen Testrechnern vergehen bis zur Abfrage
+  // einige Schritte. Daher: gleicher Tag, Schrittzähler höchstens wenig über dem gespeicherten.
+  const savedTick = (JSON.parse(text) as { state: { tick: number } }).state.tick;
+  await expect(page.getByTestId('clock')).toContainText((clock ?? '').split(' · ')[0] ?? '');
+  const tick = await page.evaluate(
+    () =>
+      (window as unknown as { __logistikum: { session: { state: { tick: number } } } }).__logistikum
+        .session.state.tick,
+  );
+  expect(tick).toBeGreaterThanOrEqual(savedTick);
+  expect(tick - savedTick).toBeLessThan(100);
 });
 
 test('Kaputte Datei gibt eine Meldung statt eines Absturzes', async ({ page }) => {

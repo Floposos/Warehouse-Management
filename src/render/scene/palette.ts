@@ -23,6 +23,7 @@ export const palette = {
   exportStripe: 0xf08a5d,
   fullBg: '#e08a1e',
   supplierCab: 0xffffff,
+  ownCab: 0xf08a5d,
   truckBody: 0x8d96a3,
   wheel: 0x2c3a4a,
 } as const;

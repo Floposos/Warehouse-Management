@@ -15,6 +15,7 @@ import { Topbar } from '../ui/hud/topbar';
 import { MainMenu } from '../ui/screens/mainMenu';
 import { openCashDialog } from '../ui/screens/cashDialog';
 import { openPauseMenu } from '../ui/screens/pauseMenu';
+import { openPurchaseDialog } from '../ui/screens/purchaseDialog';
 import { openSettingsDialog } from '../ui/screens/settingsDialog';
 import { de } from '../ui/texts/de';
 import { BuildController } from './buildController';
@@ -67,6 +68,7 @@ export class AppController {
       togglePause: () => this.session?.togglePause(),
       openMenu: () => this.openPauseMenu(),
       openCash: () => this.openCash(),
+      openPurchase: () => this.openPurchase(),
     });
     this.mainMenu = new MainMenu(
       ui,
@@ -89,7 +91,13 @@ export class AppController {
       autosaveMinutes: () => this.settings.get().autosaveMinutes,
     });
     this.perf = new PerfOverlay(ui);
-    this.build = new BuildController(ui, canvas, renderer, () => this.session);
+    this.build = new BuildController(
+      ui,
+      canvas,
+      renderer,
+      () => this.session,
+      () => this.buyTruck(),
+    );
     this.financeFeedback = new FinanceFeedback(ui, renderer);
     installGameShortcuts({
       isActive: () => this.mode === 'game' && !isDialogOpen(),
@@ -169,9 +177,26 @@ export class AppController {
   }
 
   /** Kasse (Klick auf den Kontostand). */
+  /** LKW kaufen (Bauleiste „Fahrzeuge“), Rückmeldung als Hinweis. */
+  private buyTruck(): void {
+    const result = this.session?.command({ type: 'vehicle/buyTruck' });
+    if (!result) return;
+    this.toasts.show(result.ok ? de.build.truckBought : de.build.truckNoMoney);
+  }
+
   openCash(): void {
     if (!this.session || isDialogOpen()) return;
     openCashDialog(this.ui, () => this.session?.state ?? null);
+  }
+
+  /** Einkauf von Rohware. */
+  openPurchase(): void {
+    if (!this.session || isDialogOpen()) return;
+    openPurchaseDialog(
+      this.ui,
+      () => this.session?.state ?? null,
+      (command) => this.session?.command(command),
+    );
   }
 
   private async confirmLeave(onCancel: () => void): Promise<void> {

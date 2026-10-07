@@ -1,4 +1,5 @@
 import { buildConfig } from '../../config/build';
+import { vehicleConfig } from '../../config/vehicles';
 import { zoneConfig } from '../../config/zones';
 import { buildingTypes, type BuildingTypeId } from '../../content/buildings';
 import { zoneKinds } from '../../content/zones';
@@ -26,6 +27,7 @@ export class BuildBar {
   constructor(
     parent: HTMLElement,
     private readonly onTool: (tool: BuildTool | null) => void,
+    private readonly onBuyTruck: () => void,
   ) {
     this.root.dataset['testid'] = 'build-bar';
     this.root.setAttribute('aria-label', de.build.barLabel);
@@ -75,9 +77,7 @@ export class BuildBar {
     this.panel.hidden = tab === null || tab === 'demolish';
     if (tab === 'zones') this.panel.append(...this.zoneItems(), ...this.buildingItems());
     else if (tab === 'roads') this.panel.append(this.roadItem());
-    else if (tab === 'vehicles') {
-      this.panel.append(el('span', 'buildbar-empty', de.build.comingSoon));
-    }
+    else if (tab === 'vehicles') this.panel.append(this.truckItem());
   }
 
   private buildingItems(): HTMLElement[] {
@@ -108,6 +108,18 @@ export class BuildBar {
     const cost = de.build.roadItemCost(formatEuro(buildConfig.roadCostPerTileCents));
     const active = this.tool?.kind === 'road';
     return this.item(de.build.road, cost, de.build.roadItemTitle, active, { kind: 'road' });
+  }
+
+  /** LKW kaufen ist kein Werkzeug: Klick kauft sofort, der LKW erscheint an der Einfahrt. */
+  private truckItem(): HTMLElement {
+    const cost = formatEuro(vehicleConfig.truckPriceCents);
+    const item = button('', () => this.onBuyTruck(), 'btn buildbar-item');
+    item.append(
+      el('span', 'buildbar-item-name', de.build.truck),
+      el('span', 'buildbar-item-cost', cost),
+    );
+    item.title = de.build.truckTitle(cost, formatEuro(vehicleConfig.truckDailyCents));
+    return item;
   }
 
   /** Eintrag im aufgeklappten Reiter; erneuter Klick auf den aktiven Eintrag beendet das Werkzeug. */

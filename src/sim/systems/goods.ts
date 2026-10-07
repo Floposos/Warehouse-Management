@@ -1,6 +1,7 @@
 import { updateOrders } from '../goods/orders';
 import { updateProduction } from '../production/production';
 import { updateSuppliers } from '../vehicles/suppliers';
+import { updateTrucks } from '../vehicles/trucks';
 import type { SimSystem } from './types';
 
 export const ordersSystem: SimSystem = {
@@ -16,4 +17,9 @@ export const suppliersSystem: SimSystem = {
 export const productionSystem: SimSystem = {
   id: 'production',
   update: (state, { bus }) => updateProduction(state, bus),
+};
+
+export const trucksSystem: SimSystem = {
+  id: 'trucks',
+  update: (state, { bus }) => updateTrucks(state, bus),
 };

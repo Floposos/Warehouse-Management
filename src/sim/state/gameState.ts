@@ -6,7 +6,7 @@ import { createRngState, type RngState } from '../core/rng';
 import { createFinance, type Finance } from '../finance/ledger';
 import type { OrderBlock, OrderInterval } from '../goods/orders';
 import type { Side } from '../world/access';
-import type { Cell } from '../world/roadLine';
+import type { Vehicle } from '../vehicles/types';
 
 /** Ein Gebäude auf dem Raster. `x`/`z` = Feld der linken oberen Ecke. */
 export interface Building {
@@ -56,26 +56,6 @@ export interface Order {
   nextTick: number;
   /** Warum die fällige Lieferung wartet (null = alles in Ordnung). */
   blocked: OrderBlock | null;
-}
-
-/**
- * Fahrzeug auf dem Gelände (Zulieferer; ab T1.5 auch eigene LKW).
- * Position: `route[0]` ist das aktuelle Feld, gefahren wird Richtung `route[1]`.
- */
-export interface Vehicle {
-  id: number;
-  kind: 'supplier';
-  route: Cell[];
-  /** Fortschritt zum nächsten Feld in Tausendsteln. */
-  progress: number;
-  cargo: { product: ProductId; quantity: number } | null;
-  phase: 'toSite' | 'handling' | 'toExit' | 'noRoute';
-  /** Ziel-Ort (Zone oder Ausfahrt). */
-  targetId: number;
-  /** Restschritte beim Ab-/Aufladen bzw. bis zum nächsten Wegversuch. */
-  timer: number;
-  /** Für die Zulieferung bezahlter Betrag (Erstattung, wenn das Ziel wegfällt). */
-  paidCents: number;
 }
 
 /**

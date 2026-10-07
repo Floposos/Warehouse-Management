@@ -17,7 +17,7 @@ test('Bauen und Abreißen über die Bauleiste (auch in der Pause)', async ({ pag
   await page.mouse.move(center.x, center.y);
   await expect(tip).toContainText('Kosten: 50.000 €');
   await page.mouse.click(center.x, center.y);
-  await expect(balance).toHaveText('950.000 €');
+  await expect(balance).toHaveText('1.950.000 €');
   // Gleiche Stelle ist jetzt belegt.
   await page.mouse.move(center.x + 1, center.y);
   await expect(tip).toContainText('Fläche ist belegt');
@@ -31,7 +31,7 @@ test('Bauen und Abreißen über die Bauleiste (auch in der Pause)', async ({ pag
   await page.mouse.move(center.x, center.y);
   await expect(tip).toContainText('Erstattung: 50.000 €');
   await page.mouse.click(center.x, center.y);
-  await expect(balance).toHaveText('1.000.000 €');
+  await expect(balance).toHaveText('2.000.000 €');
   await expect(tip).toContainText('Hier steht nichts zum Abreißen');
 
   await page.keyboard.press('Escape');
@@ -54,16 +54,16 @@ test('Straße ziehen und ein Feld abreißen', async ({ page }) => {
   await bar.getByRole('button', { name: 'Straßen' }).click();
   await bar.getByRole('button', { name: /je Feld/ }).click();
   await page.mouse.move(start.x, start.y);
-  await expect(tip).toContainText('1 Feld · Kosten: 500 €');
+  await expect(tip).toContainText('1 Feld · Kosten: 200 €');
   await page.mouse.down();
   await page.mouse.move(start.x + 200, start.y + 40, { steps: 5 });
   await expect(tip).toContainText(/\d+ Felder · Kosten/);
   await page.mouse.up();
-  await expect(balance).not.toHaveText('1.000.000 €');
+  await expect(balance).not.toHaveText('2.000.000 €');
 
   await bar.getByRole('button', { name: 'Abriss' }).click();
   await page.mouse.move(start.x, start.y);
-  await expect(tip).toContainText('Erstattung: 500 €');
+  await expect(tip).toContainText('Erstattung: 200 €');
   expect(problems).toEqual([]);
 });
 

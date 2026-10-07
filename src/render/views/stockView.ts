@@ -41,7 +41,7 @@ export class StockView {
 
   constructor() {
     const material = new MeshLambertMaterial({ color: 0xffffff });
-    this.crates = new InstancedMesh(new BoxGeometry(0.34, 0.3, 0.34), material, MAX_CRATES);
+    this.crates = new InstancedMesh(new BoxGeometry(0.4, 0.36, 0.4), material, MAX_CRATES);
     this.crates.castShadow = true;
     for (let i = 0; i < MAX_CRATES; i++) this.crates.setColorAt(i, this.color.set(0xffffff));
     this.crates.count = 0;
@@ -75,7 +75,7 @@ export class StockView {
         const [ox, oz] = SLOTS[slot % SLOTS.length] ?? [0.5, 0.5];
         const x = zone.x + (cell % zone.width) + ox;
         const z = zone.z + Math.floor(cell / zone.width) + oz;
-        this.dummy.position.set(x, 0.17, z);
+        this.dummy.position.set(x, 0.2, z);
         this.dummy.updateMatrix();
         this.crates.setMatrixAt(n, this.dummy.matrix);
         this.crates.setColorAt(n, this.color.set(products[product].color));

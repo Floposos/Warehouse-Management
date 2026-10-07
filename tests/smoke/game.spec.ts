@@ -5,7 +5,7 @@ test('Zeit läuft, Pause hält sie an, Esc öffnet das Menü', async ({ page }) 
   const problems = collectProblems(page);
   await page.goto('/');
   await startNewGame(page);
-  await expect(page.getByTestId('balance')).toHaveText('1.000.000 €');
+  await expect(page.getByTestId('balance')).toHaveText('2.000.000 €');
 
   const clock = page.getByTestId('clock');
   await page.keyboard.press('Digit3');

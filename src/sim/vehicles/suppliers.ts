@@ -3,7 +3,8 @@ import type { EventBus } from '../core/eventBus';
 import { book } from '../finance/ledger';
 import { addStock } from '../goods/stock';
 import { zoneCapacity } from '../commands/zones';
-import type { GameState, Vehicle } from '../state/gameState';
+import type { GameState } from '../state/gameState';
+import type { Supplier, Vehicle } from './types';
 import { accessCell } from '../world/access';
 import { ENTRANCE, RoadNetwork } from '../world/roadNetwork';
 import { advance, outsideLane, planRoute } from './movement';
@@ -23,7 +24,7 @@ export function updateSuppliers(state: GameState, bus: EventBus): void {
 }
 
 /** Ein Schritt für einen Zulieferer. Liefert false, wenn er das Gelände verlassen hat. */
-function stepSupplier(state: GameState, bus: EventBus, network: RoadNetwork, v: Vehicle): boolean {
+function stepSupplier(state: GameState, bus: EventBus, network: RoadNetwork, v: Supplier): boolean {
   const zone = state.zones.find((z) => z.id === v.targetId);
   if (v.cargo && !zone) turnBack(state, bus, network, v);
   switch (v.phase) {
@@ -58,14 +59,14 @@ function stepSupplier(state: GameState, bus: EventBus, network: RoadNetwork, v: 
 }
 
 /** Ziel weg: bezahlte Ware erstatten und hinausfahren. */
-function turnBack(state: GameState, bus: EventBus, network: RoadNetwork, v: Vehicle): void {
+function turnBack(state: GameState, bus: EventBus, network: RoadNetwork, v: Supplier): void {
   book(state.finance, state.tick, bus, 'rawGoods', v.paidCents, null);
   v.paidCents = 0;
   v.cargo = null;
   leave(network, v);
 }
 
-function leave(network: RoadNetwork, v: Vehicle): void {
+function leave(network: RoadNetwork, v: Supplier): void {
   const from = v.route[0] ?? ENTRANCE;
   const route = planRoute(network, from, ENTRANCE);
   if (!route) {
@@ -78,7 +79,7 @@ function leave(network: RoadNetwork, v: Vehicle): void {
   v.phase = 'toExit';
 }
 
-function replan(network: RoadNetwork, state: GameState, v: Vehicle): void {
+function replan(network: RoadNetwork, state: GameState, v: Supplier): void {
   if (!v.cargo) {
     leave(network, v);
     return;
