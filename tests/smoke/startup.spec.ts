@@ -25,6 +25,9 @@ async function expectGameStarted(page: Page, problems: string[]): Promise<void> 
   const size = await page.locator('#scene').evaluate((c: HTMLCanvasElement) => c.width * c.height);
   expect(size).toBeGreaterThan(0);
   await expect(page.locator('.placeholder-error')).toHaveCount(0);
+  // Leistungsanzeige lässt sich mit F3 einblenden und zeigt Bilder/s.
+  await page.keyboard.press('F3');
+  await expect(page.getByTestId('perf-overlay')).toContainText('Bilder/s');
   await page.waitForTimeout(500);
   expect(problems).toEqual([]);
 }

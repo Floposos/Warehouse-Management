@@ -62,21 +62,27 @@ config, content, shared  ←  sim  ←  save
 
 Warum: Die Logik bleibt ohne Browser testbar, Grafik- und UI-Änderungen können die Regeln nicht beschädigen, und die Simulation kann bei Bedarf ohne Umbau in einen Web Worker wandern.
 
-## Simulationskern (Plan, Umsetzung ab T0.3)
+## Simulationskern (seit T0.3)
 
-- **Fester Takt:** feste Schritte pro Spielsekunde (Wert in `config/`). Die Hauptschleife rechnet vergangene Echtzeit × Geschwindigkeit in Schritte um, mit Obergrenze pro Bild. Pause = keine Schritte. Die Darstellung interpoliert zwischen Schritten. So ist 4x exakt 4 × 1x, unabhängig von der Bildrate.
-- **Determinismus:** Zufall mit Seed, Zustand des Generators im Spielstand; feste Reihenfolge der Systeme, Listen nach ID. Gleicher Seed + gleiche Befehle = gleiches Ergebnis.
-- **Datenmodell:** ein reines Datenobjekt mit Tabellen je Objektart (`vehicles`, `buildings`, `roads`, …), nach ID geordnet, nur JSON-Werte, Verweise nur über IDs. Speichern = serialisieren.
-- **Systeme mit Datenobjekten** statt vollem ECS: je System eine Datei mit `update(state, ctx)`. Für klar unterscheidbare Objektarten einfacher zu verstehen und gut testbar.
-- **Event-Bus:** typisierte Ereignisse, während eines Schritts gesammelt und am Schrittende in fester Reihenfolge verteilt. UI und Darstellung hören dieselben Ereignisse.
-- **Wegfindung:** Graph je Netz (Straße, Schiene, Förderband, Stapler-Wege), aus gebauten Feldern abgeleitet; A* mit Zwischenspeicher, bei Bauänderung verworfen. Reservierungen für Kreuzungen und Ladezonen ab M2, Datenmodell ab M1 dafür ausgelegt.
+- **Fester Takt** (`sim/core/stepClock.ts`): 10 Schritte pro Echtzeit-Sekunde bei 1x (`config/time.ts`). Die Hauptschleife rechnet vergangene Echtzeit × Geschwindigkeit in Schritte um, höchstens 40 pro Bild. Pause = keine Schritte. `alpha` erlaubt der Darstellung, zwischen Schritten zu interpolieren. So ist 4x exakt 4 × 1x, unabhängig von der Bildrate.
+- **Spielzeit** (`sim/core/gameTime.ts`): Der Zustand speichert nur den Schrittzähler `tick`; Datum und Uhrzeit werden daraus berechnet (1 Tag = 3000 Schritte = 5 min bei 1x; Start 01.01.2000, 00:00). `systems/calendar.ts` meldet Tages-, Monats- und Jahreswechsel.
+- **Determinismus** (`sim/core/rng.ts`): Mulberry32 mit Seed, Zustand `state.rng` wird mitgespeichert; Systeme laufen in fester Reihenfolge (`systems/index.ts`), Listen nach ID. Gleicher Seed + gleiche Befehle = gleiches Ergebnis (Test über 10.000 Schritte).
+- **Datenmodell** (`sim/state/gameState.ts`): ein reines Datenobjekt mit Tabellen je Objektart (`buildings`, später `vehicles`, `roads`, …), nur JSON-Werte, Verweise nur über IDs, Geld als ganze Cent. Speichern = serialisieren.
+- **Systeme mit Datenobjekten** statt vollem ECS: je System eine Datei mit `update(state, ctx)` (`sim/systems/`). Für klar unterscheidbare Objektarten einfacher zu verstehen und gut testbar.
+- **Befehle** (`sim/commands/commands.ts`): UI und Eingabe reichen Befehle mit `simulation.submit()` ein; ausgeführt und geprüft im nächsten Schritt, Ablehnung als Ereignis `command/rejected`.
+- **Event-Bus** (`sim/core/eventBus.ts`, Typen in `events.ts`): Ereignisse werden während eines Schritts gesammelt und am Schrittende in Meldereihenfolge verteilt. UI und Darstellung hören dieselben Ereignisse.
+- **Ablauf je Schritt** (`sim/core/simulation.ts`): Befehle → `tick + 1` → Systeme → Ereignisse verteilen.
+- **Wegfindung (ab M1):** Graph je Netz (Straße, Schiene, Förderband, Stapler-Wege), aus gebauten Feldern abgeleitet; A* mit Zwischenspeicher, bei Bauänderung verworfen. Reservierungen für Kreuzungen und Ladezonen ab M2.
 
 ## Darstellung
 
 - Ziel ca. 60 Bilder/s auf einem Büro-Laptop (Chrome, Edge, Firefox aktuell).
 - Instancing (InstancedMesh) für gleichartige Objekte von Anfang an; Detailstufen vorbereitet.
 - Low-Poly-Modelle aus Code, keine externen Modelldateien. Farbstil „Hell & freundlich“.
-- Einblendbare Leistungsanzeige (ab T0.4), Leistungstest der Simulation mit vielen Fahrzeugen (ab M2).
+- Einblendbare Leistungsanzeige (`ui/hud/perfOverlay.ts`, F3), Leistungstest der Simulation mit vielen Fahrzeugen (ab M2).
+- Koordinaten: 1 Welteinheit = 1 Feld; Campus von (0, 0) bis (128, 128) in x/z, y nach oben. Gebäude-`x`/`z` = Feld der linken oberen Ecke.
+- `render/scene/gameRenderer.ts` besitzt Renderer, Szene, Licht und Kamera; `terrain.ts` Gelände, Raster, Rand, Eingangsstraße; `views/` spiegeln den Zustand (z. B. `buildingsView.ts`), `models/` erzeugen Low-Poly-Modelle.
+- Kamera: `render/camera/cameraRig.ts` hält Blickpunkt, Abstand, Drehung, Neigung als reine Zahlen mit Grenzen (getestet); `input/cameraInput.ts` übersetzt Maus/Tastatur/Rand-Scrollen. Grenzen und Geschwindigkeiten in `config/camera.ts`.
 
 ## Speichern (Plan, Umsetzung ab T0.6a)
 
