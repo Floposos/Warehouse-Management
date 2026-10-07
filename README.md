@@ -2,7 +2,7 @@
 
 3D-Logistik-Managementspiel im Browser: Du leitest aus der Vogelperspektive einen großen Logistik-Campus, baust Straßen, Zonen und Hallen und bringst Waren durch mehrstufige Produktketten bis zum Export. Low-Poly-Grafik, Oberfläche komplett auf Deutsch.
 
-**Aktueller Stand:** M0 Grundgerüst in Arbeit (Version `0.1.0-dev`). Noch nichts Spielbares, nur ein Platzhalter-Bildschirm.
+**Aktueller Stand:** M0 Grundgerüst fertig zum Test (Version `0.1.0`): Hauptmenü, Campus mit Kamera, laufende Zeit mit Pause/1x/2x/4x, Speichern/Laden/Export/Import und Autosave.
 
 ## Spielen
 
@@ -11,6 +11,8 @@
 - **Download je Meilenstein:** unter [Releases](https://github.com/Floposos/Warehouse-Management/releases)
 
 Download-Version: ZIP entpacken, `index.html` doppelklicken. Keine Installation, kein Server nötig. Empfohlen: aktuelles Chrome, Edge oder Firefox.
+
+Steuerung: rechte Maustaste ziehen = drehen/neigen, mittlere Maustaste ziehen = verschieben, Mausrad oder E/Q = zoomen, WASD = verschieben, R/F = neigen, Y/X = drehen, Bildschirmrand = verschieben. Leertaste = Pause, 1/2/3 = 1x/2x/4x, Esc = Menü, F3 = Leistungsanzeige.
 
 Version, Build-Datum und Kurz-Commit stehen unten rechts im Bild (z. B. `v0.1.0 · 12.11.2026 · a1b2c3d`). Bitte bei Feedback mit angeben.
 

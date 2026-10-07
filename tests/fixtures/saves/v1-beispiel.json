@@ -1,0 +1,30 @@
+{
+  "format": "logistikum-save",
+  "saveVersion": 1,
+  "gameVersion": "0.1.0-dev",
+  "createdAt": "2026-10-07T18:00:00.000Z",
+  "meta": {
+    "name": "Beispiel M0",
+    "tick": 10234,
+    "balanceCents": 99750000
+  },
+  "state": {
+    "seed": 20260107,
+    "tick": 10234,
+    "rng": {
+      "s": 20260107
+    },
+    "nextId": 2,
+    "finance": {
+      "balanceCents": 99750000
+    },
+    "buildings": [
+      {
+        "id": 1,
+        "type": "testHall",
+        "x": 12,
+        "z": 58
+      }
+    ]
+  }
+}

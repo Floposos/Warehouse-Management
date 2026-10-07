@@ -19,19 +19,21 @@ const KEYS = {
   back: ['KeyS', 'ArrowDown'],
   left: ['KeyA', 'ArrowLeft'],
   right: ['KeyD', 'ArrowRight'],
-  rotateLeft: ['KeyQ'],
-  rotateRight: ['KeyE'],
+  // Physische Tasten: KeyZ ist auf deutscher Tastatur das „Y“.
+  rotateLeft: ['KeyZ'],
+  rotateRight: ['KeyX'],
   tiltUp: ['KeyR'],
   tiltDown: ['KeyF'],
-  zoomIn: ['Equal', 'NumpadAdd', 'BracketRight'],
-  zoomOut: ['Minus', 'NumpadSubtract', 'Slash'],
+  zoomIn: ['KeyE', 'Equal', 'NumpadAdd', 'BracketRight'],
+  zoomOut: ['KeyQ', 'Minus', 'NumpadSubtract', 'Slash'],
 } as const;
 const ALL_KEYS = new Set<string>(Object.values(KEYS).flat());
 
 /**
  * Kamerasteuerung im Aufbauspiel-Stil (Entscheidung 07.10.2026):
  * rechte Taste ziehen = drehen/neigen, mittlere Taste ziehen = verschieben, Rad = zoomen,
- * WASD/Pfeile = verschieben, Q/E = drehen, Rand-Scrollen. ANNAHME: R/F neigen, +/− zoomen.
+ * WASD/Pfeile = verschieben, Rand-Scrollen; Tasten (07.10.2026): Q/E zoomen (E hinein,
+ * Q heraus), R/F neigen, Y/X drehen; +/− zoomen zusätzlich.
  * Linke Taste bleibt frei für Bauen und Auswählen.
  */
 export class CameraInput {

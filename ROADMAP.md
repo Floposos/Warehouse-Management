@@ -3,20 +3,20 @@
 Status: geplant · in Arbeit · im Test · fertig. Reihenfolge am 07.10.2026 von Florian freigegeben.
 Jeder Meilenstein liefert eine spielbare Version als Link und als Download. Nach der Freigabe eines Meilensteins kommen nur noch Fehlerkorrekturen hinein, Erweiterungen werden als neue Punkte eingeplant.
 
-| Meilenstein                              | Version | Status    |
-| ---------------------------------------- | ------- | --------- |
-| M0 Grundgerüst                           | 0.1.0   | in Arbeit |
-| M1 Bauen & erster Warenfluss             | 0.2.0   | geplant   |
-| M2 Flotte & Verkehr                      | 0.3.0   | geplant   |
-| M3 Produktion & Lager                    | 0.4.0   | geplant   |
-| M4 Export                                | 0.5.0   | geplant   |
-| M5 Aufträge & Finanzen (inkl. Insolvenz) | 0.6.0   | geplant   |
-| M6 Personal                              | 0.7.0   | geplant   |
-| M7 Firmenpolitik & Ereignisse            | 0.8.0   | geplant   |
-| M8 Züge, Kühl-/Gefahrgut, Produktkatalog | 0.9.0   | geplant   |
-| M9 Spielmodi & Feinschliff               | 0.10.0  | geplant   |
+| Meilenstein                              | Version | Status  |
+| ---------------------------------------- | ------- | ------- |
+| M0 Grundgerüst                           | 0.1.0   | im Test |
+| M1 Bauen & erster Warenfluss             | 0.2.0   | geplant |
+| M2 Flotte & Verkehr                      | 0.3.0   | geplant |
+| M3 Produktion & Lager                    | 0.4.0   | geplant |
+| M4 Export                                | 0.5.0   | geplant |
+| M5 Aufträge & Finanzen (inkl. Insolvenz) | 0.6.0   | geplant |
+| M6 Personal                              | 0.7.0   | geplant |
+| M7 Firmenpolitik & Ereignisse            | 0.8.0   | geplant |
+| M8 Züge, Kühl-/Gefahrgut, Produktkatalog | 0.9.0   | geplant |
+| M9 Spielmodi & Feinschliff               | 0.10.0  | geplant |
 
-## M0 Grundgerüst (0.1.0) – in Arbeit
+## M0 Grundgerüst (0.1.0) – im Test
 
 Ziel: Hauptmenü, Campus mit Raster, freie Kamera, Test-Halle, laufende Zeit mit Pause/1x/2x/4x, Topbar, Speichern/Laden/Export/Import, Autosave, CI und Auslieferung.
 Ablauf: T0.1 → (T0.2, T0.3, T0.4 parallel) → (T0.5, T0.6a parallel) → T0.6b → T0.7.
@@ -27,10 +27,10 @@ Ablauf: T0.1 → (T0.2, T0.3, T0.4 parallel) → (T0.5, T0.6a parallel) → T0.6
 | T0.2 CI und Auslieferung                             | im Test | CI prüft Lint, Typen, Tests, Build, Rauchtest; Pages + `download/logistikum-latest.zip`; Tags `v*` → Release; Einzeldatei startet über http und `file://`; Version, Datum, Commit sichtbar                    |
 | T0.3 Simulationskern und Spielzeit                   | im Test | Gleicher Seed + Befehle = gleicher Zustand nach 10.000 Schritten; 4x·1 s = 1x·4 s; Pause ändert nichts; Tag/Monat/Jahr-Ereignisse; JSON-Rundreise; Kontostand-Platzhalter                                     |
 | T0.4 3D-Szene, Raster, Kamera                        | im Test | 128 × 128 Gelände mit Raster und Rand, Eingangsstraße angedeutet; Kamera nach gewählter Belegung inkl. Rand-Scrollen, mit Grenzen; Halle rastergenau; ~60 Bilder/s, Leistungsanzeige                          |
-| T0.5 Hauptmenü, Topbar, Zeitsteuerung, Einstellungen | geplant | Menü über lebendem Campus (Neues Spiel, Laden, Einstellungen, Version, Download); Topbar Datum/Uhrzeit + Kontostand; Pause/1x/2x/4x per Klick und Taste; Einstellungen bleiben gespeichert; Texte aus `de.ts` |
-| T0.6a Speicherkern                                   | geplant | Speichern/Laden identisch; Migrationskette getestet; falsche/zu neue Version gibt Meldung; abgebrochenes Speichern lässt alten Stand heil; Backups behalten genaue Anzahl; Beispiel-Spielstand v1             |
-| T0.6b Speicher-Oberfläche und Autosave               | geplant | Speichern-/Laden-Dialoge mit Rückfragen; Export/Import; Chrome/Edge-Sicherungsdatei; Firefox-Backups + Hinweis alle 30 min; Signal „Gespeichert“                                                              |
-| T0.7 Integration und Abnahme                         | geplant | Checkliste in Chrome, Edge, Firefox; Release v0.1.0 mit ZIP; Meilenstein-Bericht                                                                                                                              |
+| T0.5 Hauptmenü, Topbar, Zeitsteuerung, Einstellungen | im Test | Menü über lebendem Campus (Neues Spiel, Laden, Einstellungen, Version, Download); Topbar Datum/Uhrzeit + Kontostand; Pause/1x/2x/4x per Klick und Taste; Einstellungen bleiben gespeichert; Texte aus `de.ts` |
+| T0.6a Speicherkern                                   | im Test | Speichern/Laden identisch; Migrationskette getestet; falsche/zu neue Version gibt Meldung; abgebrochenes Speichern lässt alten Stand heil; Backups behalten genaue Anzahl; Beispiel-Spielstand v1             |
+| T0.6b Speicher-Oberfläche und Autosave               | im Test | Speichern-/Laden-Dialoge mit Rückfragen; Export/Import; Chrome/Edge-Sicherungsdatei; Firefox-Backups + Hinweis alle 30 min; Signal „Gespeichert“                                                              |
+| T0.7 Integration und Abnahme                         | im Test | Checkliste in Chrome, Edge, Firefox; Release v0.1.0 mit ZIP; Meilenstein-Bericht                                                                                                                              |
 
 ## M1 Bauen & erster Warenfluss (0.2.0) – geplant
 
@@ -61,5 +61,6 @@ Ablauf: T1.1 → (T1.2, T1.3, T1.6 parallel) → T1.4 → T1.5 → (T1.5b, T1.7 
 
 ## Offen
 
-- Prüfen, ob die Sicherungsdatei (Chrome/Edge) auch in der Download-Version (`file://`) funktioniert (T0.6b).
+- Sicherungsdatei in der Download-Version (`file://`): Funktion ist in Chrome verfügbar (automatisch geprüft); Erhalt des Zugriffs nach Browser-Neustart manuell prüfen.
+- Bestätigung offen: Startkapital (Platzhalter 1.000.000 €).
 - Campus-Erweiterung einem Meilenstein zuordnen (Vorschlag M5).

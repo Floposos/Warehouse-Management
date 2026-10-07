@@ -10,7 +10,7 @@ export interface PerfSample {
 }
 
 /**
- * Einblendbare Leistungsanzeige (ANNAHME: Taste F3). Zeigt Bilder/s gemittelt
+ * Einblendbare Leistungsanzeige (Taste F3). Zeigt Bilder/s gemittelt
  * über eine halbe Sekunde, Simulationszeit pro Schritt und Zeichenaufrufe.
  */
 export class PerfOverlay {

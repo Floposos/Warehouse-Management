@@ -53,6 +53,7 @@ Rohware kommt von abstrakten Zulieferern über Eingangsstraßen (später Schiene
 | 07.10.2026 | LKW-Kosten                  | Kaufpreis + feste Tageskosten + Kilometerkosten                                                                                                                        |
 | 07.10.2026 | Exportpreis M1              | Fester Preis je Ware                                                                                                                                                   |
 | 07.10.2026 | Warendarstellung            | Farbige Kisten auf der Ladefläche + Bestandssymbole an Gebäuden                                                                                                        |
+| 07.10.2026 | Kamera-Tasten               | Q/E zoomen (E hinein, Q heraus), R/F neigen, Y/X drehen (ersetzt Q/E drehen), F3 Leistungsanzeige                                                                      |
 | 07.10.2026 | Meilenstein-Reihenfolge     | Aufträge & Finanzen (M5) vor Personal (M6); Insolvenz zu den Finanzen; Kühl-/Gefahrgut-Aufträge nach M8; Ereignis-Grundsystem in M2 (siehe ROADMAP.md)                 |
 
 ## Offene Designfragen
