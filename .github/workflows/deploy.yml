@@ -1,0 +1,87 @@
+# Auslieferung: Jeder Stand auf main geht nach GitHub Pages (Spiel + aktuelles ZIP).
+# Tags v* (z. B. v0.1.0) erzeugen zusätzlich ein GitHub-Release mit ZIP.
+# Ausgeliefert wird nur, wenn die komplette Prüfung (ci.yml) grün ist.
+name: Auslieferung
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+
+  pages:
+    name: GitHub Pages
+    if: github.ref == 'refs/heads/main'
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: logistikum-build
+          path: build
+
+      - name: Seite zusammenstellen
+        run: |
+          mkdir -p site/download
+          cp build/dist/index.html site/index.html
+          cp build/release/logistikum.zip site/download/logistikum-latest.zip
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  release:
+    name: Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Tag passt zur Version in package.json
+        run: |
+          expected="v$(node -p "require('./package.json').version")"
+          if [ "$expected" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME passt nicht zu package.json ($expected)." >&2
+            exit 1
+          fi
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: logistikum-build
+          path: build
+
+      - name: Release mit ZIP anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          zip="logistikum-${GITHUB_REF_NAME}.zip"
+          cp build/release/logistikum.zip "$zip"
+          gh release create "$GITHUB_REF_NAME" "$zip" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Logistikum $GITHUB_REF_NAME" \
+            --notes "Spielbare Version $GITHUB_REF_NAME. Was neu ist und wie du testest: siehe CHANGELOG.md. Start: ZIP entpacken, index.html doppelklicken."
