@@ -4,14 +4,17 @@
  */
 export const vehicleConfig = {
   supplierSpeed: 400,
-  /** Eigene LKW (T1.5). Entscheidung 07.10.2026: Kaufpreis + feste Tageskosten + Kilometerkosten. */
-  truckSpeed: 500,
+  /**
+   * Eigene LKW (T1.5). Entscheidung 07.10.2026: Kaufpreis + feste Tageskosten + Kilometerkosten.
+   * Feinjustierung nach dem M1-Test (Florian, 07.10.2026): Kosten und Tempo „Mittel“.
+   */
+  truckSpeed: 400,
   /** Ladung je Fahrt (Einheiten). */
   truckCapacity: 20,
-  /** Kaufpreis (60.000 €), Tageskosten (200 €), Kosten je km (0,50 €). */
-  truckPriceCents: 6_000_000,
-  truckDailyCents: 20_000,
-  truckCostPerKmCents: 50,
+  /** Kaufpreis (90.000 €), Tageskosten (400 €), Kosten je km (1,20 €). */
+  truckPriceCents: 9_000_000,
+  truckDailyCents: 40_000,
+  truckCostPerKmCents: 120,
   /** Länge eines Felds in Metern (für die Kilometerkosten). */
   metersPerField: 10,
   /** Automatik: Mindestmenge je Fahrt, damit der LKW nicht für jede Einheit losfährt. */
@@ -21,7 +24,7 @@ export const vehicleConfig = {
   /** Höchstzahl der Halte einer festen Tour. */
   tourMaxStops: 12,
   /** Abladen bzw. Aufladen je Halt (Schritte). */
-  handlingTicks: 20,
+  handlingTicks: 30,
   /** Wartezeit, bevor ein Fahrzeug ohne Weg oder ein Auftrag ohne Platz es erneut versucht. */
   retryTicks: 125,
   /** Felder der Eingangsstraße, auf denen Zulieferer außerhalb des Geländes fahren. */

@@ -136,6 +136,16 @@ describe('Kosten und ganze Kette', () => {
     expect(cost).toBeLessThan(vehicleConfig.truckDailyCents + 200);
   });
 
+  it('Kilometerzähler bleibt ganzzahlig (Spielstand), Rest wird übertragen', () => {
+    const s = testWorld();
+    const t = buy(s);
+    t.odometer = 1_234_567;
+    s.run(TICKS_PER_DAY);
+    expect(Number.isInteger(t.odometer)).toBe(true);
+    const rate = vehicleConfig.metersPerField * vehicleConfig.truckCostPerKmCents;
+    expect(t.odometer * rate).toBeLessThan(1_000_000);
+  });
+
   it('Rohware → A → B → C → Export: Kasse wächst über zwei Tage', () => {
     const s = testWorld();
     s.execute({ type: 'order/create', product: 'rawA', quantity: 50, interval: 'daily' });

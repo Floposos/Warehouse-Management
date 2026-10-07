@@ -120,12 +120,14 @@ function deliverCargoElsewhere(state: GameState, network: RoadNetwork, t: Truck)
 
 /** Tageswechsel: feste Tageskosten und Kilometerkosten je LKW (Kasse: „Fahrzeuge“). */
 function bookTruckCosts(state: GameState, bus: EventBus): void {
-  const milliPerCent =
-    1_000_000 / (vehicleConfig.metersPerField * vehicleConfig.truckCostPerKmCents);
+  // Tausendstel Feld × Meter je Feld × Cent je km = Millionstel Cent (1 km = 1000 m).
+  const rate = vehicleConfig.metersPerField * vehicleConfig.truckCostPerKmCents;
   for (const t of state.vehicles) {
     if (t.kind !== 'truck') continue;
-    const kmCents = Math.floor(t.odometer / milliPerCent);
-    t.odometer -= kmCents * milliPerCent;
+    const micro = t.odometer * rate;
+    const kmCents = Math.floor(micro / 1_000_000);
+    // Rest als ganze Tausendstel Feld übertragen (Spielstand speichert nur ganze Zahlen).
+    t.odometer = Math.floor((micro - kmCents * 1_000_000) / rate);
     book(state.finance, state.tick, bus, 'vehicles', -(vehicleConfig.truckDailyCents + kmCents));
   }
 }

@@ -3,7 +3,20 @@
 Pro Version: Was ist neu, Was wurde behoben, So testest du das, Bekannte Probleme.
 Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 
-## 0.2.1 – Zonen verschmelzen (07.10.2026)
+## 0.3.0 – M2 Flotte & Verkehr (in Arbeit)
+
+### Was ist neu
+
+- Feinjustierung nach dem M1-Test (Florian, 07.10.2026). Bei Bauen, LKW-Kosten und Tempo gilt die Stufe „Mittel“, Waren- und Exportpreise bleiben unverändert.
+  - Bauen: Straße 500 €/Feld (vorher 200 €), Lieferort A 250 €, B 400 €, C 400 € je Feld (vorher 100/150/150 €), Export-Ausfahrt 50.000 € (vorher 25.000 €).
+  - LKW: Kauf 90.000 € (vorher 60.000 €), 400 € je Tag (vorher 200 €), 1,20 € je km (vorher 0,50 €).
+  - Tempo: LKW 4 Felder/s bei 1x (vorher 5), Auf- und Abladen 3 s (vorher 2 s), C braucht ein Drittel länger je Endprodukt (3 × 3 Felder: 6 s statt 4,5 s).
+
+### Was wurde behoben
+
+- Die Kilometerkosten konnten bei krummen Preisen einen Kilometerstand mit Nachkommastellen erzeugen; der Spielstand hätte dann nicht mehr gespeichert werden können. Der Rest wird jetzt ganzzahlig übertragen.
+
+## 0.2.1 – Zonen verschmelzen (07.10.2026, Teil von 0.3.0)
 
 ### Was wurde behoben
 
