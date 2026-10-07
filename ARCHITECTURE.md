@@ -99,6 +99,8 @@ Warum: Die Logik bleibt ohne Browser testbar, Grafik- und UI-Änderungen können
 - **Nie halb geschrieben:** `serializeSave` erzeugt den Text und liest ihn zur Probe zurück, erst dann wird geschrieben. IndexedDB schreibt Eintrag (`saveMeta`) und Inhalt (`saveData`) in einer Transaktion; die Sicherungsdatei wird über eine Temporärdatei ersetzt.
 - **Ablagen** (`save/backends/`): `SaveStorage`-Schnittstelle mit `IndexedDbSaveStorage` (Browser) und `MemorySaveStorage` (Tests/Rückfall). `save/saveRepository.ts`: beliebig viele benannte Slots, rotierende Autosave-Backups (Anzahl in `config/save.ts`, neues zuerst schreiben, dann älteste löschen), Export-Text.
 - **Sicherungsdatei** (`backends/backupFile.ts`): File System Access API (Chrome/Edge), Dateizugriff wird in IndexedDB gemerkt; nach Browser-Neustart einmal per Klick bestätigen. **Export/Import** (`backends/fileTransfer.ts`): Download als `.json`, Import über Dateiauswahl.
+- **Bedienung** (seit T0.6b): `app/saveController.ts` verbindet Ablage, Dialoge (`ui/screens/saveDialog.ts`, `loadDialog.ts`, Liste `ui/components/saveList.ts`) und Autosave. `app/autosaveTimer.ts` zählt Echtzeit im Spiel (eigener Sekunden-Takt, unabhängig von der Bildrate): Autosave im Intervall aus den Einstellungen, nur bei Fortschritt; Export-Erinnerung alle 30 Minuten, solange keine Sicherungsdatei aktiv ist. Ohne IndexedDB fällt das Spiel auf den Arbeitsspeicher zurück und sagt es.
+- `window.__logistikum` gibt Rauchtests und der Konsole Zugriff auf die App (z. B. `saves.autosave()`).
 
 ## Auslieferung
 

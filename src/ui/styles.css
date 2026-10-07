@@ -268,3 +268,71 @@ body {
     monospace;
   pointer-events: none !important;
 }
+
+/* Speichern und Laden */
+.dialog h3 {
+  margin: 16px 0 8px;
+  font-size: 1rem;
+}
+.save-form {
+  display: grid;
+  gap: 6px;
+}
+.save-form-row {
+  display: flex;
+  gap: 8px;
+}
+.save-form input {
+  flex: 1;
+  font: inherit;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.save-hint {
+  margin: 12px 0 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.save-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.save-list-empty {
+  color: var(--muted);
+}
+.save-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.save-item-info {
+  display: grid;
+  gap: 2px;
+}
+.save-item-details,
+.save-item-date {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+.save-item-actions,
+.backup-file-actions {
+  display: flex;
+  gap: 6px;
+}
+.backup-file {
+  margin-top: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+}
+.backup-file-status {
+  margin: 6px 0;
+}

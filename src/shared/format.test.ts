@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDateDe, formatEuro } from './format';
+import { formatDateDe, formatDateTimeDe, formatEuro } from './format';
 
 describe('formatDateDe', () => {
   it('formatiert ein ISO-Datum deutsch', () => {
@@ -20,5 +20,11 @@ describe('formatEuro', () => {
     expect(formatEuro(100_000_000)).toBe('1.000.000 €');
     expect(formatEuro(-12_345_00)).toBe('-12.345 €');
     expect(formatEuro(0)).toBe('0 €');
+  });
+});
+
+describe('formatDateTimeDe', () => {
+  it('zeigt Datum und Uhrzeit in Berliner Zeit', () => {
+    expect(formatDateTimeDe('2026-10-07T16:05:00Z')).toBe('07.10.2026, 18:05');
   });
 });

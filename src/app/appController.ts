@@ -18,17 +18,12 @@ import { openSettingsDialog } from '../ui/screens/settingsDialog';
 import { de } from '../ui/texts/de';
 import { startFrameLoop } from './frameLoop';
 import { GameSession } from './gameSession';
+import { SaveController } from './saveController';
 
 const { campusWidth: W, campusDepth: D } = worldConfig;
 const BOUNDS = { minX: 0, maxX: W, minZ: 0, maxZ: D };
 /** Startblick eines neuen Spiels: auf die Test-Halle an der Eingangsstraße. */
 const START_VIEW = { x: 24, z: 62 };
-
-export interface AppHooks {
-  /** Speichern/Laden-Dialoge (T0.6b); `onClose` läuft, wenn der Dialog ohne Laden schließt. */
-  openSave(onClose: () => void): void;
-  openLoad(onClose: () => void): void;
-}
 
 /**
  * Verbindet alle Schichten und schaltet zwischen Hauptmenü und Spiel um.
@@ -46,7 +41,7 @@ export class AppController {
   private readonly topbar: Topbar;
   private readonly mainMenu: MainMenu;
   private readonly perf: PerfOverlay;
-  hooks: AppHooks = { openSave: (done) => done(), openLoad: (done) => done() };
+  readonly saves: SaveController;
 
   constructor(
     readonly ui: HTMLElement,
@@ -70,13 +65,23 @@ export class AppController {
     this.mainMenu = new MainMenu(
       ui,
       {
-        newGame: () => this.startGame(createInitialState(randomSeed())),
-        load: () => this.hooks.openLoad(() => undefined),
+        newGame: () => {
+          this.startGame(createInitialState(randomSeed()));
+          this.saves.onGameStarted(null);
+        },
+        load: () => void this.saves.openLoad(() => undefined),
         settings: () => this.openSettings(),
       },
       downloadUrl,
     );
     this.toasts = new Toasts(ui);
+    this.saves = new SaveController({
+      ui,
+      toasts: this.toasts,
+      currentState: () => this.session?.state ?? null,
+      startGame: (state) => this.startGame(state),
+      autosaveMinutes: () => this.settings.get().autosaveMinutes,
+    });
     this.perf = new PerfOverlay(ui);
     installGameShortcuts({
       isActive: () => this.mode === 'game' && !isDialogOpen(),
@@ -87,6 +92,22 @@ export class AppController {
     window.addEventListener('resize', () => renderer.resize());
     this.showMenu();
     startFrameLoop((dt) => this.frame(dt));
+    this.startAutosaveClock();
+  }
+
+  /** Echtzeit-Uhr für Autosave und Export-Erinnerung (läuft unabhängig von der Bildrate). */
+  private startAutosaveClock(): void {
+    let last = Date.now();
+    setInterval(() => {
+      const now = Date.now();
+      if (this.session) this.saves.timer.advance(now - last);
+      last = now;
+    }, 1000);
+  }
+
+  /** Aktuelle Spielkamera (für Rauchtests). */
+  get cameraRig(): Readonly<CameraRig> {
+    return this.rig;
   }
 
   get inGame(): boolean {
@@ -127,8 +148,8 @@ export class AppController {
     };
     openPauseMenu(this.ui, {
       resume,
-      save: () => this.hooks.openSave(resume),
-      load: () => this.hooks.openLoad(resume),
+      save: () => void this.saves.openSave(resume),
+      load: () => void this.saves.openLoad(resume),
       settings: () => this.openSettings(resume),
       mainMenu: () => void this.confirmLeave(resume),
     });

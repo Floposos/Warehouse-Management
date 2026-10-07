@@ -25,5 +25,9 @@ export function startApp(): AppController | null {
     return null;
   }
   const isWeb = location.protocol === 'http:' || location.protocol === 'https:';
-  return new AppController(ui, canvas, renderer, isWeb ? DOWNLOAD_PATH : null);
+  const app = new AppController(ui, canvas, renderer, isWeb ? DOWNLOAD_PATH : null);
+  void app.saves.init();
+  // Zugriff für Rauchtests und Fehlersuche in der Konsole (nur lesen bzw. Autosave auslösen).
+  (window as unknown as { __logistikum?: AppController }).__logistikum = app;
+  return app;
 }

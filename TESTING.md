@@ -36,7 +36,7 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Gelände mit Raster, hellem Rand und Eingangsstraße an der Westseite; Test-Halle sitzt genau auf Rasterlinien.
 - [ ] Rechte Maustaste ziehen: dreht (links/rechts) und neigt (hoch/runter) stufenlos.
 - [ ] Mittlere Maustaste ziehen: verschiebt die Karte. Mausrad: zoomt.
-- [ ] WASD/Pfeile verschieben, Q/E drehen, R/F neigen, +/− zoomen.
+- [ ] WASD/Pfeile verschieben, E hinein-/Q herauszoomen, R/F neigen, Y/X drehen, +/− zoomen.
 - [ ] Maus an den Bildschirmrand: Karte scrollt; über Bedienelementen nicht.
 - [ ] Neigen geht nie unter den Boden, Zoom hat Grenzen, Verschieben bleibt im Gelände.
 - [ ] Linke Maustaste bewegt die Kamera nicht. Rechtsklick öffnet kein Kontextmenü.
@@ -52,3 +52,16 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] „Hauptmenü“ fragt nach; Abbrechen kehrt ins Spiel zurück.
 - [ ] Einstellungen (aus Hauptmenü und Esc-Menü): Autosave-Intervall, Kamera-Empfindlichkeit (wirkt sofort), Rand-Scrollen an/aus; nach Neuladen noch gesetzt.
 - [ ] Tasten wirken nicht, solange ein Dialog offen ist.
+
+### Speichern, Laden, Autosave (seit 0.1.0-dev, T0.6)
+
+- [ ] Speichern: Name vorgeschlagen („Campus TT.MM.JJJJ“), änderbar; Meldung „Gespeichert“.
+- [ ] Vorhandenen Spielstand überschreiben: Rückfrage erscheint; nach Bestätigen nur ein Eintrag mit neuem Stand.
+- [ ] Laden-Liste: Name, Spielzeit (Datum/Uhrzeit im Spiel), Kontostand, Speicherdatum; neueste oben.
+- [ ] Laden im laufenden Spiel fragt nach; danach stimmen Datum, Uhrzeit, Kontostand.
+- [ ] Löschen mit Rückfrage; Abbrechen löscht nichts.
+- [ ] Export lädt `logistikum-<Name>-<Datum>.json`; Import derselben Datei stellt den Stand her (auch in der jeweils anderen Version: Link ↔ Download).
+- [ ] Import einer fremden/kaputten Datei: verständliche Meldung, Spiel läuft weiter.
+- [ ] Autosave nach Intervall: Meldung „Automatisch gespeichert“; höchstens 3 automatische Sicherungen in der Liste; bei Pause ohne Fortschritt kein neuer Autosave.
+- [ ] Chrome/Edge: Sicherungsdatei wählen, wird beim Autosave überschrieben; nach Browser-Neustart Knopf „Zugriff erlauben“ (im Hinweis und im Speichern-Dialog). Auch in der Download-Version (`file://`) prüfen.
+- [ ] Firefox: Abschnitt „Sicherungsdatei“ erklärt, dass es sie nur in Chrome/Edge gibt; nach 30 Minuten Spielzeit Hinweis „Jetzt exportieren“.

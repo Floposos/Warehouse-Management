@@ -25,3 +25,17 @@ export function formatEuro(cents: number): string {
 export function pad2(n: number): string {
   return String(n).padStart(2, '0');
 }
+
+/** ISO-Zeitstempel als „07.10.2026, 18:05“ (Zeitzone Berlin). */
+export function formatDateTimeDe(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '–';
+  return new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Berlin',
+  }).format(date);
+}
