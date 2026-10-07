@@ -14,7 +14,7 @@
 
 - Unit-Tests liegen neben der getesteten Datei (`foo.ts` + `foo.test.ts`).
 - `tests/lint/` prüft, dass die Lint-Regeln die Schichttrennung wirklich erzwingen.
-- `tests/fixtures/saves/` bekommt ab T0.6a je Spielstand-Version einen Beispiel-Spielstand; ein Test lädt alle.
+- `tests/fixtures/saves/` enthält je Spielstand-Version einen Beispiel-Spielstand (`v1-beispiel.json`); `src/save/fixtures.test.ts` lädt alle und rechnet weiter.
 - Rauchtest in der Cloud-Umgebung: nutzt das vorinstallierte Chromium (`@playwright/test` ist deshalb exakt auf 1.56.1 festgelegt). In GitHub Actions installiert die CI Chromium selbst.
 - Die CI (`.github/workflows/ci.yml`) führt alles bei jedem Pull Request aus; die Auslieferung (`deploy.yml`) startet nur, wenn alles grün ist.
 

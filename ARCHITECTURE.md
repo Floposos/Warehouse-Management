@@ -92,13 +92,13 @@ Warum: Die Logik bleibt ohne Browser testbar, Grafik- und UI-Änderungen können
 - Einstellungen: `shared/settings.ts` (Prüfung, Laden/Speichern über injizierten Speicher, localStorage im Browser), Standardwerte in `config/settings.ts`.
 - `input/gameShortcuts.ts`: Leertaste, 1/2/3, Esc; inaktiv im Hauptmenü und bei offenem Dialog.
 
-## Speichern (Plan, Umsetzung ab T0.6a)
+## Speichern (seit T0.6a)
 
-- Format `{ format: "logistikum-save", saveVersion, gameVersion, createdAt, seed, state }`.
-- Migrationen: eine Datei pro Versionssprung in `save/migrations/`, nacheinander angewendet; Beispiel-Spielstand je Version in `tests/fixtures/saves/`.
-- Slots in IndexedDB (beliebig viele mit Namen); Export/Import als `.json`.
-- Autosave Chrome/Edge: Sicherungsdatei über die File System Access API. Firefox/Fallback: IndexedDB mit rotierenden Backups und Export-Erinnerung.
-- Nie halb geschrieben: erst komplett erzeugen und prüfen, dann in einem Schritt schreiben.
+- **Format** (`save/format.ts`): `{ format: "logistikum-save", saveVersion, gameVersion, createdAt, meta: { name, tick, balanceCents }, state }`. `meta` dient Listen ohne den ganzen Zustand. `parseSave` liefert Fehlercodes (`notJson`, `wrongFormat`, `tooNew`, `invalidVersion`, `migrationFailed`, `invalidState`) statt abzustürzen; `save/validate.ts` prüft die Form des Zustands.
+- **Migrationen** (`save/migrations/`): eine Datei pro Sprung, eingetragen unter der Ausgangsversion, nacheinander angewendet. Jede Formatänderung = neue `saveVersion` + Migration + Beispiel-Spielstand in `tests/fixtures/saves/` (`save/fixtures.test.ts` lädt alle).
+- **Nie halb geschrieben:** `serializeSave` erzeugt den Text und liest ihn zur Probe zurück, erst dann wird geschrieben. IndexedDB schreibt Eintrag (`saveMeta`) und Inhalt (`saveData`) in einer Transaktion; die Sicherungsdatei wird über eine Temporärdatei ersetzt.
+- **Ablagen** (`save/backends/`): `SaveStorage`-Schnittstelle mit `IndexedDbSaveStorage` (Browser) und `MemorySaveStorage` (Tests/Rückfall). `save/saveRepository.ts`: beliebig viele benannte Slots, rotierende Autosave-Backups (Anzahl in `config/save.ts`, neues zuerst schreiben, dann älteste löschen), Export-Text.
+- **Sicherungsdatei** (`backends/backupFile.ts`): File System Access API (Chrome/Edge), Dateizugriff wird in IndexedDB gemerkt; nach Browser-Neustart einmal per Klick bestätigen. **Export/Import** (`backends/fileTransfer.ts`): Download als `.json`, Import über Dateiauswahl.
 
 ## Auslieferung
 
