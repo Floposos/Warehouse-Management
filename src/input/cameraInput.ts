@@ -32,8 +32,8 @@ const ALL_KEYS = new Set<string>(Object.values(KEYS).flat());
 /**
  * Kamerasteuerung im Aufbauspiel-Stil (Entscheidung 07.10.2026):
  * rechte Taste ziehen = drehen/neigen, mittlere Taste ziehen = verschieben, Rad = zoomen,
- * WASD/Pfeile = verschieben, Rand-Scrollen. Florian 07.10.2026: Q/E zoomen (E hinein,
- * Q heraus), R/F neigen. ANNAHME: Y/X drehen (vorher Q/E), +/− zoomen zusätzlich.
+ * WASD/Pfeile = verschieben, Rand-Scrollen; Tasten (07.10.2026): Q/E zoomen (E hinein,
+ * Q heraus), R/F neigen, Y/X drehen; +/− zoomen zusätzlich.
  * Linke Taste bleibt frei für Bauen und Auswählen.
  */
 export class CameraInput {

@@ -62,5 +62,5 @@ Ablauf: T1.1 → (T1.2, T1.3, T1.6 parallel) → T1.4 → T1.5 → (T1.5b, T1.7 
 ## Offen
 
 - Sicherungsdatei in der Download-Version (`file://`): Funktion ist in Chrome verfügbar (automatisch geprüft); Erhalt des Zugriffs nach Browser-Neustart manuell prüfen.
-- Bestätigung offen: Drehen per Y/X (Q/E sind Zoom), F3 Leistungsanzeige, Startkapital.
+- Bestätigung offen: Startkapital (Platzhalter 1.000.000 €).
 - Campus-Erweiterung einem Meilenstein zuordnen (Vorschlag M5).
