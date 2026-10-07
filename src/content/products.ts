@@ -7,6 +7,10 @@
 export const productIds = ['rawA', 'rawB', 'combo', 'final'] as const;
 export type ProductId = (typeof productIds)[number];
 
+/** Rohwaren, die eingekauft werden, und der Lieferort, an den sie geliefert werden. */
+export const rawProducts = { rawA: 'A', rawB: 'B' } as const;
+export type RawProductId = keyof typeof rawProducts;
+
 export interface Product {
   id: ProductId;
   /** Kistenfarbe (Akzentfarbe im Stil „Hell & freundlich“). */

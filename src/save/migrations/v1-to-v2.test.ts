@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { buildConfig } from '../../config/build';
 import { describe, expect, it } from 'vitest';
 import { Simulation } from '../../sim/core/simulation';
 import { parseSave } from '../format';
@@ -20,6 +21,8 @@ describe('Migration v1 → v2', () => {
         buildings: [{ id: 1, type: 'testHall', x: 12, z: 58, builtTick: 0, paidCents: 0 }],
         roads: [],
         zones: [],
+        orders: [],
+        vehicles: [],
       },
     });
   });
@@ -40,7 +43,7 @@ describe('Migration v1 → v2', () => {
     ).toEqual({
       ok: true,
     });
-    expect(sim.state.finance.today.expenseCents.build).toBe(4 * 50_000);
+    expect(sim.state.finance.today.expenseCents.build).toBe(4 * buildConfig.roadCostPerTileCents);
     expect(result.save.state.buildings[0]).toMatchObject({
       x: 12,
       z: 58,

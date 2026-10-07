@@ -1,10 +1,7 @@
-/**
- * Geldwerte in Cent (ganzzahlig, damit Rechnungen exakt bleiben).
- * ANNAHME: Startkapital ist ein Platzhalter für M0. Florian hat „großzügig“ gewählt;
- * der genaue Betrag wird vor M1 beim Balancing festgelegt (DESIGN.md, offene Fragen).
- */
+/** Geldwerte in Cent (ganzzahlig, damit Rechnungen exakt bleiben). */
 export const economyConfig = {
-  startingBalanceCents: 100_000_000,
+  /** Entscheidung 07.10.2026: Startkapital 2.000.000 €. */
+  startingBalanceCents: 200_000_000,
   /** So viele letzte Buchungen merkt sich die Kasse (Liste in der Übersicht). */
   recentBookings: 50,
 } as const;

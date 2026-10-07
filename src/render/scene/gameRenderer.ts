@@ -17,6 +17,8 @@ import { BuildingsView } from '../views/buildingsView';
 import { GhostView, type Ghost } from '../views/ghostView';
 import { RoadsView } from '../views/roadsView';
 import { SitesView } from '../views/sitesView';
+import { StockView } from '../views/stockView';
+import { VehiclesView } from '../views/vehiclesView';
 import { palette } from './palette';
 import { createTerrain } from './terrain';
 
@@ -28,6 +30,8 @@ export class GameRenderer {
   private readonly buildings = new BuildingsView();
   private readonly roads = new RoadsView();
   private readonly sites = new SitesView();
+  private readonly stock = new StockView();
+  private readonly vehicles = new VehiclesView();
   private readonly ghost = new GhostView();
   private readonly picker: GroundPicker;
   private readonly projected = new Vector3();
@@ -45,6 +49,8 @@ export class GameRenderer {
       createTerrain(),
       this.roads.root,
       this.sites.root,
+      this.stock.root,
+      this.vehicles.root,
       this.buildings.root,
       this.ghost.root,
     );
@@ -73,10 +79,12 @@ export class GameRenderer {
   }
 
   /** Gleicht die Szene mit dem Zustand ab (baut nur bei Änderungen neu). */
-  syncWorld(state: Readonly<GameState>): void {
+  syncWorld(state: Readonly<GameState>, alpha = 0): void {
     this.buildings.sync(state.buildings);
     this.roads.sync(state.roads);
     this.sites.sync(state);
+    this.stock.sync(state.zones);
+    this.vehicles.sync(state.vehicles, alpha);
   }
 
   /** Vorschau des Bauwerkzeugs; null blendet sie aus. */

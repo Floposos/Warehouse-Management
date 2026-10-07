@@ -58,7 +58,16 @@ export function placeZone(
   const f = check.footprint;
   const side = gate ?? suggestGate(new RoadNetwork(state), f);
   const paidCents = check.costCents;
-  state.zones.push({ id, kind, ...f, gate: side, builtTick: state.tick, paidCents, stock });
+  state.zones.push({
+    id,
+    kind,
+    ...f,
+    gate: side,
+    builtTick: state.tick,
+    paidCents,
+    stock,
+    work: 0,
+  });
   bookBuild(state, bus, -check.costCents, { x: f.x + f.width / 2, z: f.z + f.depth / 2 });
   bus.emit({ type: 'zone/placed', id, kind, costCents: check.costCents });
   return check;

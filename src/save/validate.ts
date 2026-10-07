@@ -1,5 +1,6 @@
 import { buildingTypes } from '../content/buildings';
-import { productIds } from '../content/products';
+import { productIds, rawProducts } from '../content/products';
+import { ORDER_INTERVALS, type OrderInterval } from '../sim/goods/orders';
 import { zoneTypes } from '../content/zones';
 import { SIDES, type Side } from '../sim/world/access';
 import { BOOKING_CATEGORIES, type BookingCategory } from '../sim/finance/ledger';
@@ -34,7 +35,7 @@ function isFinance(v: unknown): boolean {
 
 function isZone(v: unknown): boolean {
   if (!isRecord(v)) return false;
-  const ints = ['id', 'x', 'z', 'width', 'depth', 'builtTick', 'paidCents'];
+  const ints = ['id', 'x', 'z', 'width', 'depth', 'builtTick', 'paidCents', 'work'];
   const stock = v['stock'];
   return (
     ints.every((k) => isInt(v[k])) &&
@@ -45,6 +46,40 @@ function isZone(v: unknown): boolean {
     Object.entries(stock).every(
       ([p, n]) => (productIds as readonly string[]).includes(p) && isInt(n),
     )
+  );
+}
+
+const isProduct = (v: unknown): boolean => (productIds as readonly unknown[]).includes(v);
+
+function isOrder(v: unknown): boolean {
+  return (
+    isRecord(v) &&
+    ['id', 'quantity', 'nextTick'].every((k) => isInt(v[k])) &&
+    typeof v['product'] === 'string' &&
+    v['product'] in rawProducts &&
+    ORDER_INTERVALS.includes(v['interval'] as OrderInterval) &&
+    (v['blocked'] === null || typeof v['blocked'] === 'string')
+  );
+}
+
+const PHASES = ['toSite', 'handling', 'toExit', 'noRoute'];
+
+function isVehicle(v: unknown): boolean {
+  if (
+    !isRecord(v) ||
+    !['id', 'progress', 'targetId', 'timer', 'paidCents'].every((k) => isInt(v[k]))
+  ) {
+    return false;
+  }
+  const route = v['route'];
+  const cargo = v['cargo'];
+  return (
+    v['kind'] === 'supplier' &&
+    PHASES.includes(v['phase'] as string) &&
+    Array.isArray(route) &&
+    route.length > 0 &&
+    route.every((c: unknown) => isRecord(c) && isInt(c['x']) && isInt(c['z'])) &&
+    (cargo === null || (isRecord(cargo) && isProduct(cargo['product']) && isInt(cargo['quantity'])))
   );
 }
 
@@ -67,6 +102,8 @@ export function validateState(value: unknown): value is GameState {
     return isInt(t['x']) && isInt(t['z']) && isInt(t['builtTick']) && isInt(t['paidCents']);
   });
   if (!Array.isArray(s['zones']) || !(s['zones'] as unknown[]).every(isZone)) return false;
+  if (!Array.isArray(s['orders']) || !(s['orders'] as unknown[]).every(isOrder)) return false;
+  if (!Array.isArray(s['vehicles']) || !(s['vehicles'] as unknown[]).every(isVehicle)) return false;
   return (
     roadsOk &&
     buildings.every((b: unknown) => {

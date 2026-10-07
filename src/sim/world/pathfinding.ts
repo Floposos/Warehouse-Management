@@ -11,10 +11,11 @@ interface Node {
 /**
  * Kürzester Weg über das Straßennetz (A*, 4 Nachbarn, Kosten 1 je Feld).
  * Liefert die Felder von Start bis Ziel (beide enthalten) oder null, wenn es keinen Weg gibt.
+ * Der Start selbst muss keine Straße sein (Fahrzeug auf einem gerade abgerissenen Feld).
  * Gleichstände werden über die Reihenfolge entschieden, daher immer dasselbe Ergebnis.
  */
 export function findPath(network: RoadNetwork, from: Cell, to: Cell): Cell[] | null {
-  if (!network.has(from.x, from.z) || !network.has(to.x, to.z)) return null;
+  if (!network.has(to.x, to.z)) return null;
   const goal = cellKey(to.x, to.z);
   const h = (c: Cell): number => Math.abs(c.x - to.x) + Math.abs(c.z - to.z);
   const g = new Map<number, number>([[cellKey(from.x, from.z), 0]]);

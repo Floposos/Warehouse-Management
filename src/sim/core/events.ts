@@ -1,4 +1,5 @@
 import type { BuildingTypeId } from '../../content/buildings';
+import type { ProductId } from '../../content/products';
 import type { ZoneKind } from '../../content/zones';
 import type { BookingCategory, BookingPlace } from '../finance/ledger';
 
@@ -26,6 +27,15 @@ export type SimEvent =
   | { type: 'build/demolished'; id: number; refundCents: number }
   | { type: 'zone/placed'; id: number; kind: ZoneKind; costCents: number }
   | { type: 'zone/demolished'; id: number; refundCents: number }
+  | { type: 'goods/delivered'; zoneId: number; product: ProductId; quantity: number }
+  | { type: 'goods/produced'; zoneId: number; product: ProductId }
+  | {
+      type: 'goods/sold';
+      exitId: number;
+      product: ProductId;
+      quantity: number;
+      revenueCents: number;
+    }
   | { type: 'road/built'; cells: { x: number; z: number }[]; costCents: number }
   | { type: 'road/demolished'; x: number; z: number; refundCents: number };
 

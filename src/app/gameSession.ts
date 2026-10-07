@@ -21,6 +21,11 @@ export class GameSession {
     return this.sim.state;
   }
 
+  /** Anteil bis zum nächsten Schritt (0–1), damit Fahrzeuge zwischen Schritten flüssig gleiten. */
+  get alpha(): number {
+    return this.speedValue === 0 ? 0 : this.clock.alpha;
+  }
+
   get speed(): GameSpeed | 0 {
     return this.speedValue;
   }

@@ -14,7 +14,7 @@
     "rng": {
       "s": 20260107
     },
-    "nextId": 5,
+    "nextId": 7,
     "finance": {
       "balanceCents": 93310000,
       "recent": [
@@ -178,8 +178,9 @@
         "builtTick": 9600,
         "paidCents": 240000,
         "stock": {
-          "rawA": 0
-        }
+          "rawA": 30
+        },
+        "work": 0
       },
       {
         "id": 4,
@@ -192,10 +193,54 @@
         "builtTick": 9700,
         "paidCents": 600000,
         "stock": {
-          "rawA": 0,
-          "rawB": 0,
-          "combo": 0
-        }
+          "rawA": 4,
+          "rawB": 12,
+          "combo": 3
+        },
+        "work": 17
+      }
+    ],
+    "orders": [
+      {
+        "id": 5,
+        "product": "rawB",
+        "quantity": 20,
+        "interval": "daily",
+        "nextTick": 12000,
+        "blocked": null
+      }
+    ],
+    "vehicles": [
+      {
+        "id": 6,
+        "kind": "supplier",
+        "route": [
+          {
+            "x": 5,
+            "z": 61
+          },
+          {
+            "x": 6,
+            "z": 61
+          },
+          {
+            "x": 7,
+            "z": 61
+          },
+          {
+            "x": 8,
+            "z": 61
+          }
+        ],
+        "progress": 300,
+        "cargo": {
+          "product": "rawB",
+          "quantity": 20
+        },
+        "phase": "toSite",
+        "targetId": 4,
+        "timer": 0,
+        "paidCents": 60000
       }
     ]
   }

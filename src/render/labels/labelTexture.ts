@@ -23,7 +23,9 @@ export function labelTexture(text: string, background: string, color: string): C
     ctx.strokeStyle = '#ffffff';
     ctx.stroke();
     ctx.fillStyle = color;
-    ctx.font = `bold ${Math.round(size * 0.55)}px system-ui, sans-serif`;
+    // Kurze Wörter („voll“) kleiner als einzelne Zeichen.
+    const fontSize = text.length > 1 ? size * 0.32 : size * 0.55;
+    ctx.font = `bold ${Math.round(fontSize)}px system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, size / 2, size / 2 + 4);

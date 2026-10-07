@@ -13,6 +13,7 @@ const zone = {
   builtTick: 0,
   paidCents: 0,
   stock: { rawA: 5 },
+  work: 0,
 };
 
 describe('validateState', () => {
@@ -28,6 +29,34 @@ describe('validateState', () => {
     expect(validateState({ ...state, zones: [{ ...zone, gate: 'Q' }] })).toBe(false);
     expect(validateState({ ...state, zones: [{ ...zone, stock: { gold: 1 } }] })).toBe(false);
     expect(validateState({ ...state, zones: [{ ...zone, width: 1.5 }] })).toBe(false);
+  });
+
+  it('prüft Bestellungen und Fahrzeuge', () => {
+    const state = createInitialState(1);
+    const order = {
+      id: 3,
+      product: 'rawA',
+      quantity: 10,
+      interval: 'daily',
+      nextTick: 0,
+      blocked: null,
+    };
+    const vehicle = {
+      id: 4,
+      kind: 'supplier',
+      route: [{ x: -3, z: 61 }],
+      progress: 0,
+      cargo: { product: 'rawA', quantity: 10 },
+      phase: 'toSite',
+      targetId: 2,
+      timer: 0,
+      paidCents: 0,
+    };
+    expect(validateState({ ...state, orders: [order], vehicles: [vehicle] })).toBe(true);
+    expect(validateState({ ...state, orders: [{ ...order, product: 'combo' }] })).toBe(false);
+    expect(validateState({ ...state, orders: [{ ...order, interval: 'hourly' }] })).toBe(false);
+    expect(validateState({ ...state, vehicles: [{ ...vehicle, route: [] }] })).toBe(false);
+    expect(validateState({ ...state, vehicles: [{ ...vehicle, phase: 'flying' }] })).toBe(false);
   });
 
   it('lehnt eine kaputte Kasse ab', () => {
