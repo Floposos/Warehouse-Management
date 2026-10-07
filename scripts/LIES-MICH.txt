@@ -1,0 +1,12 @@
+Logistikum – Download-Version
+=============================
+
+So startest du das Spiel:
+1. Diesen Ordner entpacken (nicht direkt aus dem ZIP starten).
+2. index.html doppelklicken. Das Spiel öffnet sich in deinem Browser.
+
+Es ist keine Installation und kein Server nötig.
+Empfohlen: aktuelles Chrome, Edge oder Firefox.
+
+Hinweis: Spielstände der Download-Version und der Web-Version sind getrennt.
+Zum Übertragen im Spiel exportieren und in der anderen Version importieren.

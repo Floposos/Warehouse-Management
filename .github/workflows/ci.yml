@@ -1,0 +1,55 @@
+# Prüfung: Lint, Typen, Tests, Build, Rauchtest, ZIP.
+# Läuft bei jedem Pull Request und als erster Schritt jeder Auslieferung (deploy.yml).
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, Test, Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint und Formatierung
+        run: npm run lint
+
+      - name: Typprüfung
+        run: npm run typecheck
+
+      - name: Unit-Tests
+        run: npm test
+
+      - name: Build (Einzeldatei)
+        run: npm run build
+
+      - name: Chromium für Rauchtest installieren
+        run: npx playwright install --with-deps chromium
+
+      - name: Rauchtest (http und file://)
+        run: npm run smoke
+
+      - name: ZIP packen
+        run: npm run package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: logistikum-build
+          path: |
+            dist/index.html
+            release/logistikum.zip
+          if-no-files-found: error
+          retention-days: 30
