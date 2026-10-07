@@ -81,7 +81,12 @@ jobs:
         run: |
           zip="logistikum-${GITHUB_REF_NAME}.zip"
           cp build/release/logistikum.zip "$zip"
-          gh release create "$GITHUB_REF_NAME" "$zip" \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "Logistikum $GITHUB_REF_NAME" \
-            --notes "Spielbare Version $GITHUB_REF_NAME. Was neu ist und wie du testest: siehe CHANGELOG.md. Start: ZIP entpacken, index.html doppelklicken."
+          # Wurde das Release schon auf GitHub angelegt (dabei entsteht der Tag), nur das ZIP anhängen.
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$zip" --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$zip" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "Logistikum $GITHUB_REF_NAME" \
+              --notes "Spielbare Version $GITHUB_REF_NAME. Was neu ist und wie du testest: siehe CHANGELOG.md. Start: ZIP entpacken, index.html doppelklicken."
+          fi

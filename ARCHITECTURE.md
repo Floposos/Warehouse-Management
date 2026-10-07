@@ -107,7 +107,7 @@ Warum: Die Logik bleibt ohne Browser testbar, Grafik- und UI-Änderungen können
 - `vite build` erzeugt **eine** `dist/index.html` (Skripte, Styles eingebettet, `base: './'`). Dieselbe Datei läuft auf GitHub Pages und per Doppelklick.
 - Version aus `package.json`, Build-Datum und Kurz-Commit werden beim Build eingesetzt (`src/shared/buildInfo.ts`) und unten rechts angezeigt.
 - `ci.yml`: bei jedem Pull Request Lint, Typen, Tests, Build, Rauchtest, ZIP.
-- `deploy.yml`: bei Push auf `main` erst die komplette Prüfung, dann GitHub Pages mit `download/logistikum-latest.zip`. Bei Tag `v*` (muss zu `package.json` passen) ein GitHub-Release mit `logistikum-vX.Y.Z.zip`.
+- `deploy.yml`: bei Push auf `main` erst die komplette Prüfung, dann GitHub Pages mit `download/logistikum-latest.zip`. Bei Tag `v*` (muss zu `package.json` passen) ein GitHub-Release mit `logistikum-vX.Y.Z.zip`. Der Tag kann auch über GitHub → Releases → „Draft a new release“ entstehen (Cloud-Sitzungen dürfen keine Tags pushen); der Workflow hängt das ZIP dann an das vorhandene Release.
 - Voraussetzung im Repo: Settings → Pages → Source „GitHub Actions“.
 
 ## Repo-Organisation
