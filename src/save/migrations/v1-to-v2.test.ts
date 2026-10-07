@@ -34,7 +34,7 @@ describe('Migration v1 → v2', () => {
     );
     const result = parseSave(text);
     if (!result.ok) throw new Error(result.error);
-    expect(result.save.saveVersion).toBe(2);
+    expect(result.save.saveVersion).toBe(3);
     expect(result.save.state.finance.balanceCents).toBe(99_750_000);
     // Kasse muss nach der Umstellung buchen können.
     const sim = new Simulation(result.save.state);

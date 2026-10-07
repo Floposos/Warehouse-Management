@@ -1,3 +1,4 @@
+import { shapeArea } from '../../../sim/world/zoneShape';
 import { goodsConfig } from '../../../config/goods';
 import { productIds } from '../../../content/products';
 import { formatEuro } from '../../../shared/format';
@@ -46,9 +47,9 @@ export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoCont
     update(state: GameState) {
       const zone = state.zones.find((z) => z.id === zoneId);
       if (!zone) return null;
-      size.textContent = de.info.size(zone.width, zone.depth);
+      size.textContent = de.info.fields(shapeArea(zone.parts));
       status.value.textContent = de.info.zoneStatus[zoneStatus(zone)];
-      const connected = accessCell(new RoadNetwork(state), zone, zone.gate) !== null;
+      const connected = accessCell(new RoadNetwork(state), zone.parts, zone.gate) !== null;
       connection.textContent = connected ? de.info.connected : de.build.notConnected;
       connection.classList.toggle('is-warning', !connected);
       const cap = zoneCapacity(zone);

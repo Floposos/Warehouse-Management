@@ -2,7 +2,7 @@ import { buildingTypes, type BuildingTypeId } from '../content/buildings';
 import { checkPlaceBuilding, demolishRefund, type BuildRejection } from '../sim/commands/build';
 import type { Command } from '../sim/commands/commands';
 import { checkBuildRoad, roadRefundAt } from '../sim/commands/roads';
-import { checkPlaceZone, zoneCapacity } from '../sim/commands/zones';
+import { checkPlaceZone, neighboursOf, zoneCapacity, zoneRefund } from '../sim/commands/zones';
 import type { ZoneKind } from '../content/zones';
 import { accessCell, suggestGate } from '../sim/world/access';
 import { RoadNetwork } from '../sim/world/roadNetwork';
@@ -52,11 +52,14 @@ export type BuildPreview =
       reason: BuildRejection | null;
       /** Tor-Seite hätte (noch) keine Straße. */
       notConnected: boolean;
+      /** Grenzt an eine Zone gleicher Art und wird mit ihr eins. */
+      merges: boolean;
       command: Command;
     }
   | {
       kind: 'demolish';
-      footprint: Footprint;
+      /** Ein Rechteck; bei verschmolzenen Zonen alle Teile. */
+      footprints: Footprint[];
       height: number;
       refundCents: number;
       command: Command;
@@ -126,13 +129,17 @@ function zonePreview(state: GameState, kind: ZoneKind, from: Cell, to: Cell): Bu
   const check = checkPlaceZone(state, kind, from, to);
   const f = check.footprint;
   const network = new RoadNetwork(state);
+  const neighbours = check.ok ? neighboursOf(state, kind, f) : [];
+  const shape = [...neighbours.flatMap((z) => z.parts), f];
+  const gate = neighbours[0]?.gate ?? suggestGate(network, f);
   return {
     kind: 'zone',
     footprint: f,
-    capacity: zoneCapacity(f),
+    capacity: zoneCapacity(shape),
+    merges: neighbours.length > 0,
     costCents: check.costCents,
     reason: check.ok ? null : check.reason,
-    notConnected: accessCell(network, f, suggestGate(network, f)) === null,
+    notConnected: accessCell(network, shape, gate) === null,
     command: { type: 'zone/place', kind, fromX: from.x, fromZ: from.z, toX: to.x, toZ: to.z },
   };
 }
@@ -142,7 +149,7 @@ function demolishPreview(state: GameState, cell: Cell): BuildPreview {
   if (id === ROAD_CELL) {
     return {
       kind: 'demolish',
-      footprint: { x: cell.x, z: cell.z, width: 1, depth: 1 },
+      footprints: [{ x: cell.x, z: cell.z, width: 1, depth: 1 }],
       height: ROAD_GHOST_HEIGHT,
       refundCents: roadRefundAt(state, cell.x, cell.z) ?? 0,
       command: { type: 'road/demolish', x: cell.x, z: cell.z },
@@ -152,9 +159,9 @@ function demolishPreview(state: GameState, cell: Cell): BuildPreview {
   if (zone) {
     return {
       kind: 'demolish',
-      footprint: { x: zone.x, z: zone.z, width: zone.width, depth: zone.depth },
+      footprints: zone.parts.map(({ x, z, width, depth }) => ({ x, z, width, depth })),
       height: ROAD_GHOST_HEIGHT,
-      refundCents: demolishRefund(state, zone.builtTick, zone.paidCents),
+      refundCents: zoneRefund(state, zone),
       command: { type: 'zone/demolish', zoneId: zone.id },
     };
   }
@@ -162,7 +169,7 @@ function demolishPreview(state: GameState, cell: Cell): BuildPreview {
   if (!building) return { kind: 'nothingToDemolish' };
   return {
     kind: 'demolish',
-    footprint: buildingFootprint(building),
+    footprints: [buildingFootprint(building)],
     height: buildingTypes[building.type].height,
     refundCents: demolishRefund(state, building.builtTick, building.paidCents),
     command: { type: 'build/demolish', buildingId: building.id },

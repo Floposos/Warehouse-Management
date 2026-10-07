@@ -3,6 +3,21 @@
 Pro Version: Was ist neu, Was wurde behoben, So testest du das, Bekannte Probleme.
 Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 
+## 0.2.1 – Zonen verschmelzen (07.10.2026)
+
+### Was wurde behoben
+
+- Rückmeldung Florian: Wird ein Lieferort direkt neben einen Lieferort derselben Art gebaut, entsteht jetzt keine zweite Zone mehr, sondern die Felder werden Teil der bestehenden Zone (auch L-Formen und mehr). Lager, Verarbeitungsgeschwindigkeit in C, Infofenster und Kisten gelten für die Gesamtfläche. Ein Feld zwischen zwei Zonen verbindet beide zu einer; ihr Bestand wird zusammengezählt. Die Zone behält Nummer und Tor-Seite der größeren bisherigen Zone. LKW-Aufträge und Tour-Halte zeigen danach auf die verbundene Zone. Am Mauszeiger steht beim Aufziehen „wird Teil der angrenzenden Zone“ und das Lager der Gesamtfläche.
+- Abriss entfernt weiterhin die ganze Zone; jeder Teil wird nach seinem eigenen Bautag erstattet (100 % am selben Tag, sonst 50 %).
+- Spielstände aus 0.2.0 werden automatisch umgestellt (Spielstand-Version 3). Dort schon nebeneinander liegende Zonen bleiben getrennt, bis daneben gebaut wird.
+
+### So testest du das
+
+1. Lieferort A als 3 × 3 aufziehen, dann direkt rechts daneben ein einzelnes Feld Lieferort A: Am Mauszeiger steht „wird Teil der angrenzenden Zone“. Nach dem Bauen gibt es nur ein „A“; ein Klick zeigt „10 Felder“ und Lager 100.
+2. Zwei Lieferorte C mit einem Feld Abstand bauen, das Feld dazwischen ebenfalls als C: eine Zone, Bestand beider bleibt.
+3. Lieferort B direkt neben A: bleiben zwei Zonen (andere Art). Ein Feld nur über Eck: bleibt getrennt.
+4. Einen Spielstand aus 0.2.0 laden: lädt ohne Meldung.
+
 ## 0.2.0 – M1 Bauen & erster Warenfluss (07.10.2026)
 
 ### Was ist neu

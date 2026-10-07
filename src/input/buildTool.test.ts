@@ -28,7 +28,7 @@ describe('Bau-Vorschau', () => {
     const state = createInitialState(1);
     expect(previewAt(state, { kind: 'demolish' }, 13.5, 59.5)).toMatchObject({
       kind: 'demolish',
-      footprint: { x: 12, z: 58 },
+      footprints: [{ x: 12, z: 58 }],
       refundCents: 0,
       command: { type: 'build/demolish', buildingId: 1 },
     });

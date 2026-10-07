@@ -6,6 +6,7 @@ import { createRngState, type RngState } from '../core/rng';
 import { createFinance, type Finance } from '../finance/ledger';
 import type { OrderBlock, OrderInterval } from '../goods/orders';
 import type { Side } from '../world/access';
+import type { Footprint } from '../world/grid';
 import type { Vehicle } from '../vehicles/types';
 
 /** Ein Gebäude auf dem Raster. `x`/`z` = Feld der linken oberen Ecke. */
@@ -29,17 +30,19 @@ export interface RoadTile {
 }
 
 /** Frei aufgezogene Zone (Lieferort A, B oder C) mit Lager. `x`/`z` = linke obere Ecke. */
+/** Ein Rechteck einer Zone mit eigenem Bautag und Preis (für die Erstattung beim Abriss). */
+export interface ZonePart extends Footprint {
+  builtTick: number;
+  paidCents: number;
+}
+
 export interface Zone {
   id: number;
   kind: ZoneKind;
-  x: number;
-  z: number;
-  width: number;
-  depth: number;
+  /** Fläche: ein Rechteck oder mehrere angrenzende (verschmolzen, seit 0.2.1). */
+  parts: ZonePart[];
   /** Tor-Seite, über die LKW ein- und ausfahren. */
   gate: Side;
-  builtTick: number;
-  paidCents: number;
   /** Bestand je Ware in Einheiten (nur Waren, die die Zone lagert). */
   stock: Partial<Record<ProductId, number>>;
   /** Fortschritt der laufenden Verarbeitung in Schritten (B und C). */

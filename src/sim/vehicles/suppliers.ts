@@ -85,7 +85,7 @@ function replan(network: RoadNetwork, state: GameState, v: Supplier): void {
     return;
   }
   const zone = state.zones.find((z) => z.id === v.targetId);
-  const access = zone ? accessCell(network, zone, zone.gate) : null;
+  const access = zone ? accessCell(network, zone.parts, zone.gate) : null;
   const route = access ? planRoute(network, v.route[0] ?? ENTRANCE, access) : null;
   if (!route) {
     v.phase = 'noRoute';

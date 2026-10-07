@@ -21,7 +21,7 @@ export function buildOccupancy(state: GameState): Int32Array {
     for (const cell of footprintCells(buildingFootprint(b))) grid[cell] = b.id;
   }
   for (const zone of state.zones) {
-    for (const cell of footprintCells(zone)) grid[cell] = zone.id;
+    for (const part of zone.parts) for (const cell of footprintCells(part)) grid[cell] = zone.id;
   }
   for (const r of state.roads) grid[r.z * GRID_WIDTH + r.x] = ROAD_CELL;
   return grid;

@@ -13,6 +13,7 @@ import { products } from '../../content/products';
 import { zoneTypes } from '../../content/zones';
 import { zoneStatus } from '../../sim/production/production';
 import type { Zone } from '../../sim/state/gameState';
+import { shapeCenter } from '../../sim/world/zoneShape';
 import { labelTexture } from '../labels/labelTexture';
 import { palette } from '../scene/palette';
 
@@ -50,7 +51,7 @@ export class StockView {
   }
 
   sync(zones: readonly Zone[]): void {
-    const key = zones.map((z) => `${z.id}:${z.x}:${z.z}:${JSON.stringify(z.stock)}`).join('|');
+    const key = zones.map((z) => `${z.id}:${z.parts.length}:${JSON.stringify(z.stock)}`).join('|');
     if (key === this.lastKey) return;
     this.lastKey = key;
     let n = 0;
@@ -67,14 +68,20 @@ export class StockView {
   private placeCrates(zone: Zone, start: number): number {
     let n = start;
     let slot = 0;
-    const slotsTotal = zone.width * zone.depth * SLOTS.length;
+    const cells = zone.parts.flatMap((p) => {
+      const list: { x: number; z: number }[] = [];
+      for (let z = p.z; z < p.z + p.depth; z++)
+        for (let x = p.x; x < p.x + p.width; x++) list.push({ x, z });
+      return list;
+    });
+    const slotsTotal = cells.length * SLOTS.length;
     for (const product of zoneTypes[zone.kind].stores) {
       const count = Math.ceil((zone.stock[product] ?? 0) / UNITS_PER_CRATE);
       for (let i = 0; i < count && slot < slotsTotal && n < MAX_CRATES; i++, slot++, n++) {
-        const cell = Math.floor(slot / SLOTS.length);
+        const cell = cells[Math.floor(slot / SLOTS.length)] ?? { x: 0, z: 0 };
         const [ox, oz] = SLOTS[slot % SLOTS.length] ?? [0.5, 0.5];
-        const x = zone.x + (cell % zone.width) + ox;
-        const z = zone.z + Math.floor(cell / zone.width) + oz;
+        const x = cell.x + ox;
+        const z = cell.z + oz;
         this.dummy.position.set(x, 0.2, z);
         this.dummy.updateMatrix();
         this.crates.setMatrixAt(n, this.dummy.matrix);
@@ -90,7 +97,8 @@ function fullBadge(zone: Zone): Sprite {
     new SpriteMaterial({ map: labelTexture('voll', palette.fullBg, '#ffffff') }),
   );
   sprite.scale.set(1.6, 1.6, 1);
-  sprite.position.set(zone.x + zone.width / 2 + 1.2, 3, zone.z + zone.depth / 2);
+  const center = shapeCenter(zone.parts);
+  sprite.position.set(center.x + 1.2, 3, center.z);
   sprite.name = 'zone-full';
   return sprite;
 }

@@ -125,6 +125,7 @@ export const de = {
     zoneSize: (w: number, d: number, capacity: number, cost: string): string =>
       `${w} × ${d} Felder · Lager ${capacity} je Ware · Kosten: ${cost}`,
     notConnected: 'Nicht angeschlossen: Straße an das Tor bauen',
+    zoneMerges: 'wird Teil der angrenzenden Zone',
     gate: { N: 'Tor Nord', E: 'Tor Ost', S: 'Tor Süd', W: 'Tor West' },
     road: 'Straße',
     roadItemCost: (cost: string): string => `${cost} je Feld`,
@@ -202,7 +203,7 @@ export const de = {
     siteName: (kind: string, n: number): string => `${kind} ${n}`,
     truckName: (n: number): string => `LKW ${n}`,
     supplier: 'Zulieferer',
-    size: (w: number, d: number): string => `${w} × ${d} Felder`,
+    fields: (n: number): string => `${n} ${n === 1 ? 'Feld' : 'Felder'}`,
     stock: 'Lager',
     stockLine: (name: string, n: number, cap: number): string => `${name}: ${n} / ${cap}`,
     status: 'Status',

@@ -71,7 +71,7 @@ function findTarget(state: GameState, network: RoadNetwork, order: Order): Targe
   let best: Target | null = null;
   let anyReachable = false;
   for (const zone of zones) {
-    const access = accessCell(network, zone, zone.gate);
+    const access = accessCell(network, zone.parts, zone.gate);
     const path = access ? findPath(network, ENTRANCE, access) : null;
     if (!path) continue;
     anyReachable = true;

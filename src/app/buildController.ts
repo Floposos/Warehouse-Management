@@ -142,7 +142,11 @@ function toGhost(preview: BuildPreview): Ghost[] {
       return [{ footprint: preview.footprint, height: ROAD_GHOST_HEIGHT, style }];
     }
     case 'demolish':
-      return [{ footprint: preview.footprint, height: preview.height, style: 'demolish' }];
+      return preview.footprints.map((footprint) => ({
+        footprint,
+        height: preview.height,
+        style: 'demolish' as const,
+      }));
     case 'nothingToDemolish':
       return [];
   }

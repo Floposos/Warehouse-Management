@@ -1,3 +1,4 @@
+import { shapeArea } from '../world/zoneShape';
 import { productionConfig } from '../../config/production';
 import type { ProductId } from '../../content/products';
 import type { ZoneKind } from '../../content/zones';
@@ -45,7 +46,7 @@ export function updateProduction(state: GameState, bus: EventBus): void {
   for (const zone of state.zones) {
     const recipe = recipes[zone.kind];
     if (!recipe || zoneStatus(zone) !== 'working') continue;
-    zone.work += recipe.scalesWithArea ? zone.width * zone.depth : 1;
+    zone.work += recipe.scalesWithArea ? shapeArea(zone.parts) : 1;
     if (zone.work < recipe.work) continue;
     for (const input of recipe.inputs) addStock(zone, input, -1);
     addStock(zone, recipe.output, 1);

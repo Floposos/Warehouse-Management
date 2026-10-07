@@ -38,6 +38,7 @@ describe('Bau-Tooltip', () => {
       costCents: 240_000,
       reason: null,
       notConnected: true,
+      merges: false,
       command,
     };
     expect(buildTipText(zone)).toEqual({
@@ -49,7 +50,13 @@ describe('Bau-Tooltip', () => {
 
   it('zeigt beim Abriss die Erstattung', () => {
     expect(
-      buildTipText({ kind: 'demolish', footprint, height: 2, refundCents: 2_500_000, command }),
+      buildTipText({
+        kind: 'demolish',
+        footprints: [footprint],
+        height: 2,
+        refundCents: 2_500_000,
+        command,
+      }),
     ).toEqual({ text: 'Abreißen, Erstattung: 25.000 €', kind: 'ok' });
   });
 });

@@ -74,7 +74,7 @@ test('Exportieren und Importieren', async ({ page }) => {
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/^logistikum-.*\.json$/);
   const text = readFileSync((await download.path()) ?? '', 'utf8');
-  expect(JSON.parse(text)).toMatchObject({ format: 'logistikum-save', saveVersion: 2 });
+  expect(JSON.parse(text)).toMatchObject({ format: 'logistikum-save', saveVersion: 3 });
   await page.getByRole('button', { name: 'Schließen' }).click();
 
   await page.reload();

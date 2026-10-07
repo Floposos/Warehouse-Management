@@ -4,7 +4,7 @@ import { validateState } from './validate';
 
 export const SAVE_FORMAT = 'logistikum-save';
 /** Steigt bei jeder Änderung am Zustandsmodell; dazu Migration + Beispiel-Spielstand. */
-export const CURRENT_SAVE_VERSION = 2;
+export const CURRENT_SAVE_VERSION = 3;
 
 /** Kurzinfos für Listen, ohne den ganzen Zustand lesen zu müssen. */
 export interface SaveMeta {

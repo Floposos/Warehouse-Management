@@ -28,9 +28,10 @@ export function buildTipText(preview: BuildPreview): {
       const size = de.build.zoneSize(f.width, f.depth, preview.capacity, cost);
       if (preview.reason)
         return { text: `${de.build.reasons[preview.reason]} · ${size}`, kind: 'error' };
+      const text = preview.merges ? `${size} · ${de.build.zoneMerges}` : size;
       return preview.notConnected
-        ? { text: size, kind: 'ok', warning: de.build.notConnected }
-        : { text: size, kind: 'ok' };
+        ? { text, kind: 'ok', warning: de.build.notConnected }
+        : { text, kind: 'ok' };
     }
     case 'demolish':
       return { text: de.build.refund(formatEuro(preview.refundCents)), kind: 'ok' };

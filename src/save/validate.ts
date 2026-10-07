@@ -34,10 +34,14 @@ function isFinance(v: unknown): boolean {
 
 function isZone(v: unknown): boolean {
   if (!isRecord(v)) return false;
-  const ints = ['id', 'x', 'z', 'width', 'depth', 'builtTick', 'paidCents', 'work'];
   const stock = v['stock'];
+  const parts = v['parts'];
+  const partInts = ['x', 'z', 'width', 'depth', 'builtTick', 'paidCents'];
   return (
-    ints.every((k) => isInt(v[k])) &&
+    ['id', 'work'].every((k) => isInt(v[k])) &&
+    Array.isArray(parts) &&
+    parts.length > 0 &&
+    parts.every((p: unknown) => isRecord(p) && partInts.every((k) => isInt(p[k]))) &&
     typeof v['kind'] === 'string' &&
     v['kind'] in zoneTypes &&
     SIDES.includes(v['gate'] as Side) &&

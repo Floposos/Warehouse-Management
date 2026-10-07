@@ -73,6 +73,7 @@ Werden vor dem jeweiligen Meilenstein als Auswahlfragen gestellt.
 **Nach dem M1-Test: M1-Feinjustierung** (Florian, 07.10.2026: „später nochmal befragen“)
 
 - Alle Balancing-Platzhalter aus M1 mit Florian durchgehen: Straßen- und Zonenpreise (`src/config/build.ts`, `src/config/zones.ts`), Lagerplatz je Feld (`src/config/zones.ts`), Rohwaren- und Exportpreise sowie Bestellmengen (`src/config/goods.ts`), Verarbeitungsdauer in B und Durchsatz in C (`src/config/production.ts`), LKW-Kosten und Geschwindigkeiten (`src/config/vehicles.ts`). Die vollständige Liste mit Werten steht im M1-Abschlussbericht.
+- Zonen verschmelzen (0.2.1), Annahmen: Nummer und Tor-Seite der größeren Zone bleiben; Abriss entfernt die ganze Zone (kein Abriss einzelner Felder); in alten Spielständen schon angrenzende Zonen bleiben getrennt, bis daneben gebaut wird.
 - Dabei auch die M1-Annahmen bestätigen: LKW-Automatik fährt ab 5 Einheiten los und bedient Endprodukt → Export vor Kombi → C vor Rohware A → B; ein LKW in der festen Tour wartet nicht auf volle Ladung; Tour-Halte haben höchstens 12 Einträge.
 
 **M2 Flotte & Verkehr**
