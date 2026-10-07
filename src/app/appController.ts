@@ -16,6 +16,7 @@ import { MainMenu } from '../ui/screens/mainMenu';
 import { openPauseMenu } from '../ui/screens/pauseMenu';
 import { openSettingsDialog } from '../ui/screens/settingsDialog';
 import { de } from '../ui/texts/de';
+import { BuildController } from './buildController';
 import { startFrameLoop } from './frameLoop';
 import { GameSession } from './gameSession';
 import { SaveController } from './saveController';
@@ -41,6 +42,7 @@ export class AppController {
   private readonly topbar: Topbar;
   private readonly mainMenu: MainMenu;
   private readonly perf: PerfOverlay;
+  readonly build: BuildController;
   readonly saves: SaveController;
 
   constructor(
@@ -83,8 +85,10 @@ export class AppController {
       autosaveMinutes: () => this.settings.get().autosaveMinutes,
     });
     this.perf = new PerfOverlay(ui);
+    this.build = new BuildController(ui, canvas, renderer, () => this.session);
     installGameShortcuts({
       isActive: () => this.mode === 'game' && !isDialogOpen(),
+      cancelTool: () => this.build.cancel(),
       togglePause: () => this.session?.togglePause(),
       setSpeed: (s) => this.setSpeed(s),
       openMenu: () => this.openPauseMenu(),
@@ -121,6 +125,7 @@ export class AppController {
     this.mode = 'game';
     this.mainMenu.visible = false;
     this.topbar.visible = true;
+    this.build.visible = true;
     this.cameraInput.enabled = true;
   }
 
@@ -131,6 +136,7 @@ export class AppController {
     this.cameraInput.releaseAll();
     this.mainMenu.visible = true;
     this.topbar.visible = false;
+    this.build.visible = false;
   }
 
   private setSpeed(speed: GameSpeed): void {
@@ -188,6 +194,7 @@ export class AppController {
       rig = this.rig;
       this.cameraInput.update(dtMs / 1000);
       this.topbar.update(state, this.session.speed);
+      this.build.update();
     } else {
       rotate(this.menuRig, (cameraConfig.menuOrbitDegPerSecond * dtMs) / 1000);
     }

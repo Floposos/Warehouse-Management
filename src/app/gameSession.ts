@@ -1,4 +1,5 @@
 import type { GameSpeed } from '../config/time';
+import type { Command, CommandResult } from '../sim/commands/commands';
 import { Simulation } from '../sim/core/simulation';
 import { StepClock } from '../sim/core/stepClock';
 import type { GameState } from '../sim/state/gameState';
@@ -26,6 +27,11 @@ export class GameSession {
 
   get paused(): boolean {
     return this.speedValue === 0;
+  }
+
+  /** Spieleraktion sofort ausführen (wirkt auch in der Pause). */
+  command(command: Command): CommandResult {
+    return this.sim.execute(command);
   }
 
   setSpeed(speed: GameSpeed | 0): void {

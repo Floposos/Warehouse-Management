@@ -3,6 +3,8 @@ import type { GameSpeed } from '../config/time';
 export interface ShortcutActions {
   /** False im Hauptmenü oder solange ein Dialog offen ist. */
   isActive(): boolean;
+  /** Bricht ein aktives Werkzeug ab; true = Esc ist damit verbraucht. */
+  cancelTool(): boolean;
   togglePause(): void;
   setSpeed(speed: GameSpeed): void;
   openMenu(): void;
@@ -17,7 +19,7 @@ const SPEED_KEYS: Record<string, GameSpeed> = {
   Numpad3: 4,
 };
 
-/** Tastenkürzel im Spiel: Leertaste = Pause/Weiter, 1/2/3 = 1x/2x/4x, Esc = Menü. */
+/** Tastenkürzel im Spiel: Leertaste = Pause/Weiter, 1/2/3 = 1x/2x/4x, Esc = Werkzeug abbrechen, sonst Menü. */
 export function installGameShortcuts(actions: ShortcutActions): () => void {
   const onKey = (e: KeyboardEvent): void => {
     if (!actions.isActive() || e.repeat) return;
@@ -31,7 +33,7 @@ export function installGameShortcuts(actions: ShortcutActions): () => void {
       actions.setSpeed(speed);
     } else if (e.code === 'Escape') {
       e.preventDefault();
-      actions.openMenu();
+      if (!actions.cancelTool()) actions.openMenu();
     }
   };
   window.addEventListener('keydown', onKey);

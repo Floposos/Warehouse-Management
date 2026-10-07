@@ -105,3 +105,32 @@ describe('Abreißen', () => {
 function fail(): never {
   throw new Error('Gebäude fehlt');
 }
+
+describe('Sofort ausführen', () => {
+  it('baut auch ohne Schritt (Pause) und liefert das Ergebnis', () => {
+    const s = sim();
+    const placed: number[] = [];
+    s.bus.on('build/placed', (e) => placed.push(e.id));
+    expect(s.execute({ type: 'build/place', buildingType: 'testHall', x: 40, z: 40 })).toEqual({
+      ok: true,
+    });
+    expect(s.state.tick).toBe(0);
+    expect(placed).toEqual([2]);
+    expect(s.execute({ type: 'build/place', buildingType: 'testHall', x: 40, z: 40 })).toEqual({
+      ok: false,
+      reason: 'occupied',
+    });
+  });
+
+  it('ergibt denselben Zustand wie submit vor dem nächsten Schritt', () => {
+    const a = sim();
+    const b = sim();
+    a.run(5);
+    b.run(5);
+    a.execute({ type: 'build/place', buildingType: 'testHall', x: 40, z: 40 });
+    a.step();
+    b.submit({ type: 'build/place', buildingType: 'testHall', x: 40, z: 40 });
+    b.step();
+    expect(a.state).toEqual(b.state);
+  });
+});

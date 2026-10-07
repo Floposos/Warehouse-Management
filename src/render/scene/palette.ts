@@ -12,4 +12,7 @@ export const palette = {
   hallTrim: 0xe6cfa3,
   roof: 0xf08a5d,
   door: 0x7a8ca3,
+  ghostValid: 0x4cc38a,
+  ghostInvalid: 0xe5534b,
+  ghostDemolish: 0xe5534b,
 } as const;

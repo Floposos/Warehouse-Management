@@ -3,6 +3,23 @@
 Pro Version: Was ist neu, Was wurde behoben, So testest du das, Bekannte Probleme.
 Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 
+## 0.2.0 – M1 Bauen & erster Warenfluss (in Arbeit)
+
+### Was ist neu
+
+- Bau-Grundlage (T1.1): Bauleiste unten mittig mit den Reitern Straßen, Zonen/Gebäude, Fahrzeuge und Abriss (Straßen und Fahrzeuge folgen in diesem Meilenstein). Unter „Zonen/Gebäude“ lässt sich vorerst die Testhalle bauen. Mit gewähltem Werkzeug zeigt ein Geisterbild unter dem Mauszeiger, ob gebaut werden kann (grün) oder nicht (rot), daneben ein Hinweis mit Kosten oder Grund („Fläche ist belegt“, „Außerhalb des Geländes“, „Nicht genug Geld“). Linksklick baut, der Kontostand sinkt. „Abriss“ markiert das Gebäude unter dem Mauszeiger rot mit der Erstattung: 100 % am selben Spieltag, danach 50 %. Esc bricht das Werkzeug ab (erst ein zweites Esc öffnet das Menü). Bauen und Abreißen geht auch in der Pause.
+- ANNAHME: Die Testhalle kostet vorerst 50.000 € (Platzhalter in `src/config/build.ts`, bis die Preise festgelegt sind). Die Start-Testhalle war kostenlos und bringt beim Abriss nichts zurück.
+- Spielstände aus 0.1.0 werden automatisch umgestellt (Spielstand-Version 2).
+
+### So testest du das
+
+1. Neues Spiel, unten „Zonen/Gebäude“ und dann „Testhalle“ klicken.
+2. Mit der Maus über das Gelände fahren: grünes Geisterbild mit „Kosten: 50.000 €“; über der vorhandenen Halle oder am Rand wird es rot mit Grund.
+3. Linksklick auf eine freie Stelle: Halle steht, Kontostand sinkt um 50.000 €.
+4. Esc: Geisterbild verschwindet, Menü bleibt zu.
+5. „Abriss“ klicken, über die neue Halle fahren: rote Markierung mit „Erstattung: 50.000 €“; Klick reißt ab, Kontostand steigt wieder. Nach einem Spieltag (5 Minuten bei 1x) gibt es nur noch 50 %.
+6. Einen Spielstand aus 0.1.0 laden: lädt ohne Meldung.
+
 ## 0.1.0 – M0 Grundgerüst (07.10.2026)
 
 ### Was ist neu

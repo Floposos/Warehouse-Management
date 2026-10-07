@@ -1,4 +1,4 @@
-import { executeCommand, type Command } from '../commands/commands';
+import { executeCommand, type Command, type CommandResult } from '../commands/commands';
 import type { GameState } from '../state/gameState';
 import { defaultSystems } from '../systems';
 import type { SimSystem } from '../systems/types';
@@ -21,6 +21,17 @@ export class Simulation {
   /** Reicht einen Befehl ein; er wird im nächsten Schritt geprüft und ausgeführt. */
   submit(command: Command): void {
     this.queue.push(command);
+  }
+
+  /**
+   * Führt einen Befehl sofort zwischen zwei Schritten aus (Spieleraktionen, auch in der Pause).
+   * Gleichwertig zu `submit` + Ausführung am Anfang des nächsten Schritts, da Befehle dort
+   * ebenfalls vor dem Hochzählen laufen; liefert das Ergebnis direkt für die Rückmeldung.
+   */
+  execute(command: Command): CommandResult {
+    const result = executeCommand(this.state, command, this.bus);
+    this.bus.flush();
+    return result;
   }
 
   step(): void {

@@ -11,7 +11,9 @@ import {
 import { worldConfig } from '../../config/world';
 import type { Building } from '../../sim/state/gameState';
 import { cameraPosition, type CameraRig } from '../camera/cameraRig';
+import { GroundPicker } from '../camera/groundPicker';
 import { BuildingsView } from '../views/buildingsView';
+import { GhostView, type Ghost } from '../views/ghostView';
 import { palette } from './palette';
 import { createTerrain } from './terrain';
 
@@ -21,6 +23,8 @@ export class GameRenderer {
   private readonly renderer: WebGLRenderer;
   private readonly scene = new Scene();
   private readonly buildings = new BuildingsView();
+  private readonly ghost = new GhostView();
+  private readonly picker: GroundPicker;
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     this.renderer = new WebGLRenderer({ canvas, antialias: true });
@@ -31,7 +35,8 @@ export class GameRenderer {
     // Dunst am Horizont: das Umland läuft weich aus.
     this.scene.fog = new Fog(palette.sky, 260, 900);
     this.addLights();
-    this.scene.add(createTerrain(), this.buildings.root);
+    this.scene.add(createTerrain(), this.buildings.root, this.ghost.root);
+    this.picker = new GroundPicker(this.camera, canvas);
     this.resize();
   }
 
@@ -57,6 +62,16 @@ export class GameRenderer {
 
   syncBuildings(buildings: readonly Building[]): void {
     this.buildings.sync(buildings);
+  }
+
+  /** Vorschau des Bauwerkzeugs; null blendet sie aus. */
+  setGhost(ghost: Ghost | null): void {
+    this.ghost.show(ghost);
+  }
+
+  /** Bodenpunkt unter einer Bildschirmposition (Kamera vom letzten Bild). */
+  pickGround(clientX: number, clientY: number): { x: number; z: number } | null {
+    return this.picker.pick(clientX, clientY);
   }
 
   render(rig: CameraRig): void {

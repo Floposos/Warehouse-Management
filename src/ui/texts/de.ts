@@ -103,6 +103,28 @@ export const de = {
     exportReminder: 'Denk daran, deinen Spielstand als Datei zu sichern.',
     exportNow: 'Jetzt exportieren',
   },
+  build: {
+    barLabel: 'Bauleiste',
+    tabs: {
+      roads: 'Straßen',
+      zones: 'Zonen/Gebäude',
+      vehicles: 'Fahrzeuge',
+      demolish: 'Abriss',
+    },
+    comingSoon: 'Kommt in Kürze.',
+    buildings: { testHall: 'Testhalle' },
+    itemTitle: (name: string, cost: string): string => `${name} bauen (${cost})`,
+    cost: (cost: string): string => `Kosten: ${cost}`,
+    refund: (refund: string): string => `Abreißen, Erstattung: ${refund}`,
+    nothingToDemolish: 'Hier steht nichts zum Abreißen.',
+    escHint: 'Esc bricht ab',
+    reasons: {
+      outOfBounds: 'Außerhalb des Geländes',
+      occupied: 'Fläche ist belegt',
+      insufficientFunds: 'Nicht genug Geld',
+      unknownType: 'Unbekannter Gebäudetyp',
+    },
+  },
   perf: {
     line: (fps: number, simMsPerTick: number, drawCalls: number): string =>
       `${fps.toFixed(0)} Bilder/s · Simulation ${simMsPerTick.toFixed(2)} ms/Schritt · ${drawCalls} Zeichenaufrufe`,

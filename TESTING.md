@@ -65,3 +65,13 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Autosave nach Intervall: Meldung „Automatisch gespeichert“; höchstens 3 automatische Sicherungen in der Liste; bei Pause ohne Fortschritt kein neuer Autosave.
 - [ ] Chrome/Edge: Sicherungsdatei wählen, wird beim Autosave überschrieben; nach Browser-Neustart Knopf „Zugriff erlauben“ (im Hinweis und im Speichern-Dialog). Auch in der Download-Version (`file://`) prüfen.
 - [ ] Firefox: Abschnitt „Sicherungsdatei“ erklärt, dass es sie nur in Chrome/Edge gibt; nach 30 Minuten Spielzeit Hinweis „Jetzt exportieren“.
+
+### Bauen und Abreißen (seit 0.2.0-dev, T1.1)
+
+- [ ] Bauleiste unten mittig mit Reitern Straßen, Zonen/Gebäude, Fahrzeuge, Abriss; aktiver Reiter blau.
+- [ ] Testhalle gewählt: Geisterbild folgt der Maus rastergenau, grün auf freier Fläche, rot über Gebäuden und am Geländerand; Hinweis zeigt Kosten bzw. Grund.
+- [ ] Zu wenig Geld: rot mit „Nicht genug Geld“, Klick baut nicht.
+- [ ] Klick baut; Kontostand sinkt um die Kosten; Bauen geht auch in der Pause.
+- [ ] Abriss: Gebäude unter der Maus rot markiert mit Erstattung; am selben Spieltag 100 %, ab dem nächsten 50 %; leere Fläche zeigt „Hier steht nichts zum Abreißen“.
+- [ ] Esc beendet das Werkzeug; erst das nächste Esc öffnet das Menü. Rechte/mittlere Maustaste bewegen weiter die Kamera.
+- [ ] Spielstand aus 0.1.0 lädt; gebaute Hallen bleiben nach Speichern/Laden erhalten.

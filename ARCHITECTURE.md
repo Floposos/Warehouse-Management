@@ -69,7 +69,8 @@ Warum: Die Logik bleibt ohne Browser testbar, Grafik- und UI-Änderungen können
 - **Determinismus** (`sim/core/rng.ts`): Mulberry32 mit Seed, Zustand `state.rng` wird mitgespeichert; Systeme laufen in fester Reihenfolge (`systems/index.ts`), Listen nach ID. Gleicher Seed + gleiche Befehle = gleiches Ergebnis (Test über 10.000 Schritte).
 - **Datenmodell** (`sim/state/gameState.ts`): ein reines Datenobjekt mit Tabellen je Objektart (`buildings`, später `vehicles`, `roads`, …), nur JSON-Werte, Verweise nur über IDs, Geld als ganze Cent. Speichern = serialisieren.
 - **Systeme mit Datenobjekten** statt vollem ECS: je System eine Datei mit `update(state, ctx)` (`sim/systems/`). Für klar unterscheidbare Objektarten einfacher zu verstehen und gut testbar.
-- **Befehle** (`sim/commands/commands.ts`): UI und Eingabe reichen Befehle mit `simulation.submit()` ein; ausgeführt und geprüft im nächsten Schritt, Ablehnung als Ereignis `command/rejected`.
+- **Befehle** (`sim/commands/commands.ts`): Befehle werden mit `simulation.submit()` eingereicht und am Anfang des nächsten Schritts geprüft und ausgeführt, Ablehnung als Ereignis `command/rejected`. Spieleraktionen laufen über `simulation.execute()` (bzw. `GameSession.command()`) sofort zwischen zwei Schritten: gleichwertig, da Befehle auch im Schritt vor `tick + 1` laufen (Test), wirkt aber auch in der Pause und liefert das Ergebnis direkt.
+- **Bauen** (seit T1.1, `sim/commands/build.ts`): `build/place` und `build/demolish`. `checkPlaceBuilding` prüft Gelände, Belegung und Geld und wird von Vorschau und Befehl gleich benutzt. Die Belegung (`sim/world/occupancy.ts`, Raster in `sim/world/grid.ts`) wird aus dem Zustand abgeleitet, nicht gespeichert. Gebäude merken sich `builtTick` und `paidCents` für die Erstattung (Anteile und Kosten in `config/build.ts`).
 - **Event-Bus** (`sim/core/eventBus.ts`, Typen in `events.ts`): Ereignisse werden während eines Schritts gesammelt und am Schrittende in Meldereihenfolge verteilt. UI und Darstellung hören dieselben Ereignisse.
 - **Ablauf je Schritt** (`sim/core/simulation.ts`): Befehle → `tick + 1` → Systeme → Ereignisse verteilen.
 - **Wegfindung (ab M1):** Graph je Netz (Straße, Schiene, Förderband, Stapler-Wege), aus gebauten Feldern abgeleitet; A* mit Zwischenspeicher, bei Bauänderung verworfen. Reservierungen für Kreuzungen und Ladezonen ab M2.
@@ -90,7 +91,8 @@ Warum: Die Logik bleibt ohne Browser testbar, Grafik- und UI-Änderungen können
 - `app/gameSession.ts`: Simulation + Takt + Geschwindigkeit (0 = Pause, merkt die letzte Stufe für „Weiter“). `app/frameLoop.ts`: Bildschleife (requestAnimationFrame, max. 250 ms pro Bild).
 - `ui/components/`: `dom.ts` (Helfer), `dialog.ts` (modal, Esc schließt den obersten), `confirm.ts`, `toast.ts`. `ui/hud/topbar.ts` schreibt nur bei geänderter Anzeige. `ui/screens/`: Hauptmenü, Esc-Menü, Einstellungen.
 - Einstellungen: `shared/settings.ts` (Prüfung, Laden/Speichern über injizierten Speicher, localStorage im Browser), Standardwerte in `config/settings.ts`.
-- `input/gameShortcuts.ts`: Leertaste, 1/2/3, Esc; inaktiv im Hauptmenü und bei offenem Dialog.
+- `input/gameShortcuts.ts`: Leertaste, 1/2/3, Esc (bricht zuerst ein Werkzeug ab, sonst Menü); inaktiv im Hauptmenü und bei offenem Dialog.
+- Bauwerkzeuge (seit T1.1): `app/buildController.ts` verbindet Bauleiste (`ui/hud/buildBar.ts`), Maus (`input/buildPointer.ts`, nur linke Taste), Vorschau (`input/buildTool.ts` → `render/views/ghostView.ts` und `ui/hud/cursorTip.ts`) und schickt beim Klick den Befehl. Der Bodenpunkt unter der Maus kommt aus `render/camera/groundPicker.ts`.
 
 ## Speichern (seit T0.6a)
 
