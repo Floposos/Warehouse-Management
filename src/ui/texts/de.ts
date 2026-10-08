@@ -260,6 +260,10 @@ export const de = {
       tooManyStops: 'Mehr Halte gehen nicht.',
     },
     hoverHint: 'Klicken für Details',
+    demolishZone: 'Ganze Zone abreißen',
+    demolishZoneOk: 'Abreißen',
+    demolishZoneConfirm: (refund: string): string =>
+      `Die ganze Zone samt Bestand abreißen? Erstattung: ${refund}. Einzelne Felder reißt du mit dem Abriss-Werkzeug ab.`,
   },
   perf: {
     line: (fps: number, simMsPerTick: number, drawCalls: number): string =>

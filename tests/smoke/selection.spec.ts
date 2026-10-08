@@ -55,6 +55,22 @@ test('Zone auswählen: Lager, Status und Tor umschalten', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(panel).toBeHidden();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+
+  // Ganze Zone abreißen mit Rückfrage.
+  await select(page, 'zone', a);
+  await panel.getByRole('button', { name: 'Ganze Zone abreißen' }).click();
+  await page
+    .getByRole('dialog', { name: 'Ganze Zone abreißen' })
+    .getByRole('button', { name: 'Abreißen' })
+    .click();
+  await expect(panel).toBeHidden();
+  const zones = await page.evaluate(
+    () =>
+      (window as unknown as { __logistikum: TestApp }).__logistikum.session.state.zones.filter(
+        (z) => z.kind === 'A',
+      ).length,
+  );
+  expect(zones).toBe(0);
   expect(problems).toEqual([]);
 });
 

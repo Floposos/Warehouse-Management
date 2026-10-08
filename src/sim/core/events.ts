@@ -27,6 +27,7 @@ export type SimEvent =
   | { type: 'build/demolished'; id: number; refundCents: number }
   | { type: 'zone/placed'; id: number; kind: ZoneKind; costCents: number }
   | { type: 'zone/demolished'; id: number; refundCents: number }
+  | { type: 'zone/cellDemolished'; id: number; x: number; z: number; refundCents: number }
   | { type: 'goods/delivered'; zoneId: number; product: ProductId; quantity: number }
   | { type: 'goods/produced'; zoneId: number; product: ProductId }
   | {

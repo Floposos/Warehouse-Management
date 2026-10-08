@@ -12,6 +12,13 @@ Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
   - LKW: Kauf 90.000 € (vorher 60.000 €), 400 € je Tag (vorher 200 €), 1,20 € je km (vorher 0,50 €).
   - Tempo: LKW 4 Felder/s bei 1x (vorher 5), Auf- und Abladen 3 s (vorher 2 s), C braucht ein Drittel länger je Endprodukt (3 × 3 Felder: 6 s statt 4,5 s).
 
+- Zonen feldweise abreißen (Florian, 08.10.2026): Das Abriss-Werkzeug markiert über einer Zone nur das Feld unter dem Mauszeiger und reißt es ab (Erstattung für dieses Feld). Fällt ein Feld in der Mitte weg, zerfällt die Zone in eigenständige Zonen; der Bestand wird nach Fläche aufgeteilt, was nicht mehr ins Lager passt, geht verloren. Die ganze Zone reißt man im Infofenster mit „Ganze Zone abreißen“ (mit Rückfrage) ab.
+
+### So testest du das
+
+1. Lieferort A als 5 × 1 aufziehen. „Abriss“ über das mittlere Feld: nur dieses Feld ist markiert, Erstattung für ein Feld. Klick: zwei Zonen „A“ links und rechts.
+2. Eine Zone anklicken, „Ganze Zone abreißen“, Rückfrage mit Erstattung bestätigen: Zone ist weg.
+
 ### Was wurde behoben
 
 - Die Kilometerkosten konnten bei krummen Preisen einen Kilometerstand mit Nachkommastellen erzeugen; der Spielstand hätte dann nicht mehr gespeichert werden können. Der Rest wird jetzt ganzzahlig übertragen.
@@ -21,7 +28,6 @@ Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 ### Was wurde behoben
 
 - Rückmeldung Florian: Wird ein Lieferort direkt neben einen Lieferort derselben Art gebaut, entsteht jetzt keine zweite Zone mehr, sondern die Felder werden Teil der bestehenden Zone (auch L-Formen und mehr). Lager, Verarbeitungsgeschwindigkeit in C, Infofenster und Kisten gelten für die Gesamtfläche. Ein Feld zwischen zwei Zonen verbindet beide zu einer; ihr Bestand wird zusammengezählt. Die Zone behält Nummer und Tor-Seite der größeren bisherigen Zone. LKW-Aufträge und Tour-Halte zeigen danach auf die verbundene Zone. Am Mauszeiger steht beim Aufziehen „wird Teil der angrenzenden Zone“ und das Lager der Gesamtfläche.
-- Abriss entfernt weiterhin die ganze Zone; jeder Teil wird nach seinem eigenen Bautag erstattet (100 % am selben Tag, sonst 50 %).
 - Spielstände aus 0.2.0 werden automatisch umgestellt (Spielstand-Version 3). Dort schon nebeneinander liegende Zonen bleiben getrennt, bis daneben gebaut wird.
 
 ### So testest du das

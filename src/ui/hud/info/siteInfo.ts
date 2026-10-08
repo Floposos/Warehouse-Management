@@ -3,7 +3,8 @@ import { goodsConfig } from '../../../config/goods';
 import { productIds } from '../../../content/products';
 import { formatEuro } from '../../../shared/format';
 import type { Command } from '../../../sim/commands/commands';
-import { zoneCapacity } from '../../../sim/commands/zones';
+import { zoneCapacity, zoneRefund } from '../../../sim/commands/zones';
+import { confirmDialog } from '../../components/confirm';
 import { stockOf, stores } from '../../../sim/goods/stock';
 import { zoneStatus } from '../../../sim/production/production';
 import type { GameState } from '../../../sim/state/gameState';
@@ -18,6 +19,14 @@ import { siteLabel } from './names';
 /** Zone: Größe, Status, Anschluss, Lager je Ware, Tor-Seite umschalten. */
 export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoContent {
   const root = el('div', 'info-content');
+  let refund = 0;
+  const askDemolish = async (): Promise<void> => {
+    const host = root.ownerDocument.getElementById('ui') ?? root.ownerDocument.body;
+    const text = de.info.demolishZoneConfirm(formatEuro(refund));
+    if (await confirmDialog(host, de.info.demolishZone, text, de.info.demolishZoneOk)) {
+      submit({ type: 'zone/demolish', zoneId });
+    }
+  };
   const size = el('p', 'info-note');
   const status = row(de.info.status);
   const connection = el('p', 'info-note');
@@ -41,12 +50,14 @@ export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoCont
     stock,
     el('h3', 'info-subtitle', de.info.gate),
     gates,
+    button(de.info.demolishZone, () => void askDemolish(), 'btn btn-danger info-demolish'),
   );
   return {
     root,
     update(state: GameState) {
       const zone = state.zones.find((z) => z.id === zoneId);
       if (!zone) return null;
+      refund = zoneRefund(state, zone);
       size.textContent = de.info.fields(shapeArea(zone.parts));
       status.value.textContent = de.info.zoneStatus[zoneStatus(zone)];
       const connected = accessCell(new RoadNetwork(state), zone.parts, zone.gate) !== null;

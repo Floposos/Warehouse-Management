@@ -68,6 +68,22 @@ Rohware kommt von abstrakten Zulieferern über Eingangsstraßen (später Schiene
 | 07.10.2026 | M1-Feinjustierung           | Baupreise „Mittel“ (Straße 500 €/Feld, Zonen A 250 €, B/C 400 € je Feld, Export-Ausfahrt 50.000 €); LKW-Kosten „Mittel“ (90.000 €, 400 €/Tag, 1,20 €/km); Tempo „Mittel“ (LKW 4 Felder/s, Laden 3 s, C ein Drittel langsamer); Waren- und Exportpreise unverändert |
 | 07.10.2026 | Zonen                       | Angrenzende Lieferorte gleicher Art verschmelzen zu einer Zone (Rückmeldung zum M1-Test)                                                                                                                                                                           |
 | 07.10.2026 | Auslieferung                | Größere PRs je Meilenstein; Florian testet vor dem Merge, keine Zwischenversionen einzeln                                                                                                                                                                          |
+| 08.10.2026 | Zonen abreißen              | Einzelne Felder einer Zone lassen sich abreißen (Abriss-Werkzeug); die ganze Zone über das Infofenster                                                                                                                                                             |
+| 08.10.2026 | LKW-Mindestladung           | Automatik fährt ab 5 Einheiten los (Annahme aus M1 bestätigt)                                                                                                                                                                                                      |
+| 08.10.2026 | Feste Tour                  | LKW nimmt mit, was da ist, und wartet nicht auf volle Ladung (Annahme aus M1 bestätigt)                                                                                                                                                                            |
+| 08.10.2026 | Rangfolge Automatik         | Fertiges zuerst: Endprodukt → Export, dann Kombi → C (C voll: direkt Export), dann Rohware A → B (Annahme aus M1 bestätigt)                                                                                                                                        |
+| 08.10.2026 | M2 Kreuzungen               | Vorfahrtsstraßen markieren; die Kreuzungsregel folgt daraus                                                                                                                                                                                                        |
+| 08.10.2026 | M2 Blockaden                | Warnen und Umweg suchen, soweit es einen gibt                                                                                                                                                                                                                      |
+| 08.10.2026 | M2 Flottengröße             | Ausgelegt auf bis zu 300 Fahrzeuge                                                                                                                                                                                                                                 |
+| 08.10.2026 | M2 Stellplätze              | Zahl der Lade-/Stellplätze am Tor wächst mit der Zonengröße (Faktor in `src/config/`)                                                                                                                                                                              |
+| 08.10.2026 | M2 Fahrzeugtypen            | Transporter und LKW: Transporter klein, schnell, billig, wenig Ladung; LKW groß, langsam, viel Ladung                                                                                                                                                              |
+| 08.10.2026 | M2 Leasing                  | Feste Laufzeit mit günstigerer Rate, vorzeitige Rückgabe kostet (ANNAHME: 12 Monate, Strafe = 3 Monatsraten; Werte in `src/config/`)                                                                                                                               |
+| 08.10.2026 | M2 Diesel/Elektro           | Nur bei den Kosten: Elektro teurer im Kauf, billiger je km; keine Reichweite, keine Ladesäulen                                                                                                                                                                     |
+| 08.10.2026 | M2 Wartung                  | Werkstatt als baubare Zonenart; Fahrzeuge fahren zur Wartung hin (ANNAHME: ab 40 % Zustand automatisch, 2 Spielstunden, 800 €, 1 Platz je 4 Felder; ohne Werkstatt keine Wartung)                                                                                  |
+| 08.10.2026 | M2 Pannen                   | Fahrzeug steht einige Spielstunden, blockiert die Spur, dazu Abschleppkosten; andere suchen einen Umweg (ANNAHME: 3 Stunden, 1.500 €)                                                                                                                              |
+| 08.10.2026 | M2 Rushhour                 | Spürbar: morgens und abends deutlich längere Wartezeiten an der Einfahrt (ANNAHME: 7–9 und 16–18 Uhr, etwa dreifache Wartezeit)                                                                                                                                    |
+| 08.10.2026 | M2 Touren                   | Eigene Einträge im Fenster „Touren“, mehreren Fahrzeugen zuweisbar, Farbe je Tour, Automatik in Standardfarbe; alte Touren je LKW werden migriert                                                                                                                  |
+| 08.10.2026 | M2 Wegfarben                | Weg des gewählten Fahrzeugs immer sichtbar, Wege aller Fahrzeuge per Schalter                                                                                                                                                                                      |
 
 ## Offene Designfragen
 
@@ -76,16 +92,13 @@ Werden vor dem jeweiligen Meilenstein als Auswahlfragen gestellt.
 **Nach dem M1-Test: M1-Feinjustierung** (Preise und Tempo entschieden 07.10.2026, siehe oben; offen sind noch die Annahmen)
 
 - Alle Balancing-Platzhalter aus M1 mit Florian durchgehen: Straßen- und Zonenpreise (`src/config/build.ts`, `src/config/zones.ts`), Lagerplatz je Feld (`src/config/zones.ts`), Rohwaren- und Exportpreise sowie Bestellmengen (`src/config/goods.ts`), Verarbeitungsdauer in B und Durchsatz in C (`src/config/production.ts`), LKW-Kosten und Geschwindigkeiten (`src/config/vehicles.ts`). Die vollständige Liste mit Werten steht im M1-Abschlussbericht.
-- Zonen verschmelzen (0.2.1), Annahmen: Nummer und Tor-Seite der größeren Zone bleiben; Abriss entfernt die ganze Zone (kein Abriss einzelner Felder); in alten Spielständen schon angrenzende Zonen bleiben getrennt, bis daneben gebaut wird.
-- Dabei auch die M1-Annahmen bestätigen: LKW-Automatik fährt ab 5 Einheiten los und bedient Endprodukt → Export vor Kombi → C vor Rohware A → B; ein LKW in der festen Tour wartet nicht auf volle Ladung; Tour-Halte haben höchstens 12 Einträge.
+- Zonen verschmelzen und teilen, Annahmen: Beim Verschmelzen bleiben Nummer und Tor-Seite der größeren Zone; in alten Spielständen schon angrenzende Zonen bleiben getrennt, bis daneben gebaut wird. Zerfällt eine Zone durch Abriss eines Felds, behält das größte Stück Nummer, Tor und Verarbeitungsfortschritt, die anderen Stücke bekommen dieselbe Tor-Seite; der Bestand wird nach Fläche geteilt, was nicht mehr ins Lager passt, geht verloren; Erstattung je Feld nach dem Bautag seines Teils (100 % am selben Tag, sonst 50 %).
+- Tour-Halte: höchstens 12 je Tour (Annahme, noch nicht bestätigt).
 
 **M2 Flotte & Verkehr**
 
-- Maximale Fahrzeuganzahl (Leistungsgrenze)?
-- Einbahnstraßen, Ampeln oder nur Vorfahrt?
-- Wie wird Wartung ausgelöst (automatisch, Werkstatt-Gebäude)? Wie stark bestrafen Pannen?
-- Elektro: Ladesäulen bauen?
-- Wie stark wirken Rushhour und Störungen an den Ein-/Ausfahrten?
+- Alle 12 Fragen am 08.10.2026 entschieden (siehe Entscheidungstabelle).
+- ANNAHME: Ohne markierte Vorfahrtsstraße gilt rechts vor links; markierte Straßen bekommen eine eigene Farbe auf der Karte.
 
 **M3 Produktion & Lager**
 

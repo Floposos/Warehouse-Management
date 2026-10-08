@@ -102,6 +102,7 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Jede Zone hat Farbe, Buchstabe und Torbalken; Tor zeigt zu einer angrenzenden Straße, sonst nach Süden.
 - [ ] Ohne Straße vor dem Tor: rotes „!“; Straße an das Tor bauen: „!“ verschwindet; Straße abreißen: „!“ kommt wieder. Straße an einer anderen Seite hilft nicht.
 - [ ] Lieferort direkt neben gleicher Art: wird Teil der Zone (Hinweis am Mauszeiger, ein Buchstabe, Gesamtlager); Zwischenfeld verbindet zwei Zonen; andere Art oder über Eck bleibt getrennt (seit 0.2.1).
+- [ ] Abriss über einer Zone markiert ein Feld; Mittelfeld abreißen teilt die Zone; „Ganze Zone abreißen“ im Infofenster fragt nach (seit 0.3.0).
 - [ ] Export-Ausfahrt nur am Geländerand baubar; Tor zeigt ins Gelände; ohne Straße „!“.
 - [ ] Zone abreißen: ganze Zone weg, Erstattung nach Tagesregel.
 

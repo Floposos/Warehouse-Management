@@ -2,7 +2,8 @@ import { buildingTypes, type BuildingTypeId } from '../content/buildings';
 import { checkPlaceBuilding, demolishRefund, type BuildRejection } from '../sim/commands/build';
 import type { Command } from '../sim/commands/commands';
 import { checkBuildRoad, roadRefundAt } from '../sim/commands/roads';
-import { checkPlaceZone, neighboursOf, zoneCapacity, zoneRefund } from '../sim/commands/zones';
+import { zoneCellRefund } from '../sim/commands/zoneCells';
+import { checkPlaceZone, neighboursOf, zoneCapacity } from '../sim/commands/zones';
 import type { ZoneKind } from '../content/zones';
 import { accessCell, suggestGate } from '../sim/world/access';
 import { RoadNetwork } from '../sim/world/roadNetwork';
@@ -159,10 +160,11 @@ function demolishPreview(state: GameState, cell: Cell): BuildPreview {
   if (zone) {
     return {
       kind: 'demolish',
-      footprints: zone.parts.map(({ x, z, width, depth }) => ({ x, z, width, depth })),
+      // Entscheidung 08.10.2026: Zonen feldweise abreißen.
+      footprints: [{ x: cell.x, z: cell.z, width: 1, depth: 1 }],
       height: ROAD_GHOST_HEIGHT,
-      refundCents: zoneRefund(state, zone),
-      command: { type: 'zone/demolish', zoneId: zone.id },
+      refundCents: zoneCellRefund(state, zone, cell.x, cell.z) ?? 0,
+      command: { type: 'zone/demolishCell', zoneId: zone.id, x: cell.x, z: cell.z },
     };
   }
   const building = state.buildings.find((b) => b.id === id);

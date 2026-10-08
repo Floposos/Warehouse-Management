@@ -11,6 +11,7 @@ import type { GameState } from '../state/gameState';
 import { demolishBuilding, placeBuilding } from './build';
 import { buildRoad, demolishRoad } from './roads';
 import type { Side } from '../world/access';
+import { demolishZoneCell } from './zoneCells';
 import { demolishZone, placeZone, setZoneGate } from './zones';
 
 /**
@@ -38,6 +39,8 @@ export type Command =
     }
   | { type: 'zone/setGate'; zoneId: number; gate: Side }
   | { type: 'zone/demolish'; zoneId: number }
+  /** Einzelnes Feld einer Zone abreißen; die Zone kann dabei zerfallen. */
+  | { type: 'zone/demolishCell'; zoneId: number; x: number; z: number }
   /** Rohware bestellen: einmalig (`once`) oder als Dauerauftrag. Erste Lieferung sofort. */
   | { type: 'order/create'; product: RawProductId; quantity: number; interval: OrderInterval }
   | { type: 'order/cancel'; orderId: number }
@@ -84,6 +87,10 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
       return setZoneGate(state, command.zoneId, command.gate)
         ? { ok: true }
         : reject(bus, command, 'notFound');
+    case 'zone/demolishCell':
+      return demolishZoneCell(state, bus, command.zoneId, command.x, command.z) === null
+        ? reject(bus, command, 'notFound')
+        : { ok: true };
     case 'zone/demolish': {
       const refund = demolishZone(state, bus, command.zoneId);
       return refund === null ? reject(bus, command, 'notFound') : { ok: true };

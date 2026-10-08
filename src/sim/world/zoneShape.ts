@@ -33,7 +33,7 @@ export function shapeCenter(shape: Shape): { x: number; z: number } {
 }
 
 /** Teilen zwei Rechtecke eine Kante (nicht nur eine Ecke)? */
-function sharesEdge(a: Footprint, b: Footprint): boolean {
+export function sharesEdge(a: Footprint, b: Footprint): boolean {
   const overlapX = a.x < b.x + b.width && b.x < a.x + a.width;
   const overlapZ = a.z < b.z + b.depth && b.z < a.z + a.depth;
   const touchX = a.x + a.width === b.x || b.x + b.width === a.x;
