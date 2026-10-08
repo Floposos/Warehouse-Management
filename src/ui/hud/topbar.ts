@@ -15,6 +15,7 @@ export interface TopbarActions {
   openPurchase(): void;
   openTours(): void;
   openNotices(): void;
+  openFleet(): void;
 }
 
 /** Kopfleiste: Datum/Uhrzeit, Kontostand, Zeitsteuerung, Menü. Liest nur den Zustand. */
@@ -57,6 +58,8 @@ export class Topbar {
     purchase.title = de.purchase.openTitle;
     const tours = button(de.tours.open, () => actions.openTours());
     tours.title = de.tours.openTitle;
+    const fleet = button(de.fleetPanel.open, () => actions.openFleet());
+    fleet.title = de.fleetPanel.openTitle;
     this.notices = button(de.notices.open, () => actions.openNotices());
     this.notices.title = de.notices.openTitle;
     this.notices.dataset['testid'] = 'notices-button';
@@ -70,6 +73,7 @@ export class Topbar {
       this.balance,
       purchase,
       tours,
+      fleet,
       this.notices,
       menu,
     );

@@ -156,6 +156,15 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Langer Stau vor der Einfahrt: Meldung „Stau“.
 - [ ] Speichern in der Rushhour mit Schlange vor der Einfahrt, laden: geht genauso weiter.
 
+### Flottenfenster (seit 0.3.0, T2.8)
+
+- [ ] „Flotte“ oben öffnet links die Liste mit Anzahl im Titel; „Touren“ schließt sie und umgekehrt; Esc schließt.
+- [ ] Zeilen zeigen Name, Zustand (rot unter 40 % oder bei Panne), Typ, Tour und Status und aktualisieren sich laufend.
+- [ ] Filter und Sortierung wirken; Auswahl bleibt beim Umsortieren erhalten.
+- [ ] Sammelaktion „Tour zuweisen …“ (auch Automatik) und „Zur Werkstatt“ (ohne Werkstatt Hinweis) für die ausgewählten.
+- [ ] Klick auf einen Namen: Kamera springt hin, Infofenster öffnet sich.
+- [ ] Mit vielen Fahrzeugen (z. B. 300) bleibt das Spiel flüssig, solange das Fenster offen ist.
+
 ### Auswahl und Infofenster (seit 0.2.0, T1.7)
 
 - [ ] Ohne Bauwerkzeug: Überfahren zeigt den Namen, Klick öffnet das Infofenster; Klick ins Leere, × oder Esc schließt (Esc öffnet dabei nicht das Menü).

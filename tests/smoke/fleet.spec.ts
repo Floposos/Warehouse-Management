@@ -86,3 +86,35 @@ test('Werkstatt bauen, Fahrzeug zur Wartung schicken (T2.6)', async ({ page }) =
   expect(id).toBeGreaterThan(0);
   expect(problems).toEqual([]);
 });
+
+test('Flottenfenster: filtern, zeigen, Sammelaktion Tour zuweisen (T2.8)', async ({ page }) => {
+  const problems = collectProblems(page);
+  await page.goto('/');
+  await startNewGame(page);
+  await page.keyboard.press('Space');
+  await page.evaluate(() => {
+    const app = (window as unknown as { __logistikum: TestApp }).__logistikum;
+    const s = app.session as unknown as { command(c: unknown): { ok: boolean } };
+    s.command({ type: 'vehicle/buy', model: 'truck', drive: 'diesel', lease: false });
+    s.command({ type: 'vehicle/buy', model: 'van', drive: 'diesel', lease: false });
+    s.command({ type: 'vehicle/buy', model: 'van', drive: 'electric', lease: true });
+    s.command({ type: 'tour/create', name: 'Früh' });
+  });
+  await page.getByRole('button', { name: 'Flotte', exact: true }).click();
+  const panel = page.getByTestId('fleet-panel');
+  await expect(panel).toContainText('Flotte (3)');
+  await expect(panel.getByTestId('fleet-row')).toHaveCount(3);
+  await panel.getByLabel('Zeigen').selectOption('van');
+  await expect(panel.getByTestId('fleet-row')).toHaveCount(2);
+  await panel.getByLabel('Alle auswählen').check();
+  await expect(panel).toContainText('2 ausgewählt');
+  await panel.getByTestId('fleet-tour').selectOption({ label: 'Früh' });
+  await expect(panel).toContainText('Für 2 Fahrzeuge erledigt.');
+  await expect(panel.getByTestId('fleet-row').first()).toContainText('Früh');
+  await panel.getByRole('button', { name: 'Transporter 2' }).click();
+  await expect(page.getByTestId('info-panel')).toContainText('Transporter 2');
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+  await expect(panel).toBeHidden();
+  expect(problems).toEqual([]);
+});

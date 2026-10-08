@@ -16,7 +16,7 @@ function cargoText(v: Truck | Supplier): string {
     : de.info.empty;
 }
 
-function truckStatus(t: Truck): string {
+export function truckStatus(t: Truck): string {
   const broken = brokenText(t);
   if (broken) return broken;
   if (t.phase === 'idle' && t.idleReason) return de.info.idleReasons[t.idleReason];

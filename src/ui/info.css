@@ -218,3 +218,55 @@
   color: var(--danger);
   font-weight: 600;
 }
+
+/* Flottenfenster (T2.8) */
+.fleet-panel {
+  width: 440px;
+}
+.fleet-list {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+}
+.fleet-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+}
+.fleet-name {
+  justify-self: start;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+.fleet-condition {
+  font-variant-numeric: tabular-nums;
+}
+.fleet-condition.is-warning {
+  color: var(--danger);
+  font-weight: 700;
+}
+.fleet-info,
+.fleet-status {
+  grid-column: 2 / 4;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.fleet-all {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.fleet-bulk {
+  position: sticky;
+  bottom: -14px;
+  padding: 8px 0;
+  background: var(--panel);
+}
+.fleet-count {
+  align-self: center;
+  font-size: 0.9rem;
+}

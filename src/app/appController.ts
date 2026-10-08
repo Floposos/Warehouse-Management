@@ -23,6 +23,7 @@ import { FinanceFeedback } from './financeFeedback';
 import { startFrameLoop } from './frameLoop';
 import { SelectionController } from './selectionController';
 import { GameSession } from './gameSession';
+import { FleetController } from './fleetController';
 import { NoticesController } from './noticesController';
 import type { VehicleDrive, VehicleModel } from '../content/vehicleTypes';
 import type { Notice } from '../sim/events/notices';
@@ -53,6 +54,7 @@ export class AppController {
   readonly selection: SelectionController;
   private readonly financeFeedback: FinanceFeedback;
   readonly notices: NoticesController;
+  readonly fleet: FleetController;
   readonly saves: SaveController;
 
   constructor(
@@ -75,7 +77,14 @@ export class AppController {
       openMenu: () => this.openPauseMenu(),
       openCash: () => this.openCash(),
       openPurchase: () => this.openPurchase(),
-      openTours: () => this.selection.toggleTours(),
+      openTours: () => {
+        this.fleet.close();
+        this.selection.toggleTours();
+      },
+      openFleet: () => {
+        this.selection.tours.close();
+        this.fleet.toggle();
+      },
       openNotices: () => this.notices.toggle(),
     });
     this.mainMenu = new MainMenu(
@@ -115,9 +124,18 @@ export class AppController {
     );
     this.financeFeedback = new FinanceFeedback(ui, renderer);
     this.notices = new NoticesController(ui, this.toasts, (n) => this.showNotice(n));
+    this.fleet = new FleetController(
+      ui,
+      () => this.session,
+      (id) => this.showVehicle(id),
+    );
     installGameShortcuts({
       isActive: () => this.mode === 'game' && !isDialogOpen(),
-      cancelTool: () => this.build.cancel() || this.selection.cancel() || this.notices.close(),
+      cancelTool: () =>
+        this.build.cancel() ||
+        this.selection.cancel() ||
+        this.notices.close() ||
+        this.fleet.close(),
       togglePause: () => this.session?.togglePause(),
       setSpeed: (s) => this.setSpeed(s),
       openMenu: () => this.openPauseMenu(),
@@ -151,6 +169,7 @@ export class AppController {
   startGame(state: GameState): void {
     this.session = new GameSession(state);
     this.selection.reset();
+    this.fleet.close();
     this.financeFeedback.attach(this.session);
     this.notices.attach(this.session);
     Object.assign(this.rig, createRig(START_VIEW.x, START_VIEW.z));
@@ -165,6 +184,7 @@ export class AppController {
     this.mode = 'menu';
     this.session = null;
     this.selection.reset();
+    this.fleet.close();
     this.financeFeedback.attach(null);
     this.notices.attach(null);
     this.cameraInput.enabled = false;
@@ -209,10 +229,17 @@ export class AppController {
     if (!this.session) return;
     this.rig.targetX = notice.x + 0.5;
     this.rig.targetZ = notice.z + 0.5;
-    const exists = this.session.state.vehicles.some((v) => v.id === notice.vehicleId);
-    if (exists && notice.vehicleId !== null) {
-      this.selection.select({ kind: 'vehicle', id: notice.vehicleId });
-    }
+    if (notice.vehicleId !== null) this.showVehicle(notice.vehicleId);
+  }
+
+  /** Fahrzeug zeigen (Flottenfenster, Meldungen): Kamera hin und auswählen. */
+  showVehicle(id: number): void {
+    const v = this.session?.state.vehicles.find((x) => x.id === id);
+    const at = v?.route[0];
+    if (!v || !at) return;
+    this.rig.targetX = at.x + 0.5;
+    this.rig.targetZ = at.z + 0.5;
+    this.selection.select({ kind: 'vehicle', id });
   }
 
   /** Kasse (Klick auf den Kontostand). */
@@ -266,6 +293,7 @@ export class AppController {
       this.topbar.update(state, this.session.speed);
       this.topbar.setUnread(this.notices.unread());
       this.notices.update();
+      this.fleet.update(performance.now());
       this.build.update();
       this.selection.update(performance.now());
     } else {
