@@ -86,6 +86,17 @@ describe('validateState', () => {
       priceCents: 5_850_000,
       boughtTick: 0,
       lease: { monthlyCents: 175_500, nextPaymentTick: 9000, endTick: 90000 },
+      upkeep: {
+        condition: 38_000,
+        wearRest: 400,
+        brokenTicks: 0,
+        breakdowns: 2,
+        lastBreakdownTick: 1200,
+        lastServiceTick: null,
+        serviceRequested: true,
+        warnedNoWorkshop: false,
+        workshopId: 2,
+      },
     };
     const tour = {
       id: 9,
@@ -103,9 +114,16 @@ describe('validateState', () => {
     ).toBe(false);
     expect(validateState({ ...ok, tours: undefined })).toBe(false);
     expect(validateState({ ...ok, vehicles: [{ ...truck, model: 'bus' }] })).toBe(false);
+    expect(validateState({ ...ok, vehicles: [{ ...truck, phase: 'servicing' }] })).toBe(true);
+    const badUpkeep = { ...truck.upkeep, condition: 'gut' };
+    expect(validateState({ ...ok, vehicles: [{ ...truck, upkeep: badUpkeep }] })).toBe(false);
     expect(validateState({ ...ok, vehicles: [{ ...truck, lease: { monthlyCents: 1 } }] })).toBe(
       false,
     );
+  });
+
+  it('verlangt den Zufallsstrom der Ereignisse', () => {
+    expect(validateState({ ...createInitialState(1), eventRng: undefined })).toBe(false);
   });
 
   it('lehnt eine kaputte Kasse ab', () => {

@@ -8,6 +8,7 @@ import type { InfoContent } from './infoPanel';
 import { row } from './infoPanel';
 import { siteLabel, truckLabel } from './names';
 import { ownershipSection } from './vehicleOwnership';
+import { brokenText, upkeepSection } from './vehicleUpkeep';
 
 function cargoText(v: Truck | Supplier): string {
   return v.cargo
@@ -16,12 +17,17 @@ function cargoText(v: Truck | Supplier): string {
 }
 
 function truckStatus(t: Truck): string {
+  const broken = brokenText(t);
+  if (broken) return broken;
   if (t.phase === 'idle' && t.idleReason) return de.info.idleReasons[t.idleReason];
   return de.info.truckPhase[t.phase];
 }
 
 function truckTarget(state: GameState, t: Truck): string {
   if (t.phase === 'idle') return de.info.none;
+  if (t.phase === 'toWorkshop' || t.phase === 'servicing') {
+    return t.upkeep.workshopId === null ? de.info.none : siteLabel(state, t.upkeep.workshopId);
+  }
   const id =
     t.tourId !== null
       ? currentStop(state, t)?.siteId
@@ -53,6 +59,7 @@ export function truckInfo(
   const controls = el('div', 'tour-controls');
   controls.append(tourSelect, edit);
   const ownership = ownershipSection(truckId, submit);
+  const upkeep = upkeepSection(truckId, submit);
   root.append(
     status.root,
     cargo.root,
@@ -60,6 +67,7 @@ export function truckInfo(
     el('h3', 'info-subtitle', de.tours.drives),
     controls,
     ownership.root,
+    upkeep.root,
   );
   let optionsKey = '';
   return {
@@ -71,6 +79,7 @@ export function truckInfo(
       cargo.value.textContent = cargoText(t);
       target.value.textContent = truckTarget(state, t);
       ownership.update(state, t);
+      upkeep.update(t);
       const key = JSON.stringify(state.tours.map((x) => [x.id, x.name]));
       if (key !== optionsKey) {
         optionsKey = key;

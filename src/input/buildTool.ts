@@ -1,3 +1,5 @@
+import { baysForArea } from '../sim/traffic/bays';
+import { shapeArea } from '../sim/world/zoneShape';
 import { buildingTypes, type BuildingTypeId } from '../content/buildings';
 import { checkPlaceBuilding, demolishRefund, type BuildRejection } from '../sim/commands/build';
 import type { Command } from '../sim/commands/commands';
@@ -60,6 +62,8 @@ export type BuildPreview =
       kind: 'zone';
       footprint: Footprint;
       capacity: number;
+      /** Nur Werkstatt: Werkstattplätze statt Lager (T2.6). */
+      bays: number | null;
       costCents: number;
       reason: BuildRejection | null;
       /** Tor-Seite hätte (noch) keine Straße. */
@@ -170,6 +174,7 @@ function zonePreview(state: GameState, kind: ZoneKind, from: Cell, to: Cell): Bu
     kind: 'zone',
     footprint: f,
     capacity: zoneCapacity(shape),
+    bays: kind === 'W' ? baysForArea(kind, shapeArea(shape)) : null,
     merges: neighbours.length > 0,
     costCents: check.costCents,
     reason: check.ok ? null : check.reason,

@@ -52,4 +52,20 @@ export const deFleet = {
       `${name} zurückgeben? Vorzeitige Rückgabe kostet ${penalty}. Das Fahrzeug verschwindet sofort, Ladung geht verloren.`,
     disposed: (name: string): string => `${name} abgegeben.`,
   },
+  upkeep: {
+    condition: 'Zustand',
+    conditionLine: (percent: number, km: number): string =>
+      km > 0 ? `${percent} % · Wartung in ca. ${km} km` : `${percent} % · Wartung fällig`,
+    breakdowns: 'Pannen',
+    noBreakdowns: 'keine',
+    breakdownLine: (n: number, date: string): string => `${n}, zuletzt am ${date}`,
+    lastService: 'Letzte Wartung',
+    never: 'noch nie',
+    broken: (hours: number): string => `Panne: steht noch ca. ${hours} Std.`,
+    toWorkshop: 'Zur Werkstatt',
+    toWorkshopTitle: 'Nach dem laufenden Auftrag bzw. Halt zur nächsten Werkstatt fahren.',
+    requested: 'Fährt nach dem laufenden Auftrag zur Werkstatt.',
+    noWorkshop: 'Es gibt keine Werkstatt. Unter „Zonen/Gebäude“ eine Werkstatt bauen.',
+    workshopBays: 'Werkstattplätze',
+  },
 } as const;

@@ -39,6 +39,7 @@ export type SimEvent =
       revenueCents: number;
     }
   | { type: 'vehicle/bought'; id: number }
+  | { type: 'vehicle/brokeDown'; id: number; x: number; z: number }
   /** Verkauft bzw. Leasing zurückgegeben (Betrag: + Erlös, − Strafe). */
   | { type: 'vehicle/disposed'; id: number; amountCents: number }
   /** Fahrzeug steht seit `jamWarnTicks` im Stau (T2.4). */

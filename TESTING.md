@@ -138,6 +138,16 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Monatswechsel: Leasingrate unter „Fahrzeuge“; nach 12 Monaten Meldung „Leasing läuft weiter“.
 - [ ] Spielstand aus 0.2.x laden: LKW sind gekaufte Diesel-LKW.
 
+### Werkstatt und Pannen (seit 0.3.0, T2.6)
+
+- [ ] „Werkstatt“ unter „Zonen/Gebäude“ aufziehen: Mauszeiger zeigt Werkstattplätze und Kosten; Infofenster zeigt „Werkstattplätze“, kein Lager.
+- [ ] Infofenster eines Fahrzeugs: Zustand mit km bis zur Wartung, Pannen, letzte Wartung.
+- [ ] „Zur Werkstatt“ ohne Werkstatt: Hinweis; mit Werkstatt: fährt nach dem Auftrag hin, „Wird gewartet“, danach 100 % und 800 € in der Kasse.
+- [ ] Zustand unter 40 %: fährt von selbst zur Werkstatt; ohne Werkstatt einmal die Meldung „keine erreichbare Werkstatt“.
+- [ ] Panne: Fahrzeug steht mit Rauch und rotem „!“, Meldung, 1.500 € Abschleppen; Fahrzeuge dahinter warten oder fahren um; nach 3 Spielstunden geht es weiter.
+- [ ] Werkstatt erscheint nicht als Tour-Halt.
+- [ ] Speichern während einer Panne bzw. Wartung und laden: läuft genauso weiter.
+
 ### Auswahl und Infofenster (seit 0.2.0, T1.7)
 
 - [ ] Ohne Bauwerkzeug: Überfahren zeigt den Namen, Klick öffnet das Infofenster; Klick ins Leere, × oder Esc schließt (Esc öffnet dabei nicht das Menü).

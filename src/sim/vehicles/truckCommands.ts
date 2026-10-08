@@ -16,6 +16,23 @@ export function restartTruck(t: Truck): void {
   t.idleReason = null;
   t.timer = 1;
   t.tourIndex = 0;
+  t.upkeep.workshopId = null;
+}
+
+/**
+ * „Zur Werkstatt“ (T2.6): nach dem laufenden Auftrag bzw. Halt zur nächsten Werkstatt.
+ * null = angenommen.
+ */
+export function requestService(
+  state: GameState,
+  truckId: number,
+): 'notFound' | 'noWorkshop' | null {
+  const t = truckOf(state, truckId);
+  if (!t) return 'notFound';
+  if (!state.zones.some((z) => z.kind === 'W')) return 'noWorkshop';
+  t.upkeep.serviceRequested = true;
+  t.upkeep.warnedNoWorkshop = false;
+  return null;
 }
 
 /**

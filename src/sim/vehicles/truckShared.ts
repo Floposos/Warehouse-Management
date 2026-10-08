@@ -9,6 +9,7 @@ import { siteAccess, sites } from '../world/sites';
 import { valuesOf } from './fleet';
 import { planRoute } from './movement';
 import type { Truck, TruckIdleReason } from './types';
+import { applyWear } from './upkeep';
 import type { VehicleCtx } from './vehicleCtx';
 
 /** Wartet (abseits geparkt, gibt den Stellplatz frei) und versucht es später erneut. */
@@ -58,6 +59,7 @@ export function drive(
 ): 'arrived' | 'blocked' | 'driving' {
   const { result, moved } = driveVehicle(ctx, t, valuesOf(t).speed);
   t.odometer += moved;
+  applyWear(ctx, t, moved);
   if (result === 'blocked') {
     t.progress = 0;
     return 'blocked';

@@ -8,7 +8,15 @@ import { NOTICE_KINDS, type NoticeKind } from '../sim/events/notices';
 import { isInt, isProduct, isRecord } from './validateShapes';
 
 const SUPPLIER_PHASES = ['toSite', 'handling', 'toExit', 'noRoute'];
-const TRUCK_PHASES = ['idle', 'toPickup', 'loading', 'toDropoff', 'unloading'];
+const TRUCK_PHASES = [
+  'idle',
+  'toPickup',
+  'loading',
+  'toDropoff',
+  'unloading',
+  'toWorkshop',
+  'servicing',
+];
 const IDLE_REASONS = [null, 'noJob', 'noRoute', 'noDestination', 'noTour'];
 
 const isCargo = (c: unknown): boolean =>
@@ -23,6 +31,16 @@ const isJob = (j: unknown): boolean =>
 const isLease = (l: unknown): boolean =>
   l === null ||
   (isRecord(l) && ['monthlyCents', 'nextPaymentTick', 'endTick'].every((k) => isInt(l[k])));
+
+const intOrNull = (v: unknown): boolean => v === null || isInt(v);
+
+/** Verschleiß, Wartung und Pannen (T2.6). */
+const isUpkeep = (u: unknown): boolean =>
+  isRecord(u) &&
+  ['condition', 'wearRest', 'brokenTicks', 'breakdowns'].every((k) => isInt(u[k])) &&
+  ['lastBreakdownTick', 'lastServiceTick', 'workshopId'].every((k) => intOrNull(u[k])) &&
+  typeof u['serviceRequested'] === 'boolean' &&
+  typeof u['warnedNoWorkshop'] === 'boolean';
 
 const isStop = (s: unknown): boolean =>
   isRecord(s) &&
@@ -41,7 +59,8 @@ function isTruck(v: Record<string, unknown>): boolean {
     vehicleDrives.includes(v['drive'] as VehicleDrive) &&
     isInt(v['priceCents']) &&
     isInt(v['boughtTick']) &&
-    isLease(v['lease'])
+    isLease(v['lease']) &&
+    isUpkeep(v['upkeep'])
   );
 }
 

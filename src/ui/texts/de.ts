@@ -118,12 +118,16 @@ export const de = {
       demolish: 'Abriss',
     },
     buildings: { testHall: 'Testhalle', exportExit: 'Export-Ausfahrt' },
-    zones: { A: 'Lieferort A', B: 'Lieferort B', C: 'Lieferort C' },
+    zones: { A: 'Lieferort A', B: 'Lieferort B', C: 'Lieferort C', W: 'Werkstatt' },
     zoneItemCost: (cost: string): string => `${cost} je Feld`,
     zoneItemTitle: (name: string): string =>
       `${name} aufziehen: klicken, Rechteck ziehen, loslassen (Größe bestimmt den Lagerplatz)`,
+    workshopItemTitle: (fieldsPerBay: number): string =>
+      `Werkstatt aufziehen: klicken, Rechteck ziehen, loslassen. Fahrzeuge werden hier gewartet; je ${fieldsPerBay} Felder ein Platz.`,
     zoneSize: (w: number, d: number, capacity: number, cost: string): string =>
       `${w} × ${d} Felder · Lager ${capacity} je Ware · Kosten: ${cost}`,
+    workshopSize: (w: number, d: number, bays: number, cost: string): string =>
+      `${w} × ${d} Felder · ${bays} ${bays === 1 ? 'Werkstattplatz' : 'Werkstattplätze'} · Kosten: ${cost}`,
     notConnected: 'Nicht angeschlossen: Straße an das Tor bauen',
     zoneMerges: 'wird Teil der angrenzenden Zone',
     gate: { N: 'Tor Nord', E: 'Tor Ost', S: 'Tor Süd', W: 'Tor West' },
@@ -220,6 +224,7 @@ export const de = {
       waitingInput: 'Wartet auf Ware',
       full: 'Ausgangslager voll',
       storing: 'Lagert',
+      workshop: 'Werkstatt',
     },
     connected: 'An die Straße angeschlossen',
     bays: 'Stellplätze',
@@ -240,6 +245,8 @@ export const de = {
       loading: 'Lädt',
       toDropoff: 'Fährt zum Abladen',
       unloading: 'Lädt ab',
+      toWorkshop: 'Fährt zur Werkstatt',
+      servicing: 'Wird gewartet',
     },
     idleReasons: {
       noJob: 'Wartet: keine Aufgabe',

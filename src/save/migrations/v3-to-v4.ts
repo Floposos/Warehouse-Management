@@ -13,6 +13,8 @@ type Obj = Record<string, unknown>;
  *   haben keine Wartezeit. Straßen sind keine Vorfahrtsstraßen.
  * - Meldungen (T2.4): leere Liste.
  * - Fahrzeugtypen (T2.5): bisherige LKW sind gekaufte Diesel-LKW (Kaufzeitpunkt = jetzt).
+ * - Wartung (T2.6): LKW sind in neuem Zustand, ohne Pannen; eigener Zufallsstrom für
+ *   Ereignisse aus dem Seed.
  */
 export const migrateV3ToV4: Migration = (save) => {
   const state = save['state'] as Obj;
@@ -30,14 +32,37 @@ export const migrateV3ToV4: Migration = (save) => {
         tours.push({ id, name: `Tour ${tours.length + 1}`, color: tours.length % 10, stops });
         if (mode === 'tour') tourId = id;
       }
-      return { ...rest, tourId, ...FLEET_DEFAULTS, boughtTick: state['tick'] ?? 0 };
+      return {
+        ...rest,
+        tourId,
+        ...FLEET_DEFAULTS,
+        boughtTick: state['tick'] ?? 0,
+        upkeep: { ...UPKEEP_DEFAULTS },
+      };
     },
   );
   const roads = (Array.isArray(state['roads']) ? (state['roads'] as Obj[]) : []).map((r) => ({
     ...r,
     priority: false,
   }));
-  return { ...save, state: { ...state, nextId, vehicles, tours, roads, notices: [] } };
+  const seed = typeof state['seed'] === 'number' ? state['seed'] : 0;
+  const eventRng = { s: (seed ^ 0x5bd1e995) >>> 0 };
+  return {
+    ...save,
+    state: { ...state, nextId, vehicles, tours, roads, notices: [], eventRng },
+  };
+};
+
+const UPKEEP_DEFAULTS = {
+  condition: 100_000,
+  wearRest: 0,
+  brokenTicks: 0,
+  breakdowns: 0,
+  lastBreakdownTick: null,
+  lastServiceTick: null,
+  serviceRequested: false,
+  warnedNoWorkshop: false,
+  workshopId: null,
 };
 
 /** Bisherige LKW: LKW mit Diesel, gekauft zum damaligen Preis (90.000 €). */

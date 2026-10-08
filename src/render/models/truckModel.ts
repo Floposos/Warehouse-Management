@@ -135,3 +135,28 @@ export function setTruckJam(truck: Group, jammed: boolean): void {
   }
   mark.visible = jammed;
 }
+
+const smokeGeometry = new SphereGeometry(0.1, 8, 6);
+const smokeMaterial = new MeshLambertMaterial({ color: palette.breakdownSmoke });
+
+/** Panne (T2.6): grauer Rauch über der Motorhaube, zusätzlich zum roten Ausrufezeichen. */
+export function setTruckBroken(truck: Group, broken: boolean): void {
+  let smoke = truck.getObjectByName('smoke');
+  if (!smoke && !broken) return;
+  if (!smoke) {
+    smoke = new Group();
+    smoke.name = 'smoke';
+    for (const [x, y, s] of [
+      [0.32, 0.5, 1],
+      [0.26, 0.64, 1.3],
+      [0.18, 0.8, 1.6],
+    ] as const) {
+      const puff = new Mesh(smokeGeometry, smokeMaterial);
+      puff.position.set(x, y, 0);
+      puff.scale.setScalar(s);
+      smoke.add(puff);
+    }
+    truck.add(smoke);
+  }
+  smoke.visible = broken;
+}

@@ -5,7 +5,13 @@ import type { GameState } from '../../sim/state/gameState';
 import { valuesOf } from '../../sim/vehicles/fleet';
 import type { Vehicle } from '../../sim/vehicles/types';
 import { sites } from '../../sim/world/sites';
-import { createTruckModel, setTruckCargo, setTruckDot, setTruckJam } from '../models/truckModel';
+import {
+  createTruckModel,
+  setTruckBroken,
+  setTruckCargo,
+  setTruckDot,
+  setTruckJam,
+} from '../models/truckModel';
 import { bayPose } from './bayPose';
 import { routeColorOf } from './routeColors';
 import { LANE_OFFSET, PARKED_OFFSET, vehiclePose, type Pose } from './vehiclePose';
@@ -45,7 +51,9 @@ export class VehiclesView {
         model.rotation.y = pose.angle;
       }
       setTruckCargo(model, v.cargo?.product ?? null);
-      setTruckJam(model, v.waitTicks >= trafficConfig.jamWarnTicks);
+      const broken = v.kind === 'truck' && v.upkeep.brokenTicks > 0;
+      setTruckJam(model, v.waitTicks >= trafficConfig.jamWarnTicks || broken);
+      setTruckBroken(model, broken);
       if (v.kind === 'truck') setTruckDot(model, routeColorOf(state, v));
     }
     for (const [id, model] of this.models) {
@@ -74,9 +82,9 @@ function bayPoses(state: Readonly<GameState>): Map<number, Pose> {
 
 function isMoving(v: Vehicle): boolean {
   if (v.offRoad || v.waitTicks > 0) return false;
-  return v.kind === 'supplier'
-    ? v.phase === 'toSite' || v.phase === 'toExit'
-    : v.phase === 'toPickup' || v.phase === 'toDropoff';
+  if (v.kind === 'supplier') return v.phase === 'toSite' || v.phase === 'toExit';
+  if (v.upkeep.brokenTicks > 0) return false;
+  return v.phase === 'toPickup' || v.phase === 'toDropoff' || v.phase === 'toWorkshop';
 }
 
 function speedOf(v: Vehicle): number {

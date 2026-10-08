@@ -39,9 +39,15 @@ describe('Bau-Tooltip', () => {
       reason: null,
       notConnected: true,
       merges: false,
+      bays: null as number | null,
       command,
     };
-    expect(buildTipText(zone)).toEqual({
+    expect(buildTipText({ ...zone, bays: 3 })).toEqual({
+      text: '4 × 3 Felder · 3 Werkstattplätze · Kosten: 2.400 €',
+      kind: 'ok',
+      warning: 'Nicht angeschlossen: Straße an das Tor bauen',
+    });
+    expect(buildTipText({ ...zone, bays: null })).toEqual({
       text: '4 × 3 Felder · Lager 120 je Ware · Kosten: 2.400 €',
       kind: 'ok',
       warning: 'Nicht angeschlossen: Straße an das Tor bauen',

@@ -1,4 +1,3 @@
-import { calendarAt } from '../../../sim/core/gameTime';
 import type { Command, CommandResult } from '../../../sim/commands/commands';
 import type { GameState } from '../../../sim/state/gameState';
 import {
@@ -8,17 +7,13 @@ import {
   valuesOf,
 } from '../../../sim/vehicles/fleet';
 import type { Truck } from '../../../sim/vehicles/types';
-import { formatEuro, pad2 } from '../../../shared/format';
+import { formatEuro } from '../../../shared/format';
 import { confirmDialog } from '../../components/confirm';
 import { button, el } from '../../components/dom';
 import { de } from '../../texts/de';
 import { row } from './infoPanel';
 import { truckLabel } from './names';
-
-function dateText(tick: number): string {
-  const c = calendarAt(tick);
-  return `${pad2(c.day)}.${pad2(c.month)}.${c.year}`;
-}
+import { dateText } from './vehicleUpkeep';
 
 /** Typ, Antrieb, Kauf/Leasing und „Verkaufen“ bzw. „Leasing zurückgeben“ (T2.5). */
 export function ownershipSection(

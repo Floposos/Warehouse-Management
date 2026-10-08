@@ -74,6 +74,8 @@ export interface GameState {
   /** Anzahl ausgeführter Simulationsschritte seit Spielbeginn. */
   tick: number;
   rng: RngState;
+  /** Eigener Zufallsstrom für Ereignisse wie Pannen (T2.6), damit sie andere Zufälle nicht verschieben. */
+  eventRng: RngState;
   /** Nächste freie ID für neue Objekte. */
   nextId: number;
   finance: Finance;
@@ -91,11 +93,17 @@ export interface GameState {
 /** Lage der Test-Halle aus M0 (nahe der Eingangsstraße, Mitte der Westseite). */
 const TEST_HALL = { x: 12, z: 58 } as const;
 
+/** Startwert des Ereignis-Zufallsstroms, aus dem Seed abgeleitet. */
+export function eventSeed(seed: number): number {
+  return (seed ^ 0x5bd1e995) >>> 0;
+}
+
 export function createInitialState(seed: number): GameState {
   return {
     seed,
     tick: 0,
     rng: createRngState(seed),
+    eventRng: createRngState(eventSeed(seed)),
     nextId: 2,
     finance: createFinance(economyConfig.startingBalanceCents, 0),
     buildings: [{ id: 1, type: 'testHall', ...TEST_HALL, builtTick: 0, paidCents: 0 }],

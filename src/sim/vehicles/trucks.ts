@@ -9,10 +9,13 @@ import { dropsFor, findJob } from './truckJobs';
 import { accessOf, drive, goIdle, setRoute, unloadAt } from './truckShared';
 import { stepTourTruck } from './truckTour';
 import type { Truck } from './types';
+import { stepBreakdown } from './upkeep';
 import type { VehicleCtx } from './vehicleCtx';
+import { maybeStartService, stepWorkshop } from './workshop';
 
-/** Ein Schritt eines eigenen LKW: feste Tour oder Automatik. */
+/** Ein Schritt eines eigenen LKW: Panne, Werkstatt, sonst feste Tour oder Automatik. */
 export function stepTruck(ctx: VehicleCtx, t: Truck): void {
+  if (stepBreakdown(t) || stepWorkshop(ctx, t) || maybeStartService(ctx, t)) return;
   if (t.tourId !== null) stepTourTruck(ctx, t);
   else stepAutoTruck(ctx, t);
 }
@@ -46,6 +49,8 @@ function stepAutoTruck(ctx: VehicleCtx, t: Truck): void {
       if (--t.timer > 0) return;
       ctx.traffic.leaveBay(t);
       unload(ctx, t);
+      return;
+    default:
       return;
   }
 }

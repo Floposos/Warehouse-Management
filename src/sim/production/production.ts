@@ -32,9 +32,10 @@ export const recipes: Partial<Record<ZoneKind, Recipe>> = {
 };
 
 /** Zustand einer Zone für Anzeige und Infofenster. */
-export type ZoneStatus = 'working' | 'waitingInput' | 'full' | 'storing';
+export type ZoneStatus = 'working' | 'waitingInput' | 'full' | 'storing' | 'workshop';
 
 export function zoneStatus(zone: Zone): ZoneStatus {
+  if (zone.kind === 'W') return 'workshop';
   const recipe = recipes[zone.kind];
   if (!recipe) return isFull(zone, 'rawA') ? 'full' : 'storing';
   if (isFull(zone, recipe.output)) return 'full';

@@ -29,5 +29,7 @@ export const palette = {
   wheel: 0x2c3a4a,
   /** Grüner Dachstreifen der Elektro-Fahrzeuge (T2.5). */
   electricMark: 0x3ccf6e,
+  /** Rauch über einem Fahrzeug mit Panne (T2.6). */
+  breakdownSmoke: 0x8c8c8c,
   selection: 0x4f9dde,
 } as const;

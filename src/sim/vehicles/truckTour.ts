@@ -36,6 +36,8 @@ export function stepTourTruck(ctx: VehicleCtx, t: Truck): void {
       t.phase = 'idle';
       t.timer = 1;
       return;
+    default:
+      return;
   }
 }
 

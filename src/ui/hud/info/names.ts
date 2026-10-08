@@ -32,5 +32,7 @@ export function truckLabel(state: GameState, id: number): string {
 
 /** Alle anfahrbaren Orte mit Namen (für Auswahllisten). */
 export function siteOptions(state: GameState): { id: number; label: string }[] {
-  return sites(state).map((s) => ({ id: s.id, label: siteLabel(state, s.id) }));
+  return sites(state)
+    .filter((s) => s.kind !== 'W')
+    .map((s) => ({ id: s.id, label: siteLabel(state, s.id) }));
 }

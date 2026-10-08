@@ -62,9 +62,10 @@ export class InfoPanel {
 }
 
 /** Zeile „Bezeichnung: Wert“. */
-export function row(label: string): { root: HTMLElement; value: HTMLElement } {
+export function row(label: string): { root: HTMLElement; label: HTMLElement; value: HTMLElement } {
   const root = el('div', 'info-row');
+  const name = el('span', 'info-label', label);
   const value = el('span', 'info-value');
-  root.append(el('span', 'info-label', label), value);
-  return { root, value };
+  root.append(name, value);
+  return { root, label: name, value };
 }

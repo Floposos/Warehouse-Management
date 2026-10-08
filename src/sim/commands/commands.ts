@@ -11,7 +11,7 @@ import type { EventBus } from '../core/eventBus';
 import { book } from '../finance/ledger';
 import { buyTruck } from '../vehicles/buyTruck';
 import { disposeTruck } from '../vehicles/fleet';
-import { assignTour } from '../vehicles/truckCommands';
+import { assignTour, requestService } from '../vehicles/truckCommands';
 import { createTour, deleteTour, updateTour, type TourPatch } from '../vehicles/tours';
 import { cancelOrder, createOrder, type OrderInterval } from '../goods/orders';
 import type { GameState } from '../state/gameState';
@@ -67,6 +67,7 @@ export type Command =
   | { type: 'vehicle/buy'; model: VehicleModel; drive: VehicleDrive; lease: boolean }
   /** Verkaufen bzw. Leasing zurückgeben. */
   | { type: 'vehicle/dispose'; truckId: number }
+  | { type: 'vehicle/service'; truckId: number }
   /** Tour zuweisen; null = Automatik. */
   | { type: 'vehicle/assignTour'; truckId: number; tourId: number | null }
   /** Touren (T2.1). Halte werden immer als Ganzes geschickt. Ergebnis enthält die neue Id. */
@@ -143,6 +144,10 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
       return disposeTruck(state, bus, command.truckId)
         ? { ok: true }
         : reject(bus, command, 'notFound');
+    case 'vehicle/service': {
+      const rejection = requestService(state, command.truckId);
+      return rejection ? reject(bus, command, rejection) : { ok: true };
+    }
     case 'vehicle/assignTour':
       return assignTour(state, command.truckId, command.tourId)
         ? { ok: true }

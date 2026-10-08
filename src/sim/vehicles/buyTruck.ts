@@ -5,6 +5,7 @@ import type { GameState } from '../state/gameState';
 import { ENTRANCE } from '../world/roadNetwork';
 import { acquisitionCents, modelValues, newLease } from './fleet';
 import { vehicleBase, type Truck } from './types';
+import { newUpkeep } from './upkeep';
 
 /**
  * Kauft oder least ein Fahrzeug (T2.5); es erscheint an der Einfahrt und startet in der
@@ -34,6 +35,7 @@ export function buyTruck(
     priceCents,
     boughtTick: state.tick,
     lease: lease ? newLease(state, priceCents) : null,
+    upkeep: newUpkeep(),
   };
   state.vehicles.push(truck);
   book(state.finance, state.tick, bus, 'vehicles', -cost, {

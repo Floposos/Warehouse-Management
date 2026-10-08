@@ -7,8 +7,8 @@
 export const zoneConfig = {
   /** Mindestbreite und -tiefe in Feldern. */
   minSize: 1,
-  /** Baukosten je Feld in Cent (A 250 €, B 400 €, C 400 €). */
-  costPerFieldCents: { A: 25_000, B: 40_000, C: 40_000 },
+  /** Baukosten je Feld in Cent (A 250 €, B 400 €, C 400 €; Werkstatt 500 €, ANNAHME). */
+  costPerFieldCents: { A: 25_000, B: 40_000, C: 40_000, W: 50_000 },
   /** Lagerplatz je Feld und Ware (Einheiten). */
   capacityPerField: 10,
 } as const;

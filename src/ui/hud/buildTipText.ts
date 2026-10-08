@@ -29,7 +29,10 @@ export function buildTipText(preview: BuildPreview): {
     case 'zone': {
       const f = preview.footprint;
       const cost = formatEuro(preview.costCents);
-      const size = de.build.zoneSize(f.width, f.depth, preview.capacity, cost);
+      const size =
+        preview.bays === null
+          ? de.build.zoneSize(f.width, f.depth, preview.capacity, cost)
+          : de.build.workshopSize(f.width, f.depth, preview.bays, cost);
       if (preview.reason)
         return { text: `${de.build.reasons[preview.reason]} · ${size}`, kind: 'error' };
       const text = preview.merges ? `${size} · ${de.build.zoneMerges}` : size;

@@ -71,6 +71,25 @@ export interface Lease {
   endTick: number;
 }
 
+/** Verschleiß, Wartung und Pannen eines eigenen Fahrzeugs (T2.6). */
+export interface Upkeep {
+  /** Zustand in Tausendstel Prozent (100.000 = neu). */
+  condition: number;
+  /** Gefahrene Tausendstel Feld, die noch nicht als Verschleiß zählen (< 1000). */
+  wearRest: number;
+  /** > 0: Panne, steht noch so viele Schritte. */
+  brokenTicks: number;
+  breakdowns: number;
+  lastBreakdownTick: number | null;
+  lastServiceTick: number | null;
+  /** Spieler hat „Zur Werkstatt“ gewählt. */
+  serviceRequested: boolean;
+  /** Meldung „keine Werkstatt“ schon gegeben (bis zur nächsten Wartung). */
+  warnedNoWorkshop: boolean;
+  /** Ziel-Werkstatt während `toWorkshop`/`servicing`. */
+  workshopId: number | null;
+}
+
 /** Warum ein LKW steht. Texte in ui/texts/de.ts. */
 export type TruckIdleReason = 'noJob' | 'noRoute' | 'noDestination' | 'noTour';
 
@@ -80,7 +99,7 @@ export type TruckIdleReason = 'noJob' | 'noRoute' | 'noDestination' | 'noTour';
  */
 export interface Truck extends VehicleBase {
   kind: 'truck';
-  phase: 'idle' | 'toPickup' | 'loading' | 'toDropoff' | 'unloading';
+  phase: TruckPhase;
   job: Job | null;
   idleReason: TruckIdleReason | null;
   /** Gefahrene Tausendstel Felder, die noch nicht als Kilometerkosten gebucht sind. */
@@ -96,7 +115,11 @@ export interface Truck extends VehicleBase {
   boughtTick: number;
   /** null = gekauft. */
   lease: Lease | null;
+  upkeep: Upkeep;
 }
+
+export type TruckPhase =
+  'idle' | 'toPickup' | 'loading' | 'toDropoff' | 'unloading' | 'toWorkshop' | 'servicing';
 
 export type Vehicle = Supplier | Truck;
 

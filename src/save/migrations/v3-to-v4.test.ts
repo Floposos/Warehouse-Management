@@ -33,7 +33,19 @@ describe('Migration v3 → v4', () => {
       priceCents: 9_000_000,
       boughtTick: 0,
       lease: null,
+      upkeep: {
+        condition: 100_000,
+        wearRest: 0,
+        brokenTicks: 0,
+        breakdowns: 0,
+        lastBreakdownTick: null,
+        lastServiceTick: null,
+        serviceRequested: false,
+        warnedNoWorkshop: false,
+        workshopId: null,
+      },
     };
+    expect(state['eventRng']).toEqual({ s: (0 ^ 0x5bd1e995) >>> 0 });
     expect(state['vehicles']).toEqual([
       { id: 5, kind: 'truck', tourId: 20, ...traffic, ...fleet },
       { id: 6, kind: 'truck', tourId: null, ...traffic, ...fleet },

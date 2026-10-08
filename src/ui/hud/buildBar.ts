@@ -1,4 +1,5 @@
 import { buildConfig } from '../../config/build';
+import { maintenanceConfig } from '../../config/maintenance';
 import { leaseConfig } from '../../config/vehicles';
 import { zoneConfig } from '../../config/zones';
 import { buildingTypes, type BuildingTypeId } from '../../content/buildings';
@@ -105,7 +106,11 @@ export class BuildBar {
       const name = de.build.zones[kind];
       const cost = de.build.zoneItemCost(formatEuro(zoneConfig.costPerFieldCents[kind]));
       const active = this.tool?.kind === 'zone' && this.tool.zoneKind === kind;
-      return this.item(name, cost, de.build.zoneItemTitle(name), active, {
+      const title =
+        kind === 'W'
+          ? de.build.workshopItemTitle(maintenanceConfig.workshopFieldsPerBay)
+          : de.build.zoneItemTitle(name);
+      return this.item(name, cost, title, active, {
         kind: 'zone',
         zoneKind: kind,
       });

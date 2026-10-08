@@ -48,3 +48,41 @@ test('Transporter leasen, ansehen und zurückgeben (T2.5)', async ({ page }) => 
   expect(left).toBe(0);
   expect(problems).toEqual([]);
 });
+
+test('Werkstatt bauen, Fahrzeug zur Wartung schicken (T2.6)', async ({ page }) => {
+  const problems = collectProblems(page);
+  await page.goto('/');
+  await startNewGame(page);
+  await page.keyboard.press('Space');
+  const bar = page.getByTestId('build-bar');
+  await bar.getByRole('button', { name: 'Zonen/Gebäude' }).click();
+  await expect(bar.getByRole('button', { name: /Werkstatt/ })).toBeVisible();
+
+  const id = await page.evaluate(() => {
+    const app = (window as unknown as { __logistikum: TestApp }).__logistikum;
+    const s = app.session as unknown as { command(c: unknown): { ok: boolean; id?: number } };
+    s.command({ type: 'build/demolish', buildingId: 1 });
+    s.command({ type: 'road/build', fromX: 0, fromZ: 61, toX: 16, toZ: 61, xFirst: true });
+    const truck = s.command({ type: 'vehicle/buy', model: 'truck', drive: 'diesel', lease: false });
+    app.selection.select({ kind: 'vehicle', id: truck.id ?? -1 });
+    return truck.id ?? -1;
+  });
+  const panel = page.getByTestId('info-panel');
+  await expect(panel).toContainText('100 % · Wartung in ca. 150 km');
+  await expect(panel).toContainText('Pannen');
+  await panel.getByTestId('truck-service').click();
+  await expect(panel).toContainText('Es gibt keine Werkstatt');
+
+  await page.evaluate(() => {
+    const app = (window as unknown as { __logistikum: TestApp }).__logistikum;
+    const s = app.session as unknown as { command(c: unknown): { ok: boolean } };
+    s.command({ type: 'zone/place', kind: 'W', fromX: 8, fromZ: 62, toX: 9, toZ: 63 });
+  });
+  await panel.getByTestId('truck-service').click();
+  await expect(panel).toContainText('Fährt nach dem laufenden Auftrag zur Werkstatt.');
+  await page.keyboard.press('Space'); // Pause aufheben
+  await expect(panel).toContainText(/Fährt zur Werkstatt|Wird gewartet/, { timeout: 15_000 });
+  await expect(panel).toContainText('Werkstatt 1');
+  expect(id).toBeGreaterThan(0);
+  expect(problems).toEqual([]);
+});

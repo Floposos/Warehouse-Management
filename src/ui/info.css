@@ -46,7 +46,8 @@
   margin: 4px 0;
   font-size: 0.9rem;
 }
-.info-note.is-warning {
+.info-note.is-warning,
+.info-value.is-warning {
   color: var(--danger);
   font-weight: 600;
 }

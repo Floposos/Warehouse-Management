@@ -32,6 +32,7 @@ export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoCont
   const status = row(de.info.status);
   const connection = el('p', 'info-note');
   const bays = row(de.info.bays);
+  const stockTitle = el('h3', 'info-subtitle', de.info.stock);
   const stock = el('div', 'info-stock');
   const gates = el('div', 'info-gates');
   const gateButtons = SIDES.map((side) => {
@@ -49,7 +50,7 @@ export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoCont
     status.root,
     connection,
     bays.root,
-    el('h3', 'info-subtitle', de.info.stock),
+    stockTitle,
     stock,
     el('h3', 'info-subtitle', de.info.gate),
     gates,
@@ -67,6 +68,9 @@ export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoCont
       connection.textContent = connected ? de.info.connected : de.build.notConnected;
       connection.classList.toggle('is-warning', !connected);
       bays.value.textContent = baysText(state, zoneId);
+      const workshop = zone.kind === 'W';
+      bays.label.textContent = workshop ? de.upkeep.workshopBays : de.info.bays;
+      stockTitle.hidden = stock.hidden = workshop;
       const cap = zoneCapacity(zone);
       stock.replaceChildren(
         ...productIds
