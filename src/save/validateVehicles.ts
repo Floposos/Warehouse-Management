@@ -1,3 +1,4 @@
+import { NOTICE_KINDS, type NoticeKind } from '../sim/events/notices';
 import { isInt, isProduct, isRecord } from './validateShapes';
 
 const SUPPLIER_PHASES = ['toSite', 'handling', 'toExit', 'noRoute'];
@@ -50,7 +51,14 @@ export function isTour(t: unknown): boolean {
 
 /** Zulieferer und eigene LKW. */
 export function isVehicle(v: unknown): boolean {
-  if (!isRecord(v) || !['id', 'progress', 'timer'].every((k) => isInt(v[k]))) return false;
+  if (!isRecord(v) || !['id', 'progress', 'timer', 'waitTicks'].every((k) => isInt(v[k]))) {
+    return false;
+  }
+  const heading = v['heading'];
+  if (!isInt(heading) || heading < 0 || heading > 3 || typeof v['offRoad'] !== 'boolean') {
+    return false;
+  }
+  if (v['bayAt'] !== null && !isInt(v['bayAt'])) return false;
   const route = v['route'];
   const shared =
     Array.isArray(route) &&
@@ -60,4 +68,14 @@ export function isVehicle(v: unknown): boolean {
   if (!shared) return false;
   if (v['kind'] === 'supplier') return isSupplier(v);
   return v['kind'] === 'truck' && isTruck(v);
+}
+
+/** Meldung (T2.4/T2.6). */
+export function isNotice(n: unknown): boolean {
+  return (
+    isRecord(n) &&
+    ['id', 'tick', 'x', 'z'].every((k) => isInt(n[k])) &&
+    NOTICE_KINDS.includes(n['kind'] as NoticeKind) &&
+    (n['vehicleId'] === null || isInt(n['vehicleId']))
+  );
 }

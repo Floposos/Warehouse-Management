@@ -76,7 +76,7 @@ export class BuildBar {
     const tab = this.openTab;
     this.panel.hidden = tab === null || tab === 'demolish';
     if (tab === 'zones') this.panel.append(...this.zoneItems(), ...this.buildingItems());
-    else if (tab === 'roads') this.panel.append(this.roadItem());
+    else if (tab === 'roads') this.panel.append(this.roadItem(), ...this.priorityItems());
     else if (tab === 'vehicles') this.panel.append(this.truckItem());
   }
 
@@ -108,6 +108,16 @@ export class BuildBar {
     const cost = de.build.roadItemCost(formatEuro(buildConfig.roadCostPerTileCents));
     const active = this.tool?.kind === 'road';
     return this.item(de.build.road, cost, de.build.roadItemTitle, active, { kind: 'road' });
+  }
+
+  /** Vorfahrtsstraße markieren und Markierung entfernen (T2.2). */
+  private priorityItems(): HTMLElement[] {
+    return [true, false].map((priority) => {
+      const active = this.tool?.kind === 'priority' && this.tool.priority === priority;
+      const name = priority ? de.build.priority : de.build.priorityRemove;
+      const title = priority ? de.build.priorityTitle : de.build.priorityRemoveTitle;
+      return this.item(name, de.build.priorityCost, title, active, { kind: 'priority', priority });
+    });
   }
 
   /** LKW kaufen ist kein Werkzeug: Klick kauft sofort, der LKW erscheint an der Einfahrt. */

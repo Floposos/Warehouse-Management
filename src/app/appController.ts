@@ -23,6 +23,8 @@ import { FinanceFeedback } from './financeFeedback';
 import { startFrameLoop } from './frameLoop';
 import { SelectionController } from './selectionController';
 import { GameSession } from './gameSession';
+import { NoticesController } from './noticesController';
+import type { Notice } from '../sim/events/notices';
 import { SaveController } from './saveController';
 
 const { campusWidth: W, campusDepth: D } = worldConfig;
@@ -49,6 +51,7 @@ export class AppController {
   readonly build: BuildController;
   readonly selection: SelectionController;
   private readonly financeFeedback: FinanceFeedback;
+  readonly notices: NoticesController;
   readonly saves: SaveController;
 
   constructor(
@@ -72,6 +75,7 @@ export class AppController {
       openCash: () => this.openCash(),
       openPurchase: () => this.openPurchase(),
       openTours: () => this.selection.toggleTours(),
+      openNotices: () => this.notices.toggle(),
     });
     this.mainMenu = new MainMenu(
       ui,
@@ -109,9 +113,10 @@ export class AppController {
       () => this.build.activeTool !== null,
     );
     this.financeFeedback = new FinanceFeedback(ui, renderer);
+    this.notices = new NoticesController(ui, this.toasts, (n) => this.showNotice(n));
     installGameShortcuts({
       isActive: () => this.mode === 'game' && !isDialogOpen(),
-      cancelTool: () => this.build.cancel() || this.selection.cancel(),
+      cancelTool: () => this.build.cancel() || this.selection.cancel() || this.notices.close(),
       togglePause: () => this.session?.togglePause(),
       setSpeed: (s) => this.setSpeed(s),
       openMenu: () => this.openPauseMenu(),
@@ -146,6 +151,7 @@ export class AppController {
     this.session = new GameSession(state);
     this.selection.reset();
     this.financeFeedback.attach(this.session);
+    this.notices.attach(this.session);
     Object.assign(this.rig, createRig(START_VIEW.x, START_VIEW.z));
     this.mode = 'game';
     this.mainMenu.visible = false;
@@ -159,6 +165,7 @@ export class AppController {
     this.session = null;
     this.selection.reset();
     this.financeFeedback.attach(null);
+    this.notices.attach(null);
     this.cameraInput.enabled = false;
     this.cameraInput.releaseAll();
     this.mainMenu.visible = true;
@@ -194,6 +201,17 @@ export class AppController {
     const result = this.session?.command({ type: 'vehicle/buyTruck' });
     if (!result) return;
     this.toasts.show(result.ok ? de.build.truckBought : de.build.truckNoMoney);
+  }
+
+  /** Meldung zeigen: Kamera zum Ort, betroffenes Fahrzeug auswählen. */
+  showNotice(notice: Notice): void {
+    if (!this.session) return;
+    this.rig.targetX = notice.x + 0.5;
+    this.rig.targetZ = notice.z + 0.5;
+    const exists = this.session.state.vehicles.some((v) => v.id === notice.vehicleId);
+    if (exists && notice.vehicleId !== null) {
+      this.selection.select({ kind: 'vehicle', id: notice.vehicleId });
+    }
   }
 
   openCash(): void {
@@ -244,6 +262,8 @@ export class AppController {
       rig = this.rig;
       this.cameraInput.update(dtMs / 1000);
       this.topbar.update(state, this.session.speed);
+      this.topbar.setUnread(this.notices.unread());
+      this.notices.update();
       this.build.update();
       this.selection.update(performance.now());
     } else {

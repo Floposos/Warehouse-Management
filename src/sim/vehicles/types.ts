@@ -1,4 +1,5 @@
 import type { ProductId } from '../../content/products';
+import type { Heading } from '../traffic/lanes';
 import type { Cell } from '../world/roadLine';
 
 /** Ladung eines Fahrzeugs. */
@@ -8,7 +9,7 @@ export interface Cargo {
 }
 
 /** Gemeinsame Felder aller Fahrzeuge. Position: `route[0]` ist das aktuelle Feld. */
-interface VehicleBase {
+export interface VehicleBase {
   id: number;
   route: Cell[];
   /** Fortschritt zum nächsten Feld in Tausendsteln. */
@@ -16,6 +17,14 @@ interface VehicleBase {
   cargo: Cargo | null;
   /** Restschritte beim Ab-/Aufladen bzw. bis zum nächsten Versuch. */
   timer: number;
+  /** Fahrtrichtung im aktuellen Feld (T2.2). */
+  heading: Heading;
+  /** Steht abseits der Fahrbahn (Stellplatz, geparkt) und belegt keine Spur. */
+  offRoad: boolean;
+  /** Belegter Stellplatz: Id des Orts, sonst null (T2.3). */
+  bayAt: number | null;
+  /** Schritte, die das Fahrzeug ohne Unterbrechung im Verkehr oder vor dem Tor wartet (T2.4). */
+  waitTicks: number;
 }
 
 /** Zulieferer: bringt eingekaufte Rohware von außen zu einem Lieferort und fährt wieder hinaus. */
@@ -72,3 +81,18 @@ export interface Truck extends VehicleBase {
 }
 
 export type Vehicle = Supplier | Truck;
+
+/** Startwerte der gemeinsamen Felder; neue Fahrzeuge fahren nach Osten (von der Einfahrt). */
+export function vehicleBase(id: number, route: Cell[], offRoad: boolean): VehicleBase {
+  return {
+    id,
+    route,
+    progress: 0,
+    cargo: null,
+    timer: 1,
+    heading: 1,
+    offRoad,
+    bayAt: null,
+    waitTicks: 0,
+  };
+}

@@ -171,3 +171,49 @@
   border-color: var(--text);
   box-shadow: 0 0 0 2px var(--panel-solid) inset;
 }
+
+/* Meldungen (T2.4/T2.6) */
+.notices-panel {
+  position: absolute;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 440px;
+  max-width: calc(100% - 24px);
+  max-height: 45%;
+  overflow-y: auto;
+  padding: 10px 14px 14px;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  z-index: 2;
+}
+.notices-panel[hidden] {
+  display: none;
+}
+.notices-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.notices-item {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin: 2px 0;
+  text-align: left;
+}
+.notices-time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.notices-jam,
+.notices-breakdown {
+  color: var(--danger);
+}
+.has-unread {
+  border-color: var(--danger);
+  color: var(--danger);
+  font-weight: 600;
+}

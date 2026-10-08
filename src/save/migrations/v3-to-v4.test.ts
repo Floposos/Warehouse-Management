@@ -26,11 +26,36 @@ describe('Migration v3 → v4', () => {
       { id: 20, name: 'Tour 1', color: 0, stops: [stop] },
       { id: 21, name: 'Tour 2', color: 1, stops: [stop] },
     ]);
+    const traffic = { heading: 1, offRoad: false, bayAt: null, waitTicks: 0 };
     expect(state['vehicles']).toEqual([
-      { id: 5, kind: 'truck', tourId: 20 },
-      { id: 6, kind: 'truck', tourId: null },
-      { id: 7, kind: 'truck', tourId: null },
-      { id: 8, kind: 'supplier' },
+      { id: 5, kind: 'truck', tourId: 20, ...traffic },
+      { id: 6, kind: 'truck', tourId: null, ...traffic },
+      { id: 7, kind: 'truck', tourId: null, ...traffic },
+      { id: 8, kind: 'supplier', ...traffic },
+    ]);
+  });
+
+  it('Fahrtrichtung aus dem Weg, wartende Fahrzeuge abseits, Straßen ohne Vorfahrt', () => {
+    const route = [
+      { x: 3, z: 5 },
+      { x: 3, z: 4 },
+    ];
+    const v3 = {
+      saveVersion: 3,
+      state: {
+        nextId: 1,
+        roads: [{ x: 1, z: 2 }],
+        vehicles: [
+          { id: 1, kind: 'supplier', phase: 'toSite', route },
+          { id: 2, kind: 'supplier', phase: 'handling', route },
+        ],
+      },
+    };
+    const state = migrateV3ToV4(v3)['state'] as Record<string, unknown>;
+    expect(state['roads']).toEqual([{ x: 1, z: 2, priority: false }]);
+    expect(state['vehicles']).toMatchObject([
+      { heading: 0, offRoad: false },
+      { heading: 0, offRoad: true },
     ]);
   });
 

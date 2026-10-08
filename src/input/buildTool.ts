@@ -1,6 +1,7 @@
 import { buildingTypes, type BuildingTypeId } from '../content/buildings';
 import { checkPlaceBuilding, demolishRefund, type BuildRejection } from '../sim/commands/build';
 import type { Command } from '../sim/commands/commands';
+import { priorityTiles } from '../sim/commands/priority';
 import { checkBuildRoad, roadRefundAt } from '../sim/commands/roads';
 import { zoneCellRefund } from '../sim/commands/zoneCells';
 import { checkPlaceZone, neighboursOf, zoneCapacity } from '../sim/commands/zones';
@@ -16,12 +17,14 @@ import { prefersXFirst, roadLine, type Cell } from '../sim/world/roadLine';
 export type BuildTool =
   | { kind: 'place'; buildingType: BuildingTypeId }
   | { kind: 'road' }
+  /** Vorfahrtsstraße markieren (true) bzw. Markierung entfernen (false), T2.2. */
+  | { kind: 'priority'; priority: boolean }
   | { kind: 'zone'; zoneKind: ZoneKind }
   | { kind: 'demolish' };
 
 /** Werkzeuge, die mit gedrückter Maustaste gezogen werden (Strecke bzw. Rechteck). */
 export function isDragTool(tool: BuildTool | null): boolean {
-  return tool?.kind === 'road' || tool?.kind === 'zone';
+  return tool?.kind === 'road' || tool?.kind === 'zone' || tool?.kind === 'priority';
 }
 
 /** Höhe des Geisterbilds eines Straßenfelds. */
@@ -43,6 +46,14 @@ export type BuildPreview =
       blocked: Cell[];
       costCents: number;
       reason: BuildRejection | null;
+      command: Command;
+    }
+  | {
+      kind: 'priority';
+      priority: boolean;
+      /** Straßenfelder auf der Strecke. */
+      cells: Cell[];
+      reason: 'noRoad' | null;
       command: Command;
     }
   | {
@@ -86,6 +97,8 @@ export function previewAt(
       return placePreview(state, tool.buildingType, worldX, worldZ);
     case 'road':
       return roadPreview(state, dragStart ?? cell, cell);
+    case 'priority':
+      return priorityPreview(state, tool.priority, dragStart ?? cell, cell);
     case 'zone':
       return zonePreview(state, tool.zoneKind, dragStart ?? cell, cell);
     case 'demolish':
@@ -123,6 +136,26 @@ function roadPreview(state: GameState, from: Cell, to: Cell): BuildPreview {
     costCents: check.costCents,
     reason: check.ok ? null : check.reason,
     command: { type: 'road/build', fromX: from.x, fromZ: from.z, toX: to.x, toZ: to.z, xFirst },
+  };
+}
+
+function priorityPreview(state: GameState, priority: boolean, from: Cell, to: Cell): BuildPreview {
+  const xFirst = prefersXFirst(from, to);
+  const cells = priorityTiles(state, from, to, xFirst).map(({ x, z }) => ({ x, z }));
+  return {
+    kind: 'priority',
+    priority,
+    cells,
+    reason: cells.length === 0 ? 'noRoad' : null,
+    command: {
+      type: 'road/setPriority',
+      fromX: from.x,
+      fromZ: from.z,
+      toX: to.x,
+      toZ: to.z,
+      xFirst,
+      priority,
+    },
   };
 }
 

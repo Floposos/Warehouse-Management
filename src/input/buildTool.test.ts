@@ -67,7 +67,7 @@ describe('Straßen-Vorschau', () => {
 
   it('Abriss trifft auch Straßenfelder', () => {
     const state = createInitialState(1);
-    state.roads.push({ x: 5, z: 5, builtTick: 0, paidCents: 50_000 });
+    state.roads.push({ x: 5, z: 5, builtTick: 0, paidCents: 50_000, priority: false });
     expect(previewAt(state, { kind: 'demolish' }, 5.5, 5.5)).toMatchObject({
       kind: 'demolish',
       refundCents: 50_000,

@@ -22,6 +22,10 @@ export function buildTipText(preview: BuildPreview): {
         ? { text: `${de.build.reasons[preview.reason]} · ${cost}`, kind: 'error' }
         : { text: cost, kind: 'ok' };
     }
+    case 'priority':
+      return preview.reason
+        ? { text: de.build.priorityNoRoad, kind: 'error' }
+        : { text: de.build.priorityCells(preview.cells.length, preview.priority), kind: 'ok' };
     case 'zone': {
       const f = preview.footprint;
       const cost = formatEuro(preview.costCents);

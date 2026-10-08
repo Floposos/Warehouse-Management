@@ -8,6 +8,7 @@ export const palette = {
   border: 0xf6f1e7,
   road: 0x8d96a3,
   roadMarking: 0xfdfdfd,
+  priorityMarking: 0xf2c230,
   hall: 0xf6e7c8,
   hallTrim: 0xe6cfa3,
   roof: 0xf08a5d,

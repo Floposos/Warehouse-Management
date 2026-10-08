@@ -9,6 +9,7 @@ import { createTour, deleteTour, updateTour, type TourPatch } from '../vehicles/
 import { cancelOrder, createOrder, type OrderInterval } from '../goods/orders';
 import type { GameState } from '../state/gameState';
 import { demolishBuilding, placeBuilding } from './build';
+import { setPriority } from './priority';
 import { buildRoad, demolishRoad } from './roads';
 import type { Side } from '../world/access';
 import { demolishZoneCell } from './zoneCells';
@@ -26,6 +27,16 @@ export type Command =
   /** Straße von (fromX, fromZ) nach (toX, toZ), gerade oder L-Form; `xFirst` = Knick-Richtung. */
   | { type: 'road/build'; fromX: number; fromZ: number; toX: number; toZ: number; xFirst: boolean }
   | { type: 'road/demolish'; x: number; z: number }
+  /** Vorfahrtsstraße auf der gezogenen Strecke markieren bzw. Markierung entfernen (T2.2). */
+  | {
+      type: 'road/setPriority';
+      fromX: number;
+      fromZ: number;
+      toX: number;
+      toZ: number;
+      xFirst: boolean;
+      priority: boolean;
+    }
   /** Zone als Rechteck zwischen zwei Eckfeldern aufziehen. */
   /** Zone als Rechteck zwischen zwei Eckfeldern; ohne `gate` wird die Tor-Seite vorgeschlagen. */
   | {
@@ -122,6 +133,12 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
     }
     case 'tour/delete':
       return deleteTour(state, command.tourId) ? { ok: true } : reject(bus, command, 'notFound');
+    case 'road/setPriority': {
+      const from = { x: command.fromX, z: command.fromZ };
+      const to = { x: command.toX, z: command.toZ };
+      const changed = setPriority(state, bus, from, to, command.xFirst, command.priority);
+      return changed === null ? reject(bus, command, 'noRoad') : { ok: true };
+    }
     case 'road/demolish': {
       const refund = demolishRoad(state, bus, command.x, command.z);
       return refund === null ? reject(bus, command, 'notFound') : { ok: true };

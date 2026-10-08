@@ -3,18 +3,14 @@ import type { EventBus } from '../core/eventBus';
 import { book } from '../finance/ledger';
 import type { GameState } from '../state/gameState';
 import { ENTRANCE } from '../world/roadNetwork';
-import type { Truck } from './types';
+import { vehicleBase, type Truck } from './types';
 
 /** Kauft einen LKW; er erscheint an der Einfahrt und startet in der Automatik. */
 export function buyTruck(state: GameState, bus: EventBus): Truck | 'insufficientFunds' {
   if (state.finance.balanceCents < vehicleConfig.truckPriceCents) return 'insufficientFunds';
   const truck: Truck = {
-    id: state.nextId++,
+    ...vehicleBase(state.nextId++, [{ ...ENTRANCE }], true),
     kind: 'truck',
-    route: [{ ...ENTRANCE }],
-    progress: 0,
-    cargo: null,
-    timer: 1,
     phase: 'idle',
     job: null,
     idleReason: null,

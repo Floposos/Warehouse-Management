@@ -1,7 +1,6 @@
 import { updateOrders } from '../goods/orders';
 import { updateProduction } from '../production/production';
-import { updateSuppliers } from '../vehicles/suppliers';
-import { updateTrucks } from '../vehicles/trucks';
+import { updateVehicles } from '../vehicles/vehicleSystem';
 import type { SimSystem } from './types';
 
 export const ordersSystem: SimSystem = {
@@ -9,17 +8,13 @@ export const ordersSystem: SimSystem = {
   update: (state, { bus }) => updateOrders(state, bus),
 };
 
-export const suppliersSystem: SimSystem = {
-  id: 'suppliers',
-  update: (state, { bus }) => updateSuppliers(state, bus),
+/** Zulieferer und eigene LKW mit gemeinsamem Verkehr (seit T2.2 ein System). */
+export const vehiclesSystem: SimSystem = {
+  id: 'vehicles',
+  update: (state, { bus }) => updateVehicles(state, bus),
 };
 
 export const productionSystem: SimSystem = {
   id: 'production',
   update: (state, { bus }) => updateProduction(state, bus),
-};
-
-export const trucksSystem: SimSystem = {
-  id: 'trucks',
-  update: (state, { bus }) => updateTrucks(state, bus),
 };

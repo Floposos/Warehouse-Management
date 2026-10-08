@@ -10,6 +10,7 @@ import { zoneStatus } from '../../../sim/production/production';
 import type { GameState } from '../../../sim/state/gameState';
 import { accessCell, SIDES } from '../../../sim/world/access';
 import { RoadNetwork } from '../../../sim/world/roadNetwork';
+import { bayCapacity, bayStatus } from '../../../sim/traffic/bays';
 import { button, el } from '../../components/dom';
 import { de } from '../../texts/de';
 import type { InfoContent } from './infoPanel';
@@ -30,6 +31,7 @@ export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoCont
   const size = el('p', 'info-note');
   const status = row(de.info.status);
   const connection = el('p', 'info-note');
+  const bays = row(de.info.bays);
   const stock = el('div', 'info-stock');
   const gates = el('div', 'info-gates');
   const gateButtons = SIDES.map((side) => {
@@ -46,6 +48,7 @@ export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoCont
     size,
     status.root,
     connection,
+    bays.root,
     el('h3', 'info-subtitle', de.info.stock),
     stock,
     el('h3', 'info-subtitle', de.info.gate),
@@ -63,6 +66,7 @@ export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoCont
       const connected = accessCell(new RoadNetwork(state), zone.parts, zone.gate) !== null;
       connection.textContent = connected ? de.info.connected : de.build.notConnected;
       connection.classList.toggle('is-warning', !connected);
+      bays.value.textContent = baysText(state, zoneId);
       const cap = zoneCapacity(zone);
       stock.replaceChildren(
         ...productIds
@@ -80,9 +84,16 @@ export function zoneInfo(zoneId: number, submit: (c: Command) => void): InfoCont
   };
 }
 
-/** Gebäude: Export-Ausfahrt mit Preisen, sonst nur der Name. */
+/** Stellplätze am Tor: belegt / gesamt, dazu die Warteschlange (T2.3). */
+function baysText(state: GameState, siteId: number): string {
+  const { used, queue } = bayStatus(state, siteId);
+  return de.info.baysLine(used, bayCapacity(state, siteId), queue);
+}
+
+/** Gebäude: Export-Ausfahrt mit Preisen und Stellplätzen, sonst nur der Name. */
 export function buildingInfo(buildingId: number): InfoContent {
   const root = el('div', 'info-content');
+  const bays = row(de.info.bays);
   const prices = Object.entries(goodsConfig.exportPriceCents) as [
     keyof typeof de.products,
     number,
@@ -96,8 +107,9 @@ export function buildingInfo(buildingId: number): InfoContent {
         const list = prices.map(([p, cents]) =>
           de.info.exitPrice(de.products[p], formatEuro(cents)),
         );
-        root.append(el('p', 'info-note', de.info.exitAccepts(list.join(', '))));
+        root.append(el('p', 'info-note', de.info.exitAccepts(list.join(', '))), bays.root);
       }
+      bays.value.textContent = baysText(state, buildingId);
       return { title: siteLabel(state, buildingId) };
     },
   };

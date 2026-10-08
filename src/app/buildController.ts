@@ -137,6 +137,12 @@ function toGhost(preview: BuildPreview): Ghost[] {
         style: allRed || blocked.has(`${c.x},${c.z}`) ? 'invalid' : 'valid',
       }));
     }
+    case 'priority':
+      return preview.cells.map((c) => ({
+        footprint: { x: c.x, z: c.z, width: 1, depth: 1 },
+        height: ROAD_GHOST_HEIGHT,
+        style: preview.priority ? ('valid' as const) : ('demolish' as const),
+      }));
     case 'zone': {
       const style = preview.reason ? 'invalid' : 'valid';
       return [{ footprint: preview.footprint, height: ROAD_GHOST_HEIGHT, style }];

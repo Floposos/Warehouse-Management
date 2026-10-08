@@ -1,10 +1,13 @@
 import { Group } from 'three';
+import { trafficConfig } from '../../config/traffic';
 import { vehicleConfig } from '../../config/vehicles';
 import type { GameState } from '../../sim/state/gameState';
 import type { Vehicle } from '../../sim/vehicles/types';
-import { createTruckModel, setTruckCargo, setTruckDot } from '../models/truckModel';
+import { sites } from '../../sim/world/sites';
+import { createTruckModel, setTruckCargo, setTruckDot, setTruckJam } from '../models/truckModel';
+import { bayPose } from './bayPose';
 import { routeColorOf } from './routeColors';
-import { vehiclePose } from './vehiclePose';
+import { LANE_OFFSET, PARKED_OFFSET, vehiclePose, type Pose } from './vehiclePose';
 
 /** Fahrzeuge: ein Modell je Fahrzeug, Lage jedes Bild neu (gleitet zwischen den Schritten). */
 export class VehiclesView {
@@ -19,6 +22,7 @@ export class VehiclesView {
 
   sync(state: Readonly<GameState>, alpha: number): void {
     const seen = new Set<number>();
+    const bays = bayPoses(state);
     for (const v of state.vehicles) {
       seen.add(v.id);
       let model = this.models.get(v.id);
@@ -28,12 +32,16 @@ export class VehiclesView {
         this.models.set(v.id, model);
         this.root.add(model);
       }
-      const pose = vehiclePose(v.route, v.progress, isMoving(v) ? speedOf(v) * alpha : 0);
+      const extra = isMoving(v) ? speedOf(v) * alpha : 0;
+      const pose =
+        bays.get(v.id) ??
+        vehiclePose(v.route, v.progress, extra, v.heading, v.offRoad ? PARKED_OFFSET : LANE_OFFSET);
       if (pose) {
         model.position.set(pose.x, 0, pose.z);
         model.rotation.y = pose.angle;
       }
       setTruckCargo(model, v.cargo?.product ?? null);
+      setTruckJam(model, v.waitTicks >= trafficConfig.jamWarnTicks);
       if (v.kind === 'truck') setTruckDot(model, routeColorOf(state, v));
     }
     for (const [id, model] of this.models) {
@@ -44,7 +52,24 @@ export class VehiclesView {
   }
 }
 
+/** Fahrzeuge auf Stellplätzen: nebeneinander hinter dem Tor ihres Orts (T2.3). */
+function bayPoses(state: Readonly<GameState>): Map<number, Pose> {
+  const result = new Map<number, Pose>();
+  const inBay = state.vehicles.filter((v) => v.bayAt !== null && v.route[0]);
+  if (inBay.length === 0) return result;
+  const gates = new Map(sites(state as GameState).map((s) => [s.id, s.gate]));
+  for (const v of inBay) {
+    const gate = gates.get(v.bayAt ?? -1);
+    const access = v.route[0];
+    if (!gate || !access) continue;
+    const same = inBay.filter((o) => o.bayAt === v.bayAt);
+    result.set(v.id, bayPose(access, gate, same.indexOf(v), same.length));
+  }
+  return result;
+}
+
 function isMoving(v: Vehicle): boolean {
+  if (v.offRoad || v.waitTicks > 0) return false;
   return v.kind === 'supplier'
     ? v.phase === 'toSite' || v.phase === 'toExit'
     : v.phase === 'toPickup' || v.phase === 'toDropoff';

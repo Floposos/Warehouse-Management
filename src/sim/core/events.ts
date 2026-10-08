@@ -1,6 +1,7 @@
 import type { BuildingTypeId } from '../../content/buildings';
 import type { ProductId } from '../../content/products';
 import type { ZoneKind } from '../../content/zones';
+import type { Notice } from '../events/notices';
 import type { BookingCategory, BookingPlace } from '../finance/ledger';
 
 /** Alle Ereignisse der Simulation. Neue Systeme ergänzen hier ihre Ereignistypen. */
@@ -38,8 +39,13 @@ export type SimEvent =
       revenueCents: number;
     }
   | { type: 'vehicle/bought'; id: number }
+  /** Fahrzeug steht seit `jamWarnTicks` im Stau (T2.4). */
+  | { type: 'traffic/jam'; vehicleId: number; x: number; z: number }
+  /** Neue Meldung in der Liste (T2.4/T2.6). */
+  | { type: 'notice/added'; notice: Notice }
   | { type: 'road/built'; cells: { x: number; z: number }[]; costCents: number }
-  | { type: 'road/demolished'; x: number; z: number; refundCents: number };
+  | { type: 'road/demolished'; x: number; z: number; refundCents: number }
+  | { type: 'road/priorityChanged'; cells: { x: number; z: number }[]; priority: boolean };
 
 export type SimEventType = SimEvent['type'];
 export type SimEventOf<T extends SimEventType> = Extract<SimEvent, { type: T }>;

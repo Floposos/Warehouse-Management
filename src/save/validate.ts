@@ -7,7 +7,7 @@ import { BOOKING_CATEGORIES, type BookingCategory } from '../sim/finance/ledger'
 import type { GameState } from '../sim/state/gameState';
 
 import { isInt, isRecord } from './validateShapes';
-import { isTour, isVehicle } from './validateVehicles';
+import { isNotice, isTour, isVehicle } from './validateVehicles';
 
 function isTotals(v: unknown): boolean {
   if (!isRecord(v) || !isInt(v['key'])) return false;
@@ -79,12 +79,19 @@ export function validateState(value: unknown): value is GameState {
   const roadsOk = (s['roads'] as unknown[]).every((r: unknown) => {
     if (typeof r !== 'object' || r === null) return false;
     const t = r as Record<string, unknown>;
-    return isInt(t['x']) && isInt(t['z']) && isInt(t['builtTick']) && isInt(t['paidCents']);
+    return (
+      isInt(t['x']) &&
+      isInt(t['z']) &&
+      isInt(t['builtTick']) &&
+      isInt(t['paidCents']) &&
+      typeof t['priority'] === 'boolean'
+    );
   });
   if (!Array.isArray(s['zones']) || !(s['zones'] as unknown[]).every(isZone)) return false;
   if (!Array.isArray(s['orders']) || !(s['orders'] as unknown[]).every(isOrder)) return false;
   if (!Array.isArray(s['vehicles']) || !(s['vehicles'] as unknown[]).every(isVehicle)) return false;
   if (!Array.isArray(s['tours']) || !(s['tours'] as unknown[]).every(isTour)) return false;
+  if (!Array.isArray(s['notices']) || !(s['notices'] as unknown[]).every(isNotice)) return false;
   return (
     roadsOk &&
     buildings.every((b: unknown) => {

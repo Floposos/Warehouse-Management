@@ -11,10 +11,15 @@ interface Node {
 /**
  * Kürzester Weg über das Straßennetz (A*, 4 Nachbarn, Kosten 1 je Feld).
  * Liefert die Felder von Start bis Ziel (beide enthalten) oder null, wenn es keinen Weg gibt.
- * Der Start selbst muss keine Straße sein (Fahrzeug auf einem gerade abgerissenen Feld).
+ * `avoid` sperrt Felder (Umweg bei Stau, T2.4). Der Start selbst muss keine Straße sein (Fahrzeug auf einem gerade abgerissenen Feld).
  * Gleichstände werden über die Reihenfolge entschieden, daher immer dasselbe Ergebnis.
  */
-export function findPath(network: RoadNetwork, from: Cell, to: Cell): Cell[] | null {
+export function findPath(
+  network: RoadNetwork,
+  from: Cell,
+  to: Cell,
+  avoid?: ReadonlySet<number>,
+): Cell[] | null {
   if (!network.has(to.x, to.z)) return null;
   const goal = cellKey(to.x, to.z);
   const h = (c: Cell): number => Math.abs(c.x - to.x) + Math.abs(c.z - to.z);
@@ -34,7 +39,7 @@ export function findPath(network: RoadNetwork, from: Cell, to: Cell): Cell[] | n
       const next = { x: node.cell.x + d.dx, z: node.cell.z + d.dz };
       if (!network.has(next.x, next.z)) continue;
       const key = cellKey(next.x, next.z);
-      if (closed.has(key) || cost >= (g.get(key) ?? Infinity)) continue;
+      if (avoid?.has(key) || closed.has(key) || cost >= (g.get(key) ?? Infinity)) continue;
       g.set(key, cost);
       cameFrom.set(key, node.cell);
       open.push({ cell: next, key, f: cost + h(next), seq: seq++ });

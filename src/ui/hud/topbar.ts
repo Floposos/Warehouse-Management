@@ -13,6 +13,7 @@ export interface TopbarActions {
   openCash(): void;
   openPurchase(): void;
   openTours(): void;
+  openNotices(): void;
 }
 
 /** Kopfleiste: Datum/Uhrzeit, Kontostand, Zeitsteuerung, Menü. Liest nur den Zustand. */
@@ -23,6 +24,8 @@ export class Topbar {
   private readonly pauseBadge = el('span', 'topbar-paused', de.hud.paused);
   private readonly pauseButton: HTMLButtonElement;
   private readonly speedButtons = new Map<GameSpeed, HTMLButtonElement>();
+  private readonly notices: HTMLButtonElement;
+  private lastNotices = -1;
   private lastClock = '';
   private lastBalance = '';
 
@@ -49,9 +52,21 @@ export class Topbar {
     purchase.title = de.purchase.openTitle;
     const tours = button(de.tours.open, () => actions.openTours());
     tours.title = de.tours.openTitle;
+    this.notices = button(de.notices.open, () => actions.openNotices());
+    this.notices.title = de.notices.openTitle;
+    this.notices.dataset['testid'] = 'notices-button';
     const menu = button(de.hud.menu, () => actions.openMenu());
     menu.title = de.hud.menuTitle;
-    this.root.append(this.clock, this.pauseBadge, controls, this.balance, purchase, tours, menu);
+    this.root.append(
+      this.clock,
+      this.pauseBadge,
+      controls,
+      this.balance,
+      purchase,
+      tours,
+      this.notices,
+      menu,
+    );
     parent.append(this.root);
   }
 
@@ -62,6 +77,14 @@ export class Topbar {
     const balance = formatEuro(state.finance.balanceCents);
     if (balance !== this.lastBalance) this.balance.textContent = this.lastBalance = balance;
     this.showSpeed(speed);
+  }
+
+  /** Zahl ungelesener Meldungen am Knopf „Meldungen“. */
+  setUnread(n: number): void {
+    if (n === this.lastNotices) return;
+    this.lastNotices = n;
+    this.notices.textContent = n > 0 ? de.notices.openCount(n) : de.notices.open;
+    this.notices.classList.toggle('has-unread', n > 0);
   }
 
   private showSpeed(speed: GameSpeed | 0): void {

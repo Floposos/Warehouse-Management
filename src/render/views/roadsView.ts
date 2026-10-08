@@ -16,6 +16,9 @@ const asphaltGeometry = new PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
 const markGeometry = new PlaneGeometry(0.36, 0.07).rotateX(-Math.PI / 2).translate(0.25, 0, 0);
 const asphaltMaterial = new MeshLambertMaterial({ color: palette.road });
 const markMaterial = new MeshLambertMaterial({ color: palette.roadMarking });
+/** Vorfahrtsstraße (T2.2). ANNAHME: gelbe Raute auf jedem Feld, wie das Verkehrszeichen. */
+const diamondGeometry = new PlaneGeometry(0.2, 0.2).rotateX(-Math.PI / 2).rotateY(Math.PI / 4);
+const diamondMaterial = new MeshLambertMaterial({ color: palette.priorityMarking });
 
 /**
  * Straßen als zwei Instanz-Gruppen (Asphalt, Markierung): wenige Zeichenaufrufe,
@@ -27,6 +30,7 @@ export class RoadsView {
   private lastHash = -1;
   private asphalt: InstancedMesh | null = null;
   private marks: InstancedMesh | null = null;
+  private diamonds: InstancedMesh | null = null;
 
   sync(roads: readonly RoadTile[]): void {
     const hash = roadsHash(roads);
@@ -38,6 +42,7 @@ export class RoadsView {
   private rebuild(roads: readonly RoadTile[]): void {
     this.asphalt?.dispose();
     this.marks?.dispose();
+    this.diamonds?.dispose();
     this.root.clear();
     if (roads.length === 0) return;
     const network = new RoadNetwork({ roads: [...roads] });
@@ -67,6 +72,17 @@ export class RoadsView {
       });
       this.root.add(this.marks);
     }
+    const priority = roads.filter((r) => r.priority);
+    if (priority.length > 0) {
+      this.diamonds = instanced(diamondGeometry, diamondMaterial, priority.length);
+      priority.forEach((r, i) => {
+        dummy.position.set(r.x + 0.5, 0.035, r.z + 0.5);
+        dummy.rotation.set(0, 0, 0);
+        dummy.updateMatrix();
+        this.diamonds?.setMatrixAt(i, dummy.matrix);
+      });
+      this.root.add(this.diamonds);
+    }
   }
 }
 
@@ -79,6 +95,6 @@ function instanced(geometry: BufferGeometry, material: Material, count: number):
 /** Billige Prüfsumme über alle Felder, damit nur bei Änderungen neu aufgebaut wird. */
 function roadsHash(roads: readonly RoadTile[]): number {
   let h = roads.length;
-  for (const r of roads) h = (Math.imul(h, 31) + r.x * 257 + r.z + 1) | 0;
+  for (const r of roads) h = (Math.imul(h, 31) + r.x * 257 + r.z + 1 + (r.priority ? 7919 : 0)) | 0;
   return h;
 }

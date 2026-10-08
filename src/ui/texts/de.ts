@@ -1,8 +1,10 @@
+import { deFleet } from './deFleet';
 import { deTours } from './deTours';
 
 /** Alle deutschen Oberflächentexte an einer Stelle (große Bereiche in eigenen Dateien). */
 export const de = {
   tours: deTours,
+  ...deFleet,
   title: 'Logistikum',
   subtitle: 'Logistik-Campus-Manager',
   noWebgl: 'Dein Browser kann leider keine 3D-Grafik (WebGL) anzeigen.',
@@ -135,6 +137,15 @@ export const de = {
     roadItemTitle: 'Straße ziehen: klicken, ziehen, loslassen (gerade oder mit einem Knick)',
     roadCost: (fields: number, cost: string): string =>
       `${fields} ${fields === 1 ? 'Feld' : 'Felder'} · Kosten: ${cost}`,
+    priority: 'Vorfahrtsstraße',
+    priorityRemove: 'Vorfahrt entfernen',
+    priorityCost: 'kostenlos',
+    priorityTitle:
+      'Vorhandene Straße als Vorfahrtsstraße markieren: ziehen wie eine Straße. Wer darauf fährt, hat an Kreuzungen Vorfahrt; sonst gilt rechts vor links.',
+    priorityRemoveTitle: 'Markierung „Vorfahrtsstraße“ entfernen: über die Straße ziehen',
+    priorityCells: (n: number, on: boolean): string =>
+      `${n} ${n === 1 ? 'Feld' : 'Felder'} ${on ? 'als Vorfahrtsstraße markieren' : 'ohne Vorfahrt'}`,
+    priorityNoRoad: 'Hier ist keine Straße',
     itemTitle: (name: string, cost: string): string => `${name} bauen (${cost})`,
     cost: (cost: string): string => `Kosten: ${cost}`,
     refund: (refund: string): string => `Abreißen, Erstattung: ${refund}`,
@@ -217,6 +228,9 @@ export const de = {
       storing: 'Lagert',
     },
     connected: 'An die Straße angeschlossen',
+    bays: 'Stellplätze',
+    baysLine: (used: number, total: number, queue: number): string =>
+      `${used} / ${total} belegt${queue > 0 ? ` · ${queue} warten` : ''}`,
     gate: 'Tor',
     gateTitle: (side: string): string => `${side}: Tor auf diese Seite legen`,
     exitAccepts: (list: string): string => `Kauft: ${list}`,

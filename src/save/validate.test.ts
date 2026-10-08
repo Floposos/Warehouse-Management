@@ -48,12 +48,18 @@ describe('validateState', () => {
       targetId: 2,
       timer: 0,
       paidCents: 0,
+      heading: 1,
+      offRoad: false,
+      bayAt: null,
+      waitTicks: 0,
     };
     expect(validateState({ ...state, orders: [order], vehicles: [vehicle] })).toBe(true);
     expect(validateState({ ...state, orders: [{ ...order, product: 'combo' }] })).toBe(false);
     expect(validateState({ ...state, orders: [{ ...order, interval: 'hourly' }] })).toBe(false);
     expect(validateState({ ...state, vehicles: [{ ...vehicle, route: [] }] })).toBe(false);
     expect(validateState({ ...state, vehicles: [{ ...vehicle, phase: 'flying' }] })).toBe(false);
+    expect(validateState({ ...state, vehicles: [{ ...vehicle, heading: 4 }] })).toBe(false);
+    expect(validateState({ ...state, vehicles: [{ ...vehicle, bayAt: 'x' }] })).toBe(false);
   });
 
   it('prüft eigene LKW samt Auftrag und Touren', () => {
@@ -71,6 +77,10 @@ describe('validateState', () => {
       odometer: 1500,
       tourId: 9,
       tourIndex: 0,
+      heading: 0,
+      offRoad: true,
+      bayAt: 2,
+      waitTicks: 5,
     };
     const tour = {
       id: 9,

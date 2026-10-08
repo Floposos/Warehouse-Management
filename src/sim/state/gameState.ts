@@ -7,6 +7,7 @@ import { createFinance, type Finance } from '../finance/ledger';
 import type { OrderBlock, OrderInterval } from '../goods/orders';
 import type { Side } from '../world/access';
 import type { Footprint } from '../world/grid';
+import type { Notice } from '../events/notices';
 import type { Tour, Vehicle } from '../vehicles/types';
 
 /** Ein Gebäude auf dem Raster. `x`/`z` = Feld der linken oberen Ecke. */
@@ -27,6 +28,8 @@ export interface RoadTile {
   z: number;
   builtTick: number;
   paidCents: number;
+  /** Als Vorfahrtsstraße markiert (T2.2). */
+  priority: boolean;
 }
 
 /** Frei aufgezogene Zone (Lieferort A, B oder C) mit Lager. `x`/`z` = linke obere Ecke. */
@@ -81,6 +84,8 @@ export interface GameState {
   vehicles: Vehicle[];
   /** Feste Touren (T2.1). */
   tours: Tour[];
+  /** Meldungen (Stau, Pannen …), älteste zuerst (T2.4/T2.6). */
+  notices: Notice[];
 }
 
 /** Lage der Test-Halle aus M0 (nahe der Eingangsstraße, Mitte der Westseite). */
@@ -99,5 +104,6 @@ export function createInitialState(seed: number): GameState {
     orders: [],
     vehicles: [],
     tours: [],
+    notices: [],
   };
 }

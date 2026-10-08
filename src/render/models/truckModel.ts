@@ -97,3 +97,24 @@ export function setTruckDot(truck: Group, color: number): void {
   dot.material = material;
   dot.userData['color'] = color;
 }
+
+const jamGeometry = new BoxGeometry(0.08, 0.3, 0.08);
+const jamMaterial = new MeshBasicMaterial({ color: 0xe5484d });
+
+/** Rotes Ausrufezeichen über dem Fahrzeug, wenn es im Stau steht (T2.4). */
+export function setTruckJam(truck: Group, jammed: boolean): void {
+  let mark = truck.getObjectByName('jam');
+  if (!mark && !jammed) return;
+  if (!mark) {
+    mark = new Group();
+    mark.name = 'jam';
+    const bar = new Mesh(jamGeometry, jamMaterial);
+    bar.position.y = 0.95;
+    const dot = new Mesh(jamGeometry, jamMaterial);
+    dot.scale.y = 0.3;
+    dot.position.y = 0.72;
+    mark.add(bar, dot);
+    truck.add(mark);
+  }
+  mark.visible = jammed;
+}

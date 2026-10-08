@@ -148,3 +148,14 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] „Tour löschen“ mit Rückfrage: ihre LKW fahren wieder Automatik.
 - [ ] Spielstand aus 0.2.x laden: bisherige Touren erscheinen als „Tour 1“, „Tour 2“ … mit Farbe.
 - [ ] Speichern und Laden: Touren, Farben und Zuweisungen bleiben erhalten.
+
+### Verkehr (seit 0.3.0, T2.2–T2.4)
+
+- [ ] Zwei LKW hintereinander auf einer Straße: halten Abstand, überholen nicht; Gegenverkehr fährt ungehindert.
+- [ ] Kreuzung mit LKW aus mehreren Richtungen: immer nur einer in der Kreuzung, alle kommen durch.
+- [ ] Ohne Markierung: rechts vor links. „Vorfahrtsstraße“ ziehen: gelbe Markierung, Fahrzeuge darauf fahren zuerst; „Vorfahrt entfernen“ nimmt sie weg.
+- [ ] Kein Fahrzeug bleibt in einer Kreuzung stehen, wenn dahinter kein Platz ist.
+- [ ] Kleine Zone, viele LKW: nur so viele laden wie Stellplätze, die anderen warten davor; Infofenster zeigt belegt/gesamt und wartende.
+- [ ] Fahrzeuge auf Stellplätzen stehen hinter dem Tor in der Zone; LKW ohne Aufgabe parken am Rand.
+- [ ] Stau: nach kurzer Zeit Umweg (wenn es einen gibt); sonst rotes Ausrufezeichen und Meldung; Meldung anklicken springt hin.
+- [ ] Speichern mitten im Stau und laden: läuft genauso weiter.
