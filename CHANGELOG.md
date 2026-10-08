@@ -14,10 +14,13 @@ Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 
 - Zonen feldweise abreißen (Florian, 08.10.2026): Das Abriss-Werkzeug markiert über einer Zone nur das Feld unter dem Mauszeiger und reißt es ab (Erstattung für dieses Feld). Fällt ein Feld in der Mitte weg, zerfällt die Zone in eigenständige Zonen; der Bestand wird nach Fläche aufgeteilt, was nicht mehr ins Lager passt, geht verloren. Die ganze Zone reißt man im Infofenster mit „Ganze Zone abreißen“ (mit Rückfrage) ab.
 
+- Touren und Wegfarben (T2.1, Florians Wunsch aus dem M1-Test): Touren sind eigene Einträge im neuen Fenster „Touren“ (Knopf oben). Dort legt man Touren an, benennt sie, wählt eine von 10 Farben, bearbeitet die Halte (wie bisher per Liste oder „Orte anklicken“) und löscht sie (ihre LKW fahren dann Automatik). Eine Tour kann von beliebig vielen LKW gefahren werden; im Infofenster des LKW wählt man unter „Fährt“ die Tour oder „Automatik“. Der Weg des gewählten Fahrzeugs erscheint in der Tourfarbe (Automatik und Zulieferer grau), „Alle Wege“ zeigt die Wege aller Fahrzeuge. Jeder eigene LKW trägt einen Farbpunkt in seiner Tourfarbe. Spielstände aus 0.2.x werden umgestellt: Jede bisherige Tour wird zu „Tour 1“, „Tour 2“ … (Spielstand-Version 4).
+
 ### So testest du das
 
+1. „Touren“ → „Neue Tour“, Halte A (Laden) und B (Abladen) anhängen, Farbe Rot, Name „Früh“. Zwei LKW kaufen und bei beiden unter „Fährt“ „Früh“ wählen: Beide fahren A → B, Weg und Punkt sind rot. Farbe auf Grün: sofort grün. „Alle Wege“: alle Wege sichtbar, Automatik grau.
 1. Lieferort A als 5 × 1 aufziehen. „Abriss“ über das mittlere Feld: nur dieses Feld ist markiert, Erstattung für ein Feld. Klick: zwei Zonen „A“ links und rechts.
-2. Eine Zone anklicken, „Ganze Zone abreißen“, Rückfrage mit Erstattung bestätigen: Zone ist weg.
+1. Eine Zone anklicken, „Ganze Zone abreißen“, Rückfrage mit Erstattung bestätigen: Zone ist weg.
 
 ### Was wurde behoben
 

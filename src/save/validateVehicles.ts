@@ -25,9 +25,7 @@ function isTruck(v: Record<string, unknown>): boolean {
     ['odometer', 'tourIndex'].every((k) => isInt(v[k])) &&
     isJob(v['job']) &&
     IDLE_REASONS.includes(v['idleReason'] as string | null) &&
-    (v['mode'] === 'auto' || v['mode'] === 'tour') &&
-    Array.isArray(v['tour']) &&
-    (v['tour'] as unknown[]).every(isStop)
+    (v['tourId'] === null || isInt(v['tourId']))
   );
 }
 
@@ -35,6 +33,18 @@ function isSupplier(v: Record<string, unknown>): boolean {
   return (
     SUPPLIER_PHASES.includes(v['phase'] as string) &&
     ['targetId', 'paidCents'].every((k) => isInt(v[k]))
+  );
+}
+
+/** Feste Tour (T2.1). */
+export function isTour(t: unknown): boolean {
+  return (
+    isRecord(t) &&
+    isInt(t['id']) &&
+    typeof t['name'] === 'string' &&
+    isInt(t['color']) &&
+    Array.isArray(t['stops']) &&
+    (t['stops'] as unknown[]).every(isStop)
   );
 }
 

@@ -23,6 +23,8 @@ export const vehicleConfig = {
   truckIdleCheckTicks: 25,
   /** Höchstzahl der Halte einer festen Tour. */
   tourMaxStops: 12,
+  /** Höchstlänge eines Tour-Namens (Zeichen). */
+  tourNameMaxLength: 30,
   /** Abladen bzw. Aufladen je Halt (Schritte). */
   handlingTicks: 30,
   /** Wartezeit, bevor ein Fahrzeug ohne Weg oder ein Auftrag ohne Platz es erneut versucht. */

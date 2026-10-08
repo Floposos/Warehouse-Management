@@ -36,7 +36,7 @@ export function mergeZones(state: GameState, neighbours: Zone[], part: ZonePart)
       v.job.fromId = remap(v.job.fromId);
       v.job.toId = remap(v.job.toId);
     }
-    for (const stop of v.tour) stop.siteId = remap(stop.siteId);
   }
+  for (const tour of state.tours) for (const stop of tour.stops) stop.siteId = remap(stop.siteId);
   return keep;
 }

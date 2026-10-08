@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Simulation } from '../../sim/core/simulation';
-import { parseSave } from '../format';
+import { CURRENT_SAVE_VERSION, parseSave } from '../format';
 import { migrateV2ToV3 } from './v2-to-v3';
 
 describe('Migration v2 → v3', () => {
@@ -30,7 +30,7 @@ describe('Migration v2 → v3', () => {
     );
     const result = parseSave(text);
     if (!result.ok) throw new Error(result.error);
-    expect(result.save.saveVersion).toBe(3);
+    expect(result.save.saveVersion).toBe(CURRENT_SAVE_VERSION);
     const sim = new Simulation(result.save.state);
     const a = sim.state.zones.find((z) => z.kind === 'A');
     const part = a?.parts[0];

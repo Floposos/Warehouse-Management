@@ -19,8 +19,7 @@ export function buyTruck(state: GameState, bus: EventBus): Truck | 'insufficient
     job: null,
     idleReason: null,
     odometer: 0,
-    mode: 'auto',
-    tour: [],
+    tourId: null,
     tourIndex: 0,
   };
   state.vehicles.push(truck);

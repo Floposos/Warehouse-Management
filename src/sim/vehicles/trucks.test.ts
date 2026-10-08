@@ -27,7 +27,7 @@ describe('LKW kaufen', () => {
     expect(s.state.finance.balanceCents).toBe(before - vehicleConfig.truckPriceCents);
     expect(s.state.finance.today.expenseCents.vehicles).toBe(vehicleConfig.truckPriceCents);
     expect(t.route[0]).toEqual({ x: -1, z: 61 });
-    expect(t.mode).toBe('auto');
+    expect(t.tourId).toBeNull();
   });
 
   it('ohne genug Geld wird der Kauf abgelehnt', () => {

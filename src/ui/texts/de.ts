@@ -1,5 +1,8 @@
-/** Alle deutschen Oberflächentexte an einer Stelle. */
+import { deTours } from './deTours';
+
+/** Alle deutschen Oberflächentexte an einer Stelle (große Bereiche in eigenen Dateien). */
 export const de = {
+  tours: deTours,
   title: 'Logistikum',
   subtitle: 'Logistik-Campus-Manager',
   noWebgl: 'Dein Browser kann leider keine 3D-Grafik (WebGL) anzeigen.',
@@ -243,8 +246,6 @@ export const de = {
       noRoute: 'Wartet: kein Weg',
     },
     mode: 'Betrieb',
-    modes: { auto: 'Automatik', tour: 'Feste Tour' },
-    tour: 'Tour',
     noStops: 'Noch keine Halte. Ort wählen und „Halt hinzufügen“ oder Orte im Gelände anklicken.',
     stop: (n: number): string => `${n}.`,
     actions: { load: 'Laden', unload: 'Abladen' },
@@ -255,10 +256,6 @@ export const de = {
     removeStop: 'Halt entfernen',
     moveUp: 'Halt nach oben',
     current: 'aktueller Halt',
-    stopRejected: {
-      invalidStop: 'Dieser Halt passt nicht zum Ort.',
-      tooManyStops: 'Mehr Halte gehen nicht.',
-    },
     hoverHint: 'Klicken für Details',
     demolishZone: 'Ganze Zone abreißen',
     demolishZoneOk: 'Abreißen',

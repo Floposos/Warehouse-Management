@@ -43,10 +43,22 @@ export interface TourStop {
   product: ProductId;
 }
 
+/** Tour als eigener Eintrag (T2.1): mehreren LKW zuweisbar, mit Farbe. */
+export interface Tour {
+  id: number;
+  name: string;
+  /** Index in `content/tourColors.ts`. */
+  color: number;
+  stops: TourStop[];
+}
+
 /** Warum ein LKW steht. Texte in ui/texts/de.ts. */
 export type TruckIdleReason = 'noJob' | 'noRoute' | 'noDestination' | 'noTour';
 
-/** Eigener LKW (T1.5): sucht sich in der Automatik selbst Aufträge oder fährt eine feste Tour. */
+/**
+ * Eigener LKW (T1.5): sucht sich in der Automatik selbst Aufträge oder fährt eine feste Tour.
+ * Seit T2.1 verweist er auf eine Tour (`tourId`); null = Automatik.
+ */
 export interface Truck extends VehicleBase {
   kind: 'truck';
   phase: 'idle' | 'toPickup' | 'loading' | 'toDropoff' | 'unloading';
@@ -54,8 +66,7 @@ export interface Truck extends VehicleBase {
   idleReason: TruckIdleReason | null;
   /** Gefahrene Tausendstel Felder, die noch nicht als Kilometerkosten gebucht sind. */
   odometer: number;
-  mode: 'auto' | 'tour';
-  tour: TourStop[];
+  tourId: number | null;
   /** Nächster bzw. aktueller Halt der Tour. */
   tourIndex: number;
 }

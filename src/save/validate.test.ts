@@ -56,7 +56,7 @@ describe('validateState', () => {
     expect(validateState({ ...state, vehicles: [{ ...vehicle, phase: 'flying' }] })).toBe(false);
   });
 
-  it('prüft eigene LKW samt Auftrag und Tour', () => {
+  it('prüft eigene LKW samt Auftrag und Touren', () => {
     const state = createInitialState(1);
     const truck = {
       id: 7,
@@ -69,17 +69,24 @@ describe('validateState', () => {
       job: { product: 'rawA', fromId: 2, toId: 3, quantity: 20 },
       idleReason: null,
       odometer: 1500,
-      mode: 'tour',
-      tour: [{ siteId: 2, action: 'load', product: 'rawA' }],
+      tourId: 9,
       tourIndex: 0,
     };
-    expect(validateState({ ...state, vehicles: [truck] })).toBe(true);
-    expect(validateState({ ...state, vehicles: [{ ...truck, phase: 'toSite' }] })).toBe(false);
-    expect(validateState({ ...state, vehicles: [{ ...truck, mode: 'manual' }] })).toBe(false);
-    expect(validateState({ ...state, vehicles: [{ ...truck, idleReason: 'tired' }] })).toBe(false);
+    const tour = {
+      id: 9,
+      name: 'Früh',
+      color: 2,
+      stops: [{ siteId: 2, action: 'load', product: 'rawA' }],
+    };
+    const ok = { ...state, vehicles: [truck], tours: [tour] };
+    expect(validateState(ok)).toBe(true);
+    expect(validateState({ ...ok, vehicles: [{ ...truck, phase: 'toSite' }] })).toBe(false);
+    expect(validateState({ ...ok, vehicles: [{ ...truck, tourId: 'x' }] })).toBe(false);
+    expect(validateState({ ...ok, vehicles: [{ ...truck, idleReason: 'tired' }] })).toBe(false);
     expect(
-      validateState({ ...state, vehicles: [{ ...truck, tour: [{ siteId: 2, action: 'x' }] }] }),
+      validateState({ ...ok, tours: [{ ...tour, stops: [{ siteId: 2, action: 'x' }] }] }),
     ).toBe(false);
+    expect(validateState({ ...ok, tours: undefined })).toBe(false);
   });
 
   it('lehnt eine kaputte Kasse ab', () => {

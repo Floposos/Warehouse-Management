@@ -16,7 +16,7 @@ export function updateTrucks(state: GameState, bus: EventBus): void {
   const network = new RoadNetwork(state);
   for (const v of state.vehicles) {
     if (v.kind !== 'truck') continue;
-    if (v.mode === 'tour') stepTourTruck(state, bus, network, v);
+    if (v.tourId !== null) stepTourTruck(state, bus, network, v);
     else stepAutoTruck(state, bus, network, v);
   }
   if (isDayStart(state.tick)) bookTruckCosts(state, bus);

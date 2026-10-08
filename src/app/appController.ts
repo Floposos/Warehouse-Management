@@ -71,6 +71,7 @@ export class AppController {
       openMenu: () => this.openPauseMenu(),
       openCash: () => this.openCash(),
       openPurchase: () => this.openPurchase(),
+      openTours: () => this.selection.toggleTours(),
     });
     this.mainMenu = new MainMenu(
       ui,
@@ -143,7 +144,7 @@ export class AppController {
   /** Startet ein Spiel mit dem gegebenen Zustand (neu oder geladen). */
   startGame(state: GameState): void {
     this.session = new GameSession(state);
-    this.selection.select(null);
+    this.selection.reset();
     this.financeFeedback.attach(this.session);
     Object.assign(this.rig, createRig(START_VIEW.x, START_VIEW.z));
     this.mode = 'game';
@@ -156,7 +157,7 @@ export class AppController {
   showMenu(): void {
     this.mode = 'menu';
     this.session = null;
-    this.selection.select(null);
+    this.selection.reset();
     this.financeFeedback.attach(null);
     this.cameraInput.enabled = false;
     this.cameraInput.releaseAll();

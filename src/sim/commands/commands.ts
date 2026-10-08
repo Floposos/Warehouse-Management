@@ -4,8 +4,8 @@ import type { ZoneKind } from '../../content/zones';
 import type { EventBus } from '../core/eventBus';
 import { book } from '../finance/ledger';
 import { buyTruck } from '../vehicles/buyTruck';
-import { setTruckMode, setTruckTour } from '../vehicles/truckCommands';
-import type { TourStop } from '../vehicles/types';
+import { assignTour } from '../vehicles/truckCommands';
+import { createTour, deleteTour, updateTour, type TourPatch } from '../vehicles/tours';
 import { cancelOrder, createOrder, type OrderInterval } from '../goods/orders';
 import type { GameState } from '../state/gameState';
 import { demolishBuilding, placeBuilding } from './build';
@@ -45,12 +45,15 @@ export type Command =
   | { type: 'order/create'; product: RawProductId; quantity: number; interval: OrderInterval }
   | { type: 'order/cancel'; orderId: number }
   | { type: 'vehicle/buyTruck' }
-  /** Automatik oder feste Tour. */
-  | { type: 'vehicle/setMode'; truckId: number; mode: 'auto' | 'tour' }
-  /** Tour komplett ersetzen (Oberfläche bearbeitet eine Kopie und schickt sie ganz). */
-  | { type: 'vehicle/setTour'; truckId: number; stops: TourStop[] };
+  /** Tour zuweisen; null = Automatik. */
+  | { type: 'vehicle/assignTour'; truckId: number; tourId: number | null }
+  /** Touren (T2.1). Halte werden immer als Ganzes geschickt. Ergebnis enthält die neue Id. */
+  | ({ type: 'tour/create' } & TourPatch)
+  | ({ type: 'tour/update'; tourId: number } & TourPatch)
+  | { type: 'tour/delete'; tourId: number };
 
-export type CommandResult = { ok: true } | { ok: false; reason: string };
+/** Ergebnis; `id` ist bei Befehlen gesetzt, die etwas Neues anlegen. */
+export type CommandResult = { ok: true; id?: number } | { ok: false; reason: string };
 
 /** Prüft und führt einen Befehl aus. Abgelehnte Befehle ändern nichts. */
 export function executeCommand(state: GameState, command: Command, bus: EventBus): CommandResult {
@@ -105,14 +108,20 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
       const result = buyTruck(state, bus);
       return typeof result === 'string' ? reject(bus, command, result) : { ok: true };
     }
-    case 'vehicle/setMode':
-      return setTruckMode(state, command.truckId, command.mode)
+    case 'vehicle/assignTour':
+      return assignTour(state, command.truckId, command.tourId)
         ? { ok: true }
         : reject(bus, command, 'notFound');
-    case 'vehicle/setTour': {
-      const rejection = setTruckTour(state, command.truckId, command.stops);
+    case 'tour/create': {
+      const tour = createTour(state, command);
+      return typeof tour === 'string' ? reject(bus, command, tour) : { ok: true, id: tour.id };
+    }
+    case 'tour/update': {
+      const rejection = updateTour(state, command.tourId, command);
       return rejection ? reject(bus, command, rejection) : { ok: true };
     }
+    case 'tour/delete':
+      return deleteTour(state, command.tourId) ? { ok: true } : reject(bus, command, 'notFound');
     case 'road/demolish': {
       const refund = demolishRoad(state, bus, command.x, command.z);
       return refund === null ? reject(bus, command, 'notFound') : { ok: true };

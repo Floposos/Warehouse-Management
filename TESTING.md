@@ -136,10 +136,15 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] LKW: Status mit Grund (keine Aufgabe, kein Weg, kein Ziel, Tour ohne Halte), Ladung, Ziel; blaues Band zeigt den restlichen Weg.
 - [ ] Mit Bauwerkzeug wählt ein Klick nichts aus.
 
-### Feste Touren (seit 0.2.0, T1.5b)
+### Feste Touren (seit 0.2.0, T1.5b; seit 0.3.0 im Fenster „Touren“, T2.1)
 
+- [ ] „Touren“ oben öffnet links das Fenster; „Neue Tour“ legt „Tour n“ mit eigener Farbe an.
 - [ ] Halte per Liste und per „Orte anklicken“ anhängen; Vorschlag für Aktion und Ware ist sinnvoll.
 - [ ] Aktion/Ware ändern, verschieben, entfernen; unpassende Halte werden mit Hinweis abgelehnt.
-- [ ] „Feste Tour“: LKW fährt die Halte der Reihe nach, aktueller Halt hervorgehoben; danach von vorn.
-- [ ] Umschalten zurück auf „Automatik“ mit Ladung an Bord: Ladung wird sinnvoll abgeliefert.
-- [ ] Speichern und Laden: Tour und Betriebsart bleiben erhalten.
+- [ ] Name ändern (Enter) und Farbe wählen: Liste, Weg und Farbpunkt am LKW übernehmen sie sofort.
+- [ ] Im Infofenster eines LKW unter „Fährt“ die Tour wählen; zwei LKW auf derselben Tour fahren beide.
+- [ ] Weg des gewählten LKW in Tourfarbe, Automatik grau; „Alle Wege“ zeigt die Wege aller Fahrzeuge.
+- [ ] Zurück auf „Automatik“ mit Ladung an Bord: Ladung wird sinnvoll abgeliefert.
+- [ ] „Tour löschen“ mit Rückfrage: ihre LKW fahren wieder Automatik.
+- [ ] Spielstand aus 0.2.x laden: bisherige Touren erscheinen als „Tour 1“, „Tour 2“ … mit Farbe.
+- [ ] Speichern und Laden: Touren, Farben und Zuweisungen bleiben erhalten.

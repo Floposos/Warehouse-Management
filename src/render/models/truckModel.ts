@@ -1,4 +1,11 @@
-import { BoxGeometry, Group, Mesh, MeshLambertMaterial } from 'three';
+import {
+  BoxGeometry,
+  Group,
+  Mesh,
+  MeshBasicMaterial,
+  MeshLambertMaterial,
+  SphereGeometry,
+} from 'three';
 import { products, type ProductId } from '../../content/products';
 import { palette } from '../scene/palette';
 
@@ -10,6 +17,8 @@ const materials = {
   wheel: new MeshLambertMaterial({ color: palette.wheel }),
 };
 const crateMaterials = new Map<ProductId, MeshLambertMaterial>();
+const dotGeometry = new SphereGeometry(0.09, 10, 6);
+const dotMaterials = new Map<number, MeshBasicMaterial>();
 
 function crateMaterial(product: ProductId): MeshLambertMaterial {
   let m = crateMaterials.get(product);
@@ -68,4 +77,23 @@ export function setTruckCargo(truck: Group, product: ProductId | null): void {
     crate.castShadow = true;
     cargo.add(crate);
   }
+}
+
+/** Farbpunkt über dem Führerhaus in der Tourfarbe (T2.1). */
+export function setTruckDot(truck: Group, color: number): void {
+  let dot = truck.getObjectByName('dot') as Mesh | undefined;
+  if (dot?.userData['color'] === color) return;
+  if (!dot) {
+    dot = new Mesh(dotGeometry);
+    dot.name = 'dot';
+    dot.position.set(0.26, 0.48, 0);
+    truck.add(dot);
+  }
+  let material = dotMaterials.get(color);
+  if (!material) {
+    material = new MeshBasicMaterial({ color });
+    dotMaterials.set(color, material);
+  }
+  dot.material = material;
+  dot.userData['color'] = color;
 }

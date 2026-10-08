@@ -3,6 +3,7 @@ import type { EventBus } from '../core/eventBus';
 import { addStock, available } from '../goods/stock';
 import type { GameState } from '../state/gameState';
 import type { RoadNetwork } from '../world/roadNetwork';
+import { tourOf } from './tours';
 import { accessOf, drive, goIdle, setRoute, unloadAt } from './truckShared';
 import type { TourStop, Truck } from './types';
 
@@ -35,19 +36,20 @@ export function stepTourTruck(
     case 'unloading':
       if (--t.timer > 0) return;
       handleStop(state, bus, t);
-      t.tourIndex = (t.tourIndex + 1) % Math.max(1, t.tour.length);
+      t.tourIndex = (t.tourIndex + 1) % Math.max(1, tourOf(state, t)?.stops.length ?? 1);
       t.phase = 'idle';
       t.timer = 1;
       return;
   }
 }
 
-export function currentStop(t: Truck): TourStop | null {
-  return t.tour[t.tourIndex % Math.max(1, t.tour.length)] ?? null;
+export function currentStop(state: GameState, t: Truck): TourStop | null {
+  const stops = tourOf(state, t)?.stops ?? [];
+  return stops[t.tourIndex % Math.max(1, stops.length)] ?? null;
 }
 
 function startStop(state: GameState, network: RoadNetwork, t: Truck): void {
-  if (t.tour.length === 0) {
+  if (!currentStop(state, t)) {
     goIdle(t, 'noTour');
     return;
   }
@@ -55,7 +57,7 @@ function startStop(state: GameState, network: RoadNetwork, t: Truck): void {
 }
 
 function headToStop(state: GameState, network: RoadNetwork, t: Truck): void {
-  const stop = currentStop(t);
+  const stop = currentStop(state, t);
   const target = stop ? accessOf(state, network, stop.siteId) : null;
   if (!stop || !target || !setRoute(t, network, target)) {
     goIdle(t, 'noRoute');
@@ -66,7 +68,7 @@ function headToStop(state: GameState, network: RoadNetwork, t: Truck): void {
 }
 
 function handleStop(state: GameState, bus: EventBus, t: Truck): void {
-  const stop = currentStop(t);
+  const stop = currentStop(state, t);
   if (!stop) return;
   if (stop.action === 'unload') {
     if (t.cargo?.product === stop.product) unloadAt(state, bus, t, stop.siteId);

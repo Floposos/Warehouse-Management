@@ -14,7 +14,8 @@ import type { GameState } from '../../sim/state/gameState';
 import { cameraPosition, type CameraRig } from '../camera/cameraRig';
 import { GroundPicker } from '../camera/groundPicker';
 import { BuildingsView } from '../views/buildingsView';
-import { RouteLineView } from '../views/routeLineView';
+import { routeColorOf } from '../views/routeColors';
+import { RouteLineView, type RouteLine } from '../views/routeLineView';
 import { GhostView, type Ghost } from '../views/ghostView';
 import { RoadsView } from '../views/roadsView';
 import { SitesView } from '../views/sitesView';
@@ -34,7 +35,10 @@ export class GameRenderer {
   private readonly stock = new StockView();
   private readonly vehicles = new VehiclesView();
   private readonly ghost = new GhostView();
-  private readonly routeLine = new RouteLineView();
+  /** Weg des ausgewählten Fahrzeugs (jedes Bild) und Wege aller Fahrzeuge (gedrosselt). */
+  private readonly routeLine = new RouteLineView(512, 0.2, 6);
+  private readonly allRoutes = new RouteLineView(40_000, 0.12, 5);
+  private allRoutesAt = -Infinity;
   private readonly picker: GroundPicker;
   private readonly projected = new Vector3();
 
@@ -56,6 +60,7 @@ export class GameRenderer {
       this.buildings.root,
       this.ghost.root,
       this.routeLine.root,
+      this.allRoutes.root,
     );
     this.picker = new GroundPicker(this.camera, canvas);
     this.resize();
@@ -87,7 +92,7 @@ export class GameRenderer {
     this.roads.sync(state.roads);
     this.sites.sync(state);
     this.stock.sync(state.zones);
-    this.vehicles.sync(state.vehicles, alpha);
+    this.vehicles.sync(state, alpha);
   }
 
   /** Vorschau des Bauwerkzeugs; null blendet sie aus. */
@@ -95,11 +100,37 @@ export class GameRenderer {
     this.ghost.show(ghost);
   }
 
-  /** Fahrweg des ausgewählten Fahrzeugs; ohne Fahrzeug-Id ausblenden. */
-  setRouteLine(vehicleId: number | null, state: Readonly<GameState> | null): void {
-    const v = vehicleId === null ? undefined : state?.vehicles.find((x) => x.id === vehicleId);
+  /**
+   * Fahrwege (T2.1): der des ausgewählten Fahrzeugs immer, auf Wunsch die aller Fahrzeuge
+   * (höchstens alle 250 ms neu berechnet). Farbe nach Tour, Automatik grau.
+   */
+  setRoutes(
+    selectedId: number | null,
+    all: boolean,
+    state: Readonly<GameState>,
+    now: number,
+  ): void {
+    const v = selectedId === null ? undefined : state.vehicles.find((x) => x.id === selectedId);
     const pose = v ? this.vehicles.positionOf(v.id) : null;
-    this.routeLine.show(pose && v && v.route.length > 1 ? pose : null, v ? v.route.slice(1) : []);
+    this.routeLine.show(
+      v && pose && v.route.length > 1
+        ? [{ from: pose, cells: v.route.slice(1), color: routeColorOf(state, v) }]
+        : [],
+    );
+    if (!all) {
+      this.allRoutes.show([]);
+      this.allRoutesAt = -Infinity;
+      return;
+    }
+    if (now - this.allRoutesAt < 250) return;
+    this.allRoutesAt = now;
+    const lines: RouteLine[] = [];
+    for (const x of state.vehicles) {
+      const at = this.vehicles.positionOf(x.id);
+      if (at && x.route.length > 1)
+        lines.push({ from: at, cells: x.route.slice(1), color: routeColorOf(state, x) });
+    }
+    this.allRoutes.show(lines);
   }
 
   /** Bodenpunkt unter einer Bildschirmposition (Kamera vom letzten Bild). */

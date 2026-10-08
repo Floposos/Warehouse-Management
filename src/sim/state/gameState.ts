@@ -7,7 +7,7 @@ import { createFinance, type Finance } from '../finance/ledger';
 import type { OrderBlock, OrderInterval } from '../goods/orders';
 import type { Side } from '../world/access';
 import type { Footprint } from '../world/grid';
-import type { Vehicle } from '../vehicles/types';
+import type { Tour, Vehicle } from '../vehicles/types';
 
 /** Ein Gebäude auf dem Raster. `x`/`z` = Feld der linken oberen Ecke. */
 export interface Building {
@@ -79,6 +79,8 @@ export interface GameState {
   zones: Zone[];
   orders: Order[];
   vehicles: Vehicle[];
+  /** Feste Touren (T2.1). */
+  tours: Tour[];
 }
 
 /** Lage der Test-Halle aus M0 (nahe der Eingangsstraße, Mitte der Westseite). */
@@ -96,5 +98,6 @@ export function createInitialState(seed: number): GameState {
     zones: [],
     orders: [],
     vehicles: [],
+    tours: [],
   };
 }

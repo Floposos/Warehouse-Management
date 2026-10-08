@@ -7,7 +7,7 @@ import { BOOKING_CATEGORIES, type BookingCategory } from '../sim/finance/ledger'
 import type { GameState } from '../sim/state/gameState';
 
 import { isInt, isRecord } from './validateShapes';
-import { isVehicle } from './validateVehicles';
+import { isTour, isVehicle } from './validateVehicles';
 
 function isTotals(v: unknown): boolean {
   if (!isRecord(v) || !isInt(v['key'])) return false;
@@ -84,6 +84,7 @@ export function validateState(value: unknown): value is GameState {
   if (!Array.isArray(s['zones']) || !(s['zones'] as unknown[]).every(isZone)) return false;
   if (!Array.isArray(s['orders']) || !(s['orders'] as unknown[]).every(isOrder)) return false;
   if (!Array.isArray(s['vehicles']) || !(s['vehicles'] as unknown[]).every(isVehicle)) return false;
+  if (!Array.isArray(s['tours']) || !(s['tours'] as unknown[]).every(isTour)) return false;
   return (
     roadsOk &&
     buildings.every((b: unknown) => {

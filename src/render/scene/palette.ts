@@ -26,6 +26,5 @@ export const palette = {
   ownCab: 0xf08a5d,
   truckBody: 0x8d96a3,
   wheel: 0x2c3a4a,
-  routeLine: 0x4f9dde,
   selection: 0x4f9dde,
 } as const;

@@ -101,3 +101,73 @@
 .info-demolish {
   margin-top: 12px;
 }
+
+/* Fenster „Touren“ links (T2.1) */
+.tours-panel {
+  position: absolute;
+  top: 64px;
+  left: 12px;
+  width: 360px;
+  max-height: calc(100% - 160px);
+  overflow-y: auto;
+  padding: 10px 14px 14px;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.tours-panel[hidden] {
+  display: none;
+}
+.tours-list {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+}
+.tours-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 2px 0;
+  text-align: left;
+}
+.tours-item.is-active {
+  border-color: var(--active);
+  box-shadow: inset 0 0 0 1px var(--active);
+}
+.tours-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tours-count {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.tour-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: none;
+}
+.tours-name-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+.tour-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tour-swatch {
+  width: 26px;
+  height: 26px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.tour-swatch.is-active {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px var(--panel-solid) inset;
+}

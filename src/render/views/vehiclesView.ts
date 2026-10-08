@@ -1,7 +1,9 @@
 import { Group } from 'three';
 import { vehicleConfig } from '../../config/vehicles';
+import type { GameState } from '../../sim/state/gameState';
 import type { Vehicle } from '../../sim/vehicles/types';
-import { createTruckModel, setTruckCargo } from '../models/truckModel';
+import { createTruckModel, setTruckCargo, setTruckDot } from '../models/truckModel';
+import { routeColorOf } from './routeColors';
 import { vehiclePose } from './vehiclePose';
 
 /** Fahrzeuge: ein Modell je Fahrzeug, Lage jedes Bild neu (gleitet zwischen den Schritten). */
@@ -15,9 +17,9 @@ export class VehiclesView {
     return model ? { x: model.position.x, z: model.position.z } : null;
   }
 
-  sync(vehicles: readonly Vehicle[], alpha: number): void {
+  sync(state: Readonly<GameState>, alpha: number): void {
     const seen = new Set<number>();
-    for (const v of vehicles) {
+    for (const v of state.vehicles) {
       seen.add(v.id);
       let model = this.models.get(v.id);
       if (!model) {
@@ -32,6 +34,7 @@ export class VehiclesView {
         model.rotation.y = pose.angle;
       }
       setTruckCargo(model, v.cargo?.product ?? null);
+      if (v.kind === 'truck') setTruckDot(model, routeColorOf(state, v));
     }
     for (const [id, model] of this.models) {
       if (seen.has(id)) continue;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { zoneConfig } from '../../config/zones';
 import { Simulation } from '../core/simulation';
-import { testWorld, zoneOf } from '../goods/testWorld';
+import { giveTour, testWorld, zoneOf } from '../goods/testWorld';
 import { createInitialState } from '../state/gameState';
 import { zoneCapacity } from './zones';
 
@@ -50,14 +50,10 @@ describe('Angrenzende Zonen gleicher Art verschmelzen (Florian, Test 0.2.0)', ()
     s.execute({ type: 'vehicle/buyTruck' });
     const truck = s.state.vehicles.at(-1);
     if (!truck) throw new Error('LKW fehlt');
-    s.execute({
-      type: 'vehicle/setTour',
-      truckId: truck.id,
-      stops: [{ siteId: extra.id, action: 'unload', product: 'rawA' }],
-    });
+    const tourId = giveTour(s, truck.id, [{ siteId: extra.id, action: 'unload', product: 'rawA' }]);
     s.execute(zone('B', 23, 62, 23, 64));
     expect(s.state.zones.filter((z) => z.kind === 'B')).toHaveLength(1);
-    expect(truck.kind === 'truck' && truck.tour[0]?.siteId).toBe(b.id);
+    expect(s.state.tours.find((t) => t.id === tourId)?.stops[0]?.siteId).toBe(b.id);
   });
 
   it('Abriss erstattet jeden Teil nach seinem Bautag', () => {
