@@ -44,7 +44,6 @@ export type Command =
       xFirst: boolean;
       priority: boolean;
     }
-  /** Zone als Rechteck zwischen zwei Eckfeldern aufziehen. */
   /** Zone als Rechteck zwischen zwei Eckfeldern; ohne `gate` wird die Tor-Seite vorgeschlagen. */
   | {
       type: 'zone/place';

@@ -41,6 +41,7 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Neigen geht nie unter den Boden, Zoom hat Grenzen, Verschieben bleibt im Gelände.
 - [ ] Linke Maustaste bewegt die Kamera nicht. Rechtsklick öffnet kein Kontextmenü.
 - [ ] F3 blendet die Leistungsanzeige ein und aus; Bilder/s um 60 auf einem normalen Laptop.
+- [ ] Seit 0.3.0: mit 300 Fahrzeugen flüssig; Zeichenaufrufe wachsen kaum mit der Zahl der Fahrzeuge.
 
 ### Zeit, Kopfleiste, Menü, Einstellungen (seit 0.1.0-dev, T0.5)
 

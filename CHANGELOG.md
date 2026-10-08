@@ -3,7 +3,7 @@
 Pro Version: Was ist neu, Was wurde behoben, So testest du das, Bekannte Probleme.
 Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 
-## 0.3.0 – M2 Flotte & Verkehr (in Arbeit)
+## 0.3.0 – M2 Flotte & Verkehr (08.10.2026, im Test)
 
 ### Was ist neu
 
@@ -23,6 +23,7 @@ Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 - Verschleiß, Werkstatt und Pannen (T2.6): Eigene Fahrzeuge nutzen sich beim Fahren ab (0,4 Prozentpunkte je km). Unter „Zonen/Gebäude“ gibt es die Werkstatt (500 € je Feld, ein Werkstattplatz je angefangene 4 Felder). Fällt ein Fahrzeug unter 40 % Zustand, fährt es nach dem laufenden Auftrag (bei Touren nach dem laufenden Halt) zur nächsten Werkstatt, wird 2 Spielstunden gewartet (800 €) und ist danach wieder bei 100 %. Im Infofenster stehen Zustand mit „Wartung in ca. … km“, Pannen und letzte Wartung, dazu der Knopf „Zur Werkstatt“. Ohne Werkstatt gibt es keine Wartung und einmal die Meldung „braucht eine Wartung, aber es gibt keine erreichbare Werkstatt“. Je schlechter der Zustand, desto eher eine Panne (neu nie, bei 40 % etwa 1,8 % je km): Das Fahrzeug steht 3 Spielstunden mit Rauch und rotem Ausrufezeichen auf der Spur, Abschleppen kostet 1.500 €, es erscheint eine Meldung, und Fahrzeuge dahinter warten oder suchen einen Umweg. Danach fährt es mit 20 Prozentpunkten mehr Zustand weiter. Pannen sind zufällig, aber bei gleichem Spielstand immer gleich. ANNAHME: Schwelle, Dauer und Kosten wie im M2-Plan; Verschleiß, Pannenrisiko und Werkstatt-Baupreis bis zum Balancing (in `src/config/maintenance.ts` und `src/config/zones.ts`).
 - Externer Verkehr und Rushhour (T2.7): Die Eingangsstraße mündet in eine Bundesstraße mit Autos in beiden Richtungen, morgens und abends deutlich mehr. Wer aufs Gelände oder hinaus will, muss sich an der Einfahrt einfädeln: normal 1 Sekunde (bei 1x), in der Rushhour (7–9 und 16–18 Uhr, mit einer Stunde Übergang) etwa 3 Sekunden, und je Richtung fährt immer nur einer. Bei vielen Zulieferern bildet sich dann eine Schlange vor der Einfahrt. Oben neben der Uhr erscheint „Rushhour“. ANNAHME: Zeiten und Faktor wie im M2-Plan, Einfädelzeit bis zum Balancing (`src/config/entrance.ts`).
 - Flottenfenster (T2.8): Knopf „Flotte“ oben öffnet links die Liste aller eigenen Fahrzeuge mit Typ, Tour, Status und Zustand (rot unter 40 % oder bei Panne). Oben filtern (Alle, Transporter, LKW, Wartung fällig, Panne, Wartend) und sortieren (Name, Zustand, Status, Tour). Klick auf den Namen springt zum Fahrzeug und öffnet sein Infofenster. Mit den Kästchen (oder „Alle auswählen“) mehrere Fahrzeuge wählen und gemeinsam einer Tour oder der Automatik zuweisen oder zur Werkstatt schicken. Touren- und Flottenfenster teilen sich den Platz links; Esc schließt.
+- Leistung mit großen Flotten (T2.9): Das Spiel ist auf 300 Fahrzeuge ausgelegt. Alle Fahrzeuge werden gebündelt gezeichnet (statt rund 5.000 nur noch rund 200 Zeichenaufrufe bei 300 Fahrzeugen), ein Simulationsschritt mit 300 Fahrzeugen braucht unter 1 ms (automatischer Lasttest prüft unter 4 ms). Spielstände aus 0.2.x werden auf Version 4 umgestellt: Touren werden eigene Einträge, LKW gekaufte Diesel-LKW in neuem Zustand.
 
 ### So testest du das
 
@@ -37,12 +38,21 @@ Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 1. Panne: mehrere LKW über einige Spieltage ohne Werkstatt fahren lassen. Bei einer Panne steht der LKW mit Rauch, Meldung „Panne“, Kasse −1.500 €; nach 3 Spielstunden fährt er weiter.
 1. Bis 7 Uhr laufen lassen: Oben erscheint „Rushhour“, auf der Bundesstraße am Ende der Eingangsstraße fahren mehr Autos. Fünf Lieferungen Rohware A auf einmal bestellen: Die Zulieferer stehen hintereinander vor der Einfahrt und fahren im Abstand von etwa 3 Sekunden herein. Dasselbe mittags: etwa 1 Sekunde Abstand.
 1. Drei Fahrzeuge anschaffen, „Flotte“: drei Zeilen. „Zeigen: Transporter“ filtert, „Sortieren: Zustand“ stellt den schlechtesten nach oben. „Alle auswählen“, „Tour zuweisen …“ → eine Tour: alle fahren sie. Klick auf einen Namen: Kamera springt hin, Infofenster öffnet sich.
+1. Mit vielen Fahrzeugen (z. B. 100 und mehr bei viel Geld) F3 einblenden: Bilder/s bleiben flüssig, Zeichenaufrufe wachsen kaum mit der Zahl der Fahrzeuge.
+1. Einen Spielstand aus 0.2.x laden: Touren erscheinen im Fenster „Touren“, LKW sind „LKW Diesel“, gekauft, 100 % Zustand.
 1. Lieferort A als 5 × 1 aufziehen. „Abriss“ über das mittlere Feld: nur dieses Feld ist markiert, Erstattung für ein Feld. Klick: zwei Zonen „A“ links und rechts.
 1. Eine Zone anklicken, „Ganze Zone abreißen“, Rückfrage mit Erstattung bestätigen: Zone ist weg.
 
 ### Was wurde behoben
 
 - Die Kilometerkosten konnten bei krummen Preisen einen Kilometerstand mit Nachkommastellen erzeugen; der Spielstand hätte dann nicht mehr gespeichert werden können. Der Rest wird jetzt ganzzahlig übertragen.
+
+### Bekannte Probleme
+
+- Alle neuen Zahlen (Transporter, Elektro, Leasing, Verschleiß, Pannen, Werkstatt, Einfädelzeit) sind Platzhalter bis zum Balancing (ANNAHME, siehe DESIGN.md).
+- Fahrzeuge heißen jetzt „Transporter n“ bzw. „LKW n“, je Typ nummeriert (ANNAHME).
+- Ein Fahrzeug auf einem Stellplatz lässt sich im Gelände an seiner Zufahrt anklicken, nicht genau an seiner gezeichneten Stelle in der Zone.
+- Die Autos auf der Bundesstraße sind nur Darstellung; sie fahren nie aufs Gelände.
 
 ## 0.2.1 – Zonen verschmelzen (07.10.2026, Teil von 0.3.0)
 

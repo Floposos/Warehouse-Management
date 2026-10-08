@@ -1,65 +1,70 @@
-import { Group } from 'three';
+import { Group, Matrix4, Quaternion, Vector3 } from 'three';
 import { trafficConfig } from '../../config/traffic';
 import { vehicleConfig } from '../../config/vehicles';
 import type { GameState } from '../../sim/state/gameState';
 import { valuesOf } from '../../sim/vehicles/fleet';
 import type { Vehicle } from '../../sim/vehicles/types';
 import { sites } from '../../sim/world/sites';
-import {
-  createTruckModel,
-  setTruckBroken,
-  setTruckCargo,
-  setTruckDot,
-  setTruckJam,
-} from '../models/truckModel';
+import { TruckParts } from '../models/truckModel';
 import { bayPose } from './bayPose';
 import { routeColorOf } from './routeColors';
 import { LANE_OFFSET, PARKED_OFFSET, vehiclePose, type Pose } from './vehiclePose';
 
-/** Fahrzeuge: ein Modell je Fahrzeug, Lage jedes Bild neu (gleitet zwischen den Schritten). */
+/** Gut sichtbar aus der Vogelperspektive, passt aber noch auf eine Fahrspur. */
+const MODEL_SCALE = 1.45;
+const UP = new Vector3(0, 1, 0);
+
+/**
+ * Fahrzeuge (seit T2.9 instanziert): Lage jedes Bild neu (gleitet zwischen den Schritten),
+ * alle Fahrzeuge zusammen in wenigen Zeichenaufrufen.
+ */
 export class VehiclesView {
   readonly root = new Group();
-  private readonly models = new Map<number, Group>();
+  private readonly parts = new TruckParts();
+  private readonly positions = new Map<number, { x: number; z: number }>();
+  private readonly base = new Matrix4();
+  private readonly position = new Vector3();
+  private readonly rotation = new Quaternion();
+  private readonly scale = new Vector3(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
+  private attached: readonly unknown[] = [];
 
   /** Aktuelle Lage (Modellmitte auf dem Boden) eines Fahrzeugs; null = unbekannt. */
   positionOf(id: number): { x: number; z: number } | null {
-    const model = this.models.get(id);
-    return model ? { x: model.position.x, z: model.position.z } : null;
+    return this.positions.get(id) ?? null;
   }
 
   sync(state: Readonly<GameState>, alpha: number): void {
-    const seen = new Set<number>();
     const bays = bayPoses(state);
+    this.positions.clear();
+    this.parts.begin();
     for (const v of state.vehicles) {
-      seen.add(v.id);
-      let model = this.models.get(v.id);
-      if (!model) {
-        model =
-          v.kind === 'truck'
-            ? createTruckModel('truck', v.model, v.drive === 'electric')
-            : createTruckModel('supplier');
-        model.userData['vehicleId'] = v.id;
-        this.models.set(v.id, model);
-        this.root.add(model);
-      }
       const extra = isMoving(v) ? speedOf(v) * alpha : 0;
       const pose =
         bays.get(v.id) ??
         vehiclePose(v.route, v.progress, extra, v.heading, v.offRoad ? PARKED_OFFSET : LANE_OFFSET);
-      if (pose) {
-        model.position.set(pose.x, 0, pose.z);
-        model.rotation.y = pose.angle;
-      }
-      setTruckCargo(model, v.cargo?.product ?? null);
-      const broken = v.kind === 'truck' && v.upkeep.brokenTicks > 0;
-      setTruckJam(model, v.waitTicks >= trafficConfig.jamWarnTicks || broken);
-      setTruckBroken(model, broken);
-      if (v.kind === 'truck') setTruckDot(model, routeColorOf(state, v));
+      if (!pose) continue;
+      this.positions.set(v.id, { x: pose.x, z: pose.z });
+      this.position.set(pose.x, 0, pose.z);
+      this.rotation.setFromAxisAngle(UP, pose.angle);
+      this.base.compose(this.position, this.rotation, this.scale);
+      const own = v.kind === 'truck';
+      this.parts.add(this.base, {
+        own,
+        shape: own ? v.model : 'truck',
+        electric: own && v.drive === 'electric',
+        cargo: v.cargo?.product ?? null,
+        dot: own ? routeColorOf(state, v) : null,
+        jam: v.waitTicks >= trafficConfig.jamWarnTicks,
+        broken: own && v.upkeep.brokenTicks > 0,
+      });
     }
-    for (const [id, model] of this.models) {
-      if (seen.has(id)) continue;
-      this.root.remove(model);
-      this.models.delete(id);
+    this.parts.end();
+    // Wächst ein Bauteil, ersetzt es seine InstancedMesh: Szene nachziehen.
+    const meshes = this.parts.meshes;
+    if (meshes.some((m, i) => m !== this.attached[i])) {
+      this.root.clear();
+      this.root.add(...meshes);
+      this.attached = meshes;
     }
   }
 }
