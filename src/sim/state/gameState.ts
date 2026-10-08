@@ -3,6 +3,7 @@ import type { BuildingTypeId } from '../../content/buildings';
 import type { ProductId, RawProductId } from '../../content/products';
 import type { ZoneKind } from '../../content/zones';
 import { createRngState, type RngState } from '../core/rng';
+import type { EntranceState } from '../traffic/entrance';
 import { createFinance, type Finance } from '../finance/ledger';
 import type { OrderBlock, OrderInterval } from '../goods/orders';
 import type { Side } from '../world/access';
@@ -88,6 +89,8 @@ export interface GameState {
   tours: Tour[];
   /** Meldungen (Stau, Pannen …), älteste zuerst (T2.4/T2.6). */
   notices: Notice[];
+  /** Einfahrt: nächste erlaubte Durchfahrt je Richtung (T2.7). */
+  entrance: EntranceState;
 }
 
 /** Lage der Test-Halle aus M0 (nahe der Eingangsstraße, Mitte der Westseite). */
@@ -113,5 +116,6 @@ export function createInitialState(seed: number): GameState {
     vehicles: [],
     tours: [],
     notices: [],
+    entrance: { nextInTick: 0, nextOutTick: 0 },
   };
 }

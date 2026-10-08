@@ -97,3 +97,21 @@ test('Mehrere LKW: Stellplätze und Warteschlange im Infofenster, Meldungsliste'
   await expect(page.getByTestId('notices-panel')).toBeVisible();
   expect(problems).toEqual([]);
 });
+
+test('Rushhour: Hinweis oben morgens, mittags nicht (T2.7)', async ({ page }) => {
+  const problems = collectProblems(page);
+  await page.goto('/');
+  await startNewGame(page);
+  const setHour = (h: number) =>
+    page.evaluate((hour) => {
+      const app = (window as unknown as { __logistikum: { session: { state: { tick: number } } } })
+        .__logistikum;
+      app.session.state.tick = Math.round((hour * 3000) / 24);
+    }, h);
+  await setHour(8);
+  await expect(page.getByTestId('rush-badge')).toBeVisible();
+  await expect(page.getByTestId('clock')).toContainText('08:');
+  await setHour(12);
+  await expect(page.getByTestId('rush-badge')).toBeHidden();
+  expect(problems).toEqual([]);
+});

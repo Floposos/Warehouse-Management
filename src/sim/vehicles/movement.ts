@@ -76,6 +76,7 @@ export function advance(vehicle: Vehicle, speed: number, traffic: Traffic): Adva
         traffic.claim(vehicle, here, heading);
       }
       traffic.claim(vehicle, next, heading);
+      traffic.gate?.pass(here, next);
     }
     const step = Math.min(budget, CELL - vehicle.progress);
     vehicle.progress += step;

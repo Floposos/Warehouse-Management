@@ -20,6 +20,7 @@ import { GhostView, type Ghost } from '../views/ghostView';
 import { RoadsView } from '../views/roadsView';
 import { SitesView } from '../views/sitesView';
 import { StockView } from '../views/stockView';
+import { ExternalTrafficView } from '../views/externalTrafficView';
 import { VehiclesView } from '../views/vehiclesView';
 import { palette } from './palette';
 import { createTerrain } from './terrain';
@@ -34,6 +35,7 @@ export class GameRenderer {
   private readonly sites = new SitesView();
   private readonly stock = new StockView();
   private readonly vehicles = new VehiclesView();
+  private readonly external = new ExternalTrafficView();
   private readonly ghost = new GhostView();
   /** Weg des ausgewählten Fahrzeugs (jedes Bild) und Wege aller Fahrzeuge (gedrosselt). */
   private readonly routeLine = new RouteLineView(512, 0.2, 6);
@@ -57,6 +59,7 @@ export class GameRenderer {
       this.sites.root,
       this.stock.root,
       this.vehicles.root,
+      this.external.root,
       this.buildings.root,
       this.ghost.root,
       this.routeLine.root,
@@ -93,6 +96,7 @@ export class GameRenderer {
     this.sites.sync(state);
     this.stock.sync(state.zones);
     this.vehicles.sync(state, alpha);
+    this.external.sync(state.tick, alpha);
   }
 
   /** Vorschau des Bauwerkzeugs; null blendet sie aus. */

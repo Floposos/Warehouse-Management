@@ -52,6 +52,11 @@ export const deFleet = {
       `${name} zurückgeben? Vorzeitige Rückgabe kostet ${penalty}. Das Fahrzeug verschwindet sofort, Ladung geht verloren.`,
     disposed: (name: string): string => `${name} abgegeben.`,
   },
+  entrance: {
+    rush: 'Rushhour',
+    rushTitle:
+      'Rushhour an der Einfahrt: Fahrzeuge warten beim Hinein- und Hinausfahren etwa dreimal so lange.',
+  },
   upkeep: {
     condition: 'Zustand',
     conditionLine: (percent: number, km: number): string =>

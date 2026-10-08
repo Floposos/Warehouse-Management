@@ -124,6 +124,7 @@ describe('validateState', () => {
 
   it('verlangt den Zufallsstrom der Ereignisse', () => {
     expect(validateState({ ...createInitialState(1), eventRng: undefined })).toBe(false);
+    expect(validateState({ ...createInitialState(1), entrance: { nextInTick: 1 } })).toBe(false);
   });
 
   it('lehnt eine kaputte Kasse ab', () => {

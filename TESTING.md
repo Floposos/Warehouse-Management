@@ -148,6 +148,14 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Werkstatt erscheint nicht als Tour-Halt.
 - [ ] Speichern während einer Panne bzw. Wartung und laden: läuft genauso weiter.
 
+### Einfahrt und Rushhour (seit 0.3.0, T2.7)
+
+- [ ] Bundesstraße am Ende der Eingangsstraße mit Autos in beiden Richtungen; 7–9 und 16–18 Uhr dichter.
+- [ ] „Rushhour“ neben der Uhr nur zu diesen Zeiten.
+- [ ] Mehrere Zulieferer gleichzeitig: Sie fädeln einzeln ein, in der Rushhour sichtbar langsamer; hinaus ebenso.
+- [ ] Langer Stau vor der Einfahrt: Meldung „Stau“.
+- [ ] Speichern in der Rushhour mit Schlange vor der Einfahrt, laden: geht genauso weiter.
+
 ### Auswahl und Infofenster (seit 0.2.0, T1.7)
 
 - [ ] Ohne Bauwerkzeug: Überfahren zeigt den Namen, Klick öffnet das Infofenster; Klick ins Leere, × oder Esc schließt (Esc öffnet dabei nicht das Menü).

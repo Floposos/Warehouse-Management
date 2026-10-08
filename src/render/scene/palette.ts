@@ -31,5 +31,7 @@ export const palette = {
   electricMark: 0x3ccf6e,
   /** Rauch über einem Fahrzeug mit Panne (T2.6). */
   breakdownSmoke: 0x8c8c8c,
+  /** Autos auf der Bundesstraße (T2.7). */
+  externalCars: [0x6b8fd6, 0xe0e4ea, 0xd96a6a, 0x5a6472, 0x8cc08a, 0xf0d070],
   selection: 0x4f9dde,
 } as const;

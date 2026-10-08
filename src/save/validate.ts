@@ -75,6 +75,9 @@ export function validateState(value: unknown): value is GameState {
   }
   const eventRng = s['eventRng'] as Record<string, unknown> | null | undefined;
   if (typeof eventRng !== 'object' || eventRng === null || !isInt(eventRng['s'])) return false;
+  const entrance = s['entrance'] as Record<string, unknown> | null | undefined;
+  if (typeof entrance !== 'object' || entrance === null) return false;
+  if (!isInt(entrance['nextInTick']) || !isInt(entrance['nextOutTick'])) return false;
   if (!isFinance(finance)) return false;
   const buildings = s['buildings'];
   if (!Array.isArray(buildings) || !Array.isArray(s['roads'])) return false;

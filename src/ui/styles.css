@@ -157,6 +157,18 @@ body {
   font-weight: 700;
   letter-spacing: 0.08em;
 }
+.topbar-rush {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f2a33a;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.topbar-rush[hidden],
+.topbar-paused[hidden] {
+  display: none;
+}
 .topbar.is-paused .topbar-clock {
   color: var(--muted);
 }

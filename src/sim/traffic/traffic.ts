@@ -2,6 +2,7 @@ import type { GameState } from '../state/gameState';
 import type { Vehicle } from '../vehicles/types';
 import type { Cell } from '../world/roadLine';
 import { cellKey, type RoadNetwork } from '../world/roadNetwork';
+import type { EntranceGate } from './entrance';
 import { grantJunctions } from './junctions';
 import { headingBetween, laneKey, type Heading } from './lanes';
 
@@ -18,6 +19,8 @@ export class Traffic {
   private readonly junctionCache = new Map<number, boolean>();
   readonly priority = new Set<number>();
   private readonly granted: Set<number>;
+  /** Einfahrt mit externem Verkehr (T2.7); fehlt in reinen Verkehrstests. */
+  gate: EntranceGate | null = null;
 
   constructor(
     readonly network: RoadNetwork,
@@ -94,6 +97,7 @@ export class Traffic {
   canEnter(v: Vehicle): boolean {
     const [here, next] = v.route;
     if (!here || !next) return false;
+    if (this.gate && !this.gate.allows(v, here, next)) return false;
     const heading = headingBetween(here, next);
     if (
       v.offRoad &&

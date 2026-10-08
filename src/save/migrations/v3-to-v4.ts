@@ -15,6 +15,7 @@ type Obj = Record<string, unknown>;
  * - Fahrzeugtypen (T2.5): bisherige LKW sind gekaufte Diesel-LKW (Kaufzeitpunkt = jetzt).
  * - Wartung (T2.6): LKW sind in neuem Zustand, ohne Pannen; eigener Zufallsstrom für
  *   Ereignisse aus dem Seed.
+ * - Einfahrt (T2.7): sofort frei in beide Richtungen.
  */
 export const migrateV3ToV4: Migration = (save) => {
   const state = save['state'] as Obj;
@@ -49,7 +50,16 @@ export const migrateV3ToV4: Migration = (save) => {
   const eventRng = { s: (seed ^ 0x5bd1e995) >>> 0 };
   return {
     ...save,
-    state: { ...state, nextId, vehicles, tours, roads, notices: [], eventRng },
+    state: {
+      ...state,
+      nextId,
+      vehicles,
+      tours,
+      roads,
+      notices: [],
+      eventRng,
+      entrance: { nextInTick: 0, nextOutTick: 0 },
+    },
   };
 };
 

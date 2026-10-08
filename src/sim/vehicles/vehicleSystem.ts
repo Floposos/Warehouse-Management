@@ -1,6 +1,7 @@
 import type { EventBus } from '../core/eventBus';
 import { isDayStart } from '../core/gameTime';
 import type { GameState } from '../state/gameState';
+import { EntranceGate } from '../traffic/entrance';
 import { Traffic } from '../traffic/traffic';
 import { RoadNetwork } from '../world/roadNetwork';
 import { updateLeases } from './fleet';
@@ -15,6 +16,7 @@ import type { Vehicle } from './types';
  */
 export function updateVehicles(state: GameState, bus: EventBus): void {
   const traffic = new Traffic(new RoadNetwork(state), state);
+  traffic.gate = new EntranceGate(state);
   const ctx = { state, bus, traffic };
   const remaining: Vehicle[] = [];
   for (const v of state.vehicles) {
