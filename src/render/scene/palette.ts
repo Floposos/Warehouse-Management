@@ -27,5 +27,7 @@ export const palette = {
   ownCab: 0xf08a5d,
   truckBody: 0x8d96a3,
   wheel: 0x2c3a4a,
+  /** Grüner Dachstreifen der Elektro-Fahrzeuge (T2.5). */
+  electricMark: 0x3ccf6e,
   selection: 0x4f9dde,
 } as const;

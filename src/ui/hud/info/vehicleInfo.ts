@@ -7,6 +7,7 @@ import { de } from '../../texts/de';
 import type { InfoContent } from './infoPanel';
 import { row } from './infoPanel';
 import { siteLabel, truckLabel } from './names';
+import { ownershipSection } from './vehicleOwnership';
 
 function cargoText(v: Truck | Supplier): string {
   return v.cargo
@@ -30,7 +31,7 @@ function truckTarget(state: GameState, t: Truck): string {
   return id === undefined ? de.info.none : siteLabel(state, id);
 }
 
-/** Eigener LKW: Status, Ladung, Ziel und welche Tour er fährt (T2.1). */
+/** Eigenes Fahrzeug: Status, Ladung, Ziel, Tour (T2.1), Typ und Besitz (T2.5). */
 export function truckInfo(
   truckId: number,
   submit: (c: Command) => CommandResult,
@@ -51,12 +52,14 @@ export function truckInfo(
   const edit = button(de.tours.editTour, () => openTours(tourId), 'btn');
   const controls = el('div', 'tour-controls');
   controls.append(tourSelect, edit);
+  const ownership = ownershipSection(truckId, submit);
   root.append(
     status.root,
     cargo.root,
     target.root,
     el('h3', 'info-subtitle', de.tours.drives),
     controls,
+    ownership.root,
   );
   let optionsKey = '';
   return {
@@ -67,6 +70,7 @@ export function truckInfo(
       status.value.textContent = truckStatus(t);
       cargo.value.textContent = cargoText(t);
       target.value.textContent = truckTarget(state, t);
+      ownership.update(state, t);
       const key = JSON.stringify(state.tours.map((x) => [x.id, x.name]));
       if (key !== optionsKey) {
         optionsKey = key;

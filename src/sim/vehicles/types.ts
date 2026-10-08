@@ -1,4 +1,5 @@
 import type { ProductId } from '../../content/products';
+import type { VehicleDrive, VehicleModel } from '../../content/vehicleTypes';
 import type { Heading } from '../traffic/lanes';
 import type { Cell } from '../world/roadLine';
 
@@ -61,6 +62,15 @@ export interface Tour {
   stops: TourStop[];
 }
 
+/** Leasingvertrag (T2.5): feste Laufzeit, Monatsrate, verlängert sich automatisch. */
+export interface Lease {
+  monthlyCents: number;
+  /** Schritt der nächsten Rate. */
+  nextPaymentTick: number;
+  /** Ende der laufenden Laufzeit. */
+  endTick: number;
+}
+
 /** Warum ein LKW steht. Texte in ui/texts/de.ts. */
 export type TruckIdleReason = 'noJob' | 'noRoute' | 'noDestination' | 'noTour';
 
@@ -78,6 +88,14 @@ export interface Truck extends VehicleBase {
   tourId: number | null;
   /** Nächster bzw. aktueller Halt der Tour. */
   tourIndex: number;
+  /** Typ und Antrieb (T2.5). */
+  model: VehicleModel;
+  drive: VehicleDrive;
+  /** Kaufpreis (bei Leasing der Listenpreis): Grundlage für Restwert und Rate. */
+  priceCents: number;
+  boughtTick: number;
+  /** null = gekauft. */
+  lease: Lease | null;
 }
 
 export type Vehicle = Supplier | Truck;

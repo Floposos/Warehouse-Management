@@ -119,7 +119,7 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 
 ### Eigene LKW (seit 0.2.0, T1.5)
 
-- [ ] „Fahrzeuge“ → „LKW kaufen“: Hinweis, Kontostand sinkt um den Kaufpreis; ohne Geld Hinweis „Nicht genug Geld“.
+- [ ] „Fahrzeuge“ → „LKW Diesel“ (Kaufen): Hinweis, Kontostand sinkt um den Kaufpreis; ohne Geld Hinweis „Nicht genug Geld“.
 - [ ] Ganze Kette läuft mit 2 LKW von allein: A → B → C → Export, Kontostand steigt über einen Spieltag.
 - [ ] LKW fahren rechts, Ladung als Kisten sichtbar, leer ohne Kisten.
 - [ ] Unter 5 Einheiten fährt kein LKW los; zwei LKW holen nicht dieselbe Ware doppelt.
@@ -127,6 +127,16 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Ziel während der Fahrt abreißen: LKW sucht mit Ladung ein neues Ziel.
 - [ ] Tageswechsel: Kasse zeigt unter „Fahrzeuge“ Tages- und Kilometerkosten.
 - [ ] Speichern mit LKW unterwegs (beladen), laden: fährt weiter und liefert ab.
+
+### Fahrzeugtypen, Kauf und Leasing (seit 0.3.0, T2.5)
+
+- [ ] „Fahrzeuge“: Schalter „Kaufen“/„Leasen“ ändert die Preise der vier Einträge (Kaufpreis bzw. „/ Monat“); Tooltip nennt Ladung, Tages- und Kilometerkosten.
+- [ ] Transporter ist kürzer als der LKW, Elektro hat einen grünen Dachstreifen; Transporter fährt schneller und lädt höchstens 8.
+- [ ] Ohne Geld: Hinweis „Nicht genug Geld“, kein Fahrzeug.
+- [ ] Infofenster: Typ, Antrieb, Ladung, Besitz (Restwert bzw. Rate und Laufzeitende).
+- [ ] „Verkaufen“ und „Leasing zurückgeben“ fragen nach und nennen den Betrag; danach ist das Fahrzeug weg, Kasse zeigt die Buchung.
+- [ ] Monatswechsel: Leasingrate unter „Fahrzeuge“; nach 12 Monaten Meldung „Leasing läuft weiter“.
+- [ ] Spielstand aus 0.2.x laden: LKW sind gekaufte Diesel-LKW.
 
 ### Auswahl und Infofenster (seit 0.2.0, T1.7)
 

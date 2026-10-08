@@ -12,6 +12,7 @@ type Obj = Record<string, unknown>;
  *   abseits der Fahrbahn, wenn sie warten oder laden, belegen noch keinen Stellplatz und
  *   haben keine Wartezeit. Straßen sind keine Vorfahrtsstraßen.
  * - Meldungen (T2.4): leere Liste.
+ * - Fahrzeugtypen (T2.5): bisherige LKW sind gekaufte Diesel-LKW (Kaufzeitpunkt = jetzt).
  */
 export const migrateV3ToV4: Migration = (save) => {
   const state = save['state'] as Obj;
@@ -29,7 +30,7 @@ export const migrateV3ToV4: Migration = (save) => {
         tours.push({ id, name: `Tour ${tours.length + 1}`, color: tours.length % 10, stops });
         if (mode === 'tour') tourId = id;
       }
-      return { ...rest, tourId };
+      return { ...rest, tourId, ...FLEET_DEFAULTS, boughtTick: state['tick'] ?? 0 };
     },
   );
   const roads = (Array.isArray(state['roads']) ? (state['roads'] as Obj[]) : []).map((r) => ({
@@ -38,6 +39,9 @@ export const migrateV3ToV4: Migration = (save) => {
   }));
   return { ...save, state: { ...state, nextId, vehicles, tours, roads, notices: [] } };
 };
+
+/** Bisherige LKW: LKW mit Diesel, gekauft zum damaligen Preis (90.000 €). */
+const FLEET_DEFAULTS = { model: 'truck', drive: 'diesel', priceCents: 9_000_000, lease: null };
 
 const PARKED = ['idle', 'loading', 'unloading', 'handling', 'noRoute'];
 const DIRS: [number, number][] = [

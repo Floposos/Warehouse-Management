@@ -1,6 +1,7 @@
 import { vehicleConfig } from '../../config/vehicles';
 import { addStock, available } from '../goods/stock';
 import type { GameState } from '../state/gameState';
+import { valuesOf } from './fleet';
 import { tourOf } from './tours';
 import { accessOf, drive, goIdle, setRoute, unloadAt } from './truckShared';
 import type { TourStop, Truck } from './types';
@@ -74,7 +75,7 @@ function handleStop(ctx: VehicleCtx, t: Truck): void {
   if (!zone || (t.cargo && t.cargo.product !== stop.product)) return;
   const loaded = t.cargo?.quantity ?? 0;
   const quantity = Math.min(
-    vehicleConfig.truckCapacity - loaded,
+    valuesOf(t).capacity - loaded,
     available(ctx.state, zone, stop.product),
   );
   if (quantity <= 0) return;

@@ -1,3 +1,9 @@
+import {
+  vehicleDrives,
+  vehicleModels,
+  type VehicleDrive,
+  type VehicleModel,
+} from '../content/vehicleTypes';
 import { NOTICE_KINDS, type NoticeKind } from '../sim/events/notices';
 import { isInt, isProduct, isRecord } from './validateShapes';
 
@@ -14,6 +20,10 @@ const isJob = (j: unknown): boolean =>
     isProduct(j['product']) &&
     ['fromId', 'toId', 'quantity'].every((k) => isInt(j[k])));
 
+const isLease = (l: unknown): boolean =>
+  l === null ||
+  (isRecord(l) && ['monthlyCents', 'nextPaymentTick', 'endTick'].every((k) => isInt(l[k])));
+
 const isStop = (s: unknown): boolean =>
   isRecord(s) &&
   isInt(s['siteId']) &&
@@ -26,7 +36,12 @@ function isTruck(v: Record<string, unknown>): boolean {
     ['odometer', 'tourIndex'].every((k) => isInt(v[k])) &&
     isJob(v['job']) &&
     IDLE_REASONS.includes(v['idleReason'] as string | null) &&
-    (v['tourId'] === null || isInt(v['tourId']))
+    (v['tourId'] === null || isInt(v['tourId'])) &&
+    vehicleModels.includes(v['model'] as VehicleModel) &&
+    vehicleDrives.includes(v['drive'] as VehicleDrive) &&
+    isInt(v['priceCents']) &&
+    isInt(v['boughtTick']) &&
+    isLease(v['lease'])
   );
 }
 

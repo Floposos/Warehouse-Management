@@ -64,13 +64,14 @@ export function findJob(
   state: GameState,
   network: RoadNetwork,
   position: Cell,
+  capacity: number = vehicleConfig.truckCapacity,
 ): PlannedJob | 'noRoute' | null {
   let unreachable = false;
   for (const { product, from } of PRIORITY) {
     const sources = state.zones
       .filter((z) => z.kind === from)
       .map((zone) => ({ zone, avail: available(state, zone, product) }))
-      .filter((s) => s.avail >= Math.min(vehicleConfig.truckMinLoad, vehicleConfig.truckCapacity))
+      .filter((s) => s.avail >= Math.min(vehicleConfig.truckMinLoad, capacity))
       .sort((a, b) => b.avail - a.avail || a.zone.id - b.zone.id);
     for (const source of sources) {
       const sourceSite = sites(state).find((s) => s.id === source.zone.id);
@@ -86,7 +87,7 @@ export function findJob(
           unreachable = true;
           continue;
         }
-        const quantity = Math.min(vehicleConfig.truckCapacity, source.avail, drop.free);
+        const quantity = Math.min(capacity, source.avail, drop.free);
         if (quantity < 1) continue;
         return {
           job: { product, fromId: source.zone.id, toId: drop.site.id, quantity },

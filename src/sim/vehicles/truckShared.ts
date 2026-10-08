@@ -6,6 +6,7 @@ import { driveVehicle, enterBay } from '../traffic/driving';
 import type { Cell } from '../world/roadLine';
 import type { RoadNetwork } from '../world/roadNetwork';
 import { siteAccess, sites } from '../world/sites';
+import { valuesOf } from './fleet';
 import { planRoute } from './movement';
 import type { Truck, TruckIdleReason } from './types';
 import type { VehicleCtx } from './vehicleCtx';
@@ -55,7 +56,7 @@ export function drive(
   t: Truck,
   siteId: number | undefined,
 ): 'arrived' | 'blocked' | 'driving' {
-  const { result, moved } = driveVehicle(ctx, t, vehicleConfig.truckSpeed);
+  const { result, moved } = driveVehicle(ctx, t, valuesOf(t).speed);
   t.odometer += moved;
   if (result === 'blocked') {
     t.progress = 0;

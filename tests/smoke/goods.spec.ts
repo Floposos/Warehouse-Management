@@ -67,8 +67,10 @@ test('LKW kaufen: bringt Rohware A von A nach B', async ({ page }) => {
 
   const bar = page.getByTestId('build-bar');
   await bar.getByRole('button', { name: 'Fahrzeuge' }).click();
-  await bar.getByRole('button', { name: /LKW kaufen/ }).click();
-  await expect(page.getByTestId('toast').filter({ hasText: 'LKW gekauft' })).toBeVisible();
+  await bar.getByTestId('buy-truck-diesel').click();
+  await expect(
+    page.getByTestId('toast').filter({ hasText: 'LKW Diesel angeschafft' }),
+  ).toBeVisible();
   await expect
     .poll(
       () =>

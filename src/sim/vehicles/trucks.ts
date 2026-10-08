@@ -4,6 +4,7 @@ import { book } from '../finance/ledger';
 import { addStock, stockOf } from '../goods/stock';
 import type { GameState } from '../state/gameState';
 import { siteAccess } from '../world/sites';
+import { valuesOf } from './fleet';
 import { dropsFor, findJob } from './truckJobs';
 import { accessOf, drive, goIdle, setRoute, unloadAt } from './truckShared';
 import { stepTourTruck } from './truckTour';
@@ -58,7 +59,7 @@ function startJob(ctx: VehicleCtx, t: Truck): void {
   const position = t.route[0];
   if (!position) return;
   const network = ctx.traffic.network;
-  const planned = findJob(ctx.state, network, position);
+  const planned = findJob(ctx.state, network, position, valuesOf(t).capacity);
   if (planned === null || planned === 'noRoute') {
     idleAuto(ctx, t, planned ?? 'noJob');
     return;
@@ -120,16 +121,17 @@ function deliverCargoElsewhere(ctx: VehicleCtx, t: Truck): void {
   goIdle(ctx, t, 'noDestination');
 }
 
-/** Tageswechsel: feste Tageskosten und Kilometerkosten je LKW (Kasse: „Fahrzeuge“). */
+/** Tageswechsel: Tages- und Kilometerkosten je Fahrzeug nach Typ und Antrieb (Kasse: „Fahrzeuge“). */
 export function bookTruckCosts(state: GameState, bus: EventBus): void {
-  // Tausendstel Feld × Meter je Feld × Cent je km = Millionstel Cent (1 km = 1000 m).
-  const rate = vehicleConfig.metersPerField * vehicleConfig.truckCostPerKmCents;
   for (const t of state.vehicles) {
     if (t.kind !== 'truck') continue;
+    const values = valuesOf(t);
+    // Tausendstel Feld × Meter je Feld × Cent je km = Millionstel Cent (1 km = 1000 m).
+    const rate = vehicleConfig.metersPerField * values.costPerKmCents;
     const micro = t.odometer * rate;
     const kmCents = Math.floor(micro / 1_000_000);
     // Rest als ganze Tausendstel Feld übertragen (Spielstand speichert nur ganze Zahlen).
     t.odometer = Math.floor((micro - kmCents * 1_000_000) / rate);
-    book(state.finance, state.tick, bus, 'vehicles', -(vehicleConfig.truckDailyCents + kmCents));
+    book(state.finance, state.tick, bus, 'vehicles', -(values.dailyCents + kmCents));
   }
 }

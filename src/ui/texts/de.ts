@@ -117,11 +117,6 @@ export const de = {
       vehicles: 'Fahrzeuge',
       demolish: 'Abriss',
     },
-    truck: 'LKW kaufen',
-    truckTitle: (price: string, daily: string): string =>
-      `LKW kaufen (${price}, dazu ${daily} am Tag und Kilometerkosten). Er erscheint an der Einfahrt und fährt automatisch.`,
-    truckBought: 'LKW gekauft, er fährt an der Einfahrt los.',
-    truckNoMoney: 'Nicht genug Geld für einen LKW.',
     buildings: { testHall: 'Testhalle', exportExit: 'Export-Ausfahrt' },
     zones: { A: 'Lieferort A', B: 'Lieferort B', C: 'Lieferort C' },
     zoneItemCost: (cost: string): string => `${cost} je Feld`,
@@ -215,7 +210,6 @@ export const de = {
   info: {
     close: 'Infofenster schließen',
     siteName: (kind: string, n: number): string => `${kind} ${n}`,
-    truckName: (n: number): string => `LKW ${n}`,
     supplier: 'Zulieferer',
     fields: (n: number): string => `${n} ${n === 1 ? 'Feld' : 'Felder'}`,
     stock: 'Lager',

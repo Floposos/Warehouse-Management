@@ -2,6 +2,7 @@ import { Group } from 'three';
 import { trafficConfig } from '../../config/traffic';
 import { vehicleConfig } from '../../config/vehicles';
 import type { GameState } from '../../sim/state/gameState';
+import { valuesOf } from '../../sim/vehicles/fleet';
 import type { Vehicle } from '../../sim/vehicles/types';
 import { sites } from '../../sim/world/sites';
 import { createTruckModel, setTruckCargo, setTruckDot, setTruckJam } from '../models/truckModel';
@@ -27,7 +28,10 @@ export class VehiclesView {
       seen.add(v.id);
       let model = this.models.get(v.id);
       if (!model) {
-        model = createTruckModel(v.kind);
+        model =
+          v.kind === 'truck'
+            ? createTruckModel('truck', v.model, v.drive === 'electric')
+            : createTruckModel('supplier');
         model.userData['vehicleId'] = v.id;
         this.models.set(v.id, model);
         this.root.add(model);
@@ -76,5 +80,5 @@ function isMoving(v: Vehicle): boolean {
 }
 
 function speedOf(v: Vehicle): number {
-  return v.kind === 'supplier' ? vehicleConfig.supplierSpeed : vehicleConfig.truckSpeed;
+  return v.kind === 'supplier' ? vehicleConfig.supplierSpeed : valuesOf(v).speed;
 }

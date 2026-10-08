@@ -81,6 +81,11 @@ describe('validateState', () => {
       offRoad: true,
       bayAt: 2,
       waitTicks: 5,
+      model: 'van',
+      drive: 'electric',
+      priceCents: 5_850_000,
+      boughtTick: 0,
+      lease: { monthlyCents: 175_500, nextPaymentTick: 9000, endTick: 90000 },
     };
     const tour = {
       id: 9,
@@ -97,6 +102,10 @@ describe('validateState', () => {
       validateState({ ...ok, tours: [{ ...tour, stops: [{ siteId: 2, action: 'x' }] }] }),
     ).toBe(false);
     expect(validateState({ ...ok, tours: undefined })).toBe(false);
+    expect(validateState({ ...ok, vehicles: [{ ...truck, model: 'bus' }] })).toBe(false);
+    expect(validateState({ ...ok, vehicles: [{ ...truck, lease: { monthlyCents: 1 } }] })).toBe(
+      false,
+    );
   });
 
   it('lehnt eine kaputte Kasse ab', () => {

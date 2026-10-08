@@ -27,10 +27,17 @@ describe('Migration v3 → v4', () => {
       { id: 21, name: 'Tour 2', color: 1, stops: [stop] },
     ]);
     const traffic = { heading: 1, offRoad: false, bayAt: null, waitTicks: 0 };
+    const fleet = {
+      model: 'truck',
+      drive: 'diesel',
+      priceCents: 9_000_000,
+      boughtTick: 0,
+      lease: null,
+    };
     expect(state['vehicles']).toEqual([
-      { id: 5, kind: 'truck', tourId: 20, ...traffic },
-      { id: 6, kind: 'truck', tourId: null, ...traffic },
-      { id: 7, kind: 'truck', tourId: null, ...traffic },
+      { id: 5, kind: 'truck', tourId: 20, ...traffic, ...fleet },
+      { id: 6, kind: 'truck', tourId: null, ...traffic, ...fleet },
+      { id: 7, kind: 'truck', tourId: null, ...traffic, ...fleet },
       { id: 8, kind: 'supplier', ...traffic },
     ]);
   });

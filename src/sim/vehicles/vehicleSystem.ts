@@ -3,6 +3,7 @@ import { isDayStart } from '../core/gameTime';
 import type { GameState } from '../state/gameState';
 import { Traffic } from '../traffic/traffic';
 import { RoadNetwork } from '../world/roadNetwork';
+import { updateLeases } from './fleet';
 import { stepSupplier } from './suppliers';
 import { bookTruckCosts, stepTruck } from './trucks';
 import type { Vehicle } from './types';
@@ -10,7 +11,7 @@ import type { Vehicle } from './types';
 /**
  * Alle Fahrzeuge eines Schritts in fester Reihenfolge (nach Id), mit gemeinsamer
  * Verkehrslage (T2.2): Zulieferer und eigene LKW teilen sich Spuren, Kreuzungen und
- * Stellplätze. Am Tageswechsel die Fahrzeugkosten.
+ * Stellplätze. Leasingraten bei Fälligkeit, am Tageswechsel die Fahrzeugkosten.
  */
 export function updateVehicles(state: GameState, bus: EventBus): void {
   const traffic = new Traffic(new RoadNetwork(state), state);
@@ -22,5 +23,6 @@ export function updateVehicles(state: GameState, bus: EventBus): void {
     remaining.push(v);
   }
   state.vehicles = remaining;
+  updateLeases(state, bus);
   if (isDayStart(state.tick)) bookTruckCosts(state, bus);
 }

@@ -32,9 +32,9 @@ export class BuildController {
     private readonly canvas: HTMLCanvasElement,
     private readonly renderer: GameRenderer,
     private readonly session: () => GameSession | null,
-    onBuyTruck: () => void,
+    onBuy: ConstructorParameters<typeof BuildBar>[2],
   ) {
-    this.bar = new BuildBar(ui, (tool) => this.setTool(tool), onBuyTruck);
+    this.bar = new BuildBar(ui, (tool) => this.setTool(tool), onBuy);
     this.tip = new CursorTip(ui);
     installBuildPointer(canvas, {
       move: (x, y) => (this.pointer = { x, y }),

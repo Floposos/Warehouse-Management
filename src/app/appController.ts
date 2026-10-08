@@ -24,6 +24,7 @@ import { startFrameLoop } from './frameLoop';
 import { SelectionController } from './selectionController';
 import { GameSession } from './gameSession';
 import { NoticesController } from './noticesController';
+import type { VehicleDrive, VehicleModel } from '../content/vehicleTypes';
 import type { Notice } from '../sim/events/notices';
 import { SaveController } from './saveController';
 
@@ -103,7 +104,7 @@ export class AppController {
       canvas,
       renderer,
       () => this.session,
-      () => this.buyTruck(),
+      (model, drive, lease) => this.buyVehicle(model, drive, lease),
     );
     this.selection = new SelectionController(
       ui,
@@ -195,12 +196,12 @@ export class AppController {
     });
   }
 
-  /** Kasse (Klick auf den Kontostand). */
-  /** LKW kaufen (Bauleiste „Fahrzeuge“), Rückmeldung als Hinweis. */
-  private buyTruck(): void {
-    const result = this.session?.command({ type: 'vehicle/buyTruck' });
+  /** Fahrzeug kaufen oder leasen (Bauleiste „Fahrzeuge“), Rückmeldung als Hinweis. */
+  private buyVehicle(model: VehicleModel, drive: VehicleDrive, lease: boolean): void {
+    const result = this.session?.command({ type: 'vehicle/buy', model, drive, lease });
     if (!result) return;
-    this.toasts.show(result.ok ? de.build.truckBought : de.build.truckNoMoney);
+    const name = de.fleet.itemName(de.fleet.models[model], de.fleet.drives[drive]);
+    this.toasts.show(result.ok ? de.fleet.bought(name) : de.fleet.noMoney);
   }
 
   /** Meldung zeigen: Kamera zum Ort, betroffenes Fahrzeug auswählen. */
@@ -214,6 +215,7 @@ export class AppController {
     }
   }
 
+  /** Kasse (Klick auf den Kontostand). */
   openCash(): void {
     if (!this.session || isDialogOpen()) return;
     openCashDialog(this.ui, () => this.session?.state ?? null);

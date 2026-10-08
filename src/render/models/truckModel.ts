@@ -15,7 +15,16 @@ const materials = {
   ownCab: new MeshLambertMaterial({ color: palette.ownCab }),
   body: new MeshLambertMaterial({ color: palette.truckBody }),
   wheel: new MeshLambertMaterial({ color: palette.wheel }),
+  electric: new MeshLambertMaterial({ color: palette.electricMark }),
 };
+
+/** Maße je Fahrzeugtyp (T2.5): Transporter kürzer mit zwei Kisten, LKW lang mit drei. */
+const shapes = {
+  truck: { bodyLength: 0.5, bodyX: -0.08, rearWheel: -0.22, crates: [-0.22, -0.08, 0.06] },
+  van: { bodyLength: 0.34, bodyX: 0, rearWheel: -0.08, crates: [-0.08, 0.06] },
+} as const;
+
+export type TruckShape = keyof typeof shapes;
 const crateMaterials = new Map<ProductId, MeshLambertMaterial>();
 const dotGeometry = new SphereGeometry(0.09, 10, 6);
 const dotMaterials = new Map<number, MeshBasicMaterial>();
@@ -30,11 +39,18 @@ function crateMaterial(product: ProductId): MeshLambertMaterial {
 }
 
 /**
- * Kleiner Low-Poly-LKW (Zulieferer weiß, eigene LKW orange), fährt entlang +x. Ursprung = Mitte am Boden.
- * Die Ladefläche (Kind „cargo“) zeigt Kisten in Produktfarbe.
+ * Kleiner Low-Poly-LKW (Zulieferer weiß, eigene Fahrzeuge orange), fährt entlang +x. Ursprung =
+ * Mitte am Boden. Die Ladefläche (Kind „cargo“) zeigt Kisten in Produktfarbe. Elektro bekommt
+ * einen grünen Streifen auf dem Führerhausdach (T2.5).
  */
-export function createTruckModel(kind: 'supplier' | 'truck'): Group {
+export function createTruckModel(
+  kind: 'supplier' | 'truck',
+  shape: TruckShape = 'truck',
+  electric = false,
+): Group {
   const truck = new Group();
+  const s = shapes[shape];
+  truck.userData['crates'] = s.crates;
   const box = (
     sx: number,
     sy: number,
@@ -52,8 +68,9 @@ export function createTruckModel(kind: 'supplier' | 'truck'): Group {
     return mesh;
   };
   box(0.22, 0.28, 0.3, 0.26, 0.24, 0, kind === 'truck' ? materials.ownCab : materials.supplierCab);
-  box(0.5, 0.06, 0.32, -0.08, 0.13, 0, materials.body);
-  for (const x of [-0.22, 0.26])
+  box(s.bodyLength, 0.06, 0.32, s.bodyX, 0.13, 0, materials.body);
+  if (electric) box(0.18, 0.02, 0.3, 0.26, 0.39, 0, materials.electric);
+  for (const x of [s.rearWheel, 0.26])
     for (const z of [-0.15, 0.15]) box(0.1, 0.1, 0.04, x, 0.06, z, materials.wheel);
   const cargo = new Group();
   cargo.name = 'cargo';
@@ -63,14 +80,14 @@ export function createTruckModel(kind: 'supplier' | 'truck'): Group {
   return truck;
 }
 
-/** Zeigt die Ladung als bis zu drei Kisten auf der Ladefläche (leer = keine). */
+/** Zeigt die Ladung als Kisten auf der Ladefläche (leer = keine). */
 export function setTruckCargo(truck: Group, product: ProductId | null): void {
   const cargo = truck.getObjectByName('cargo');
   if (!cargo || cargo.userData['product'] === product) return;
   cargo.userData['product'] = product;
   cargo.clear();
   if (!product) return;
-  for (const x of [-0.22, -0.08, 0.06]) {
+  for (const x of truck.userData['crates'] as readonly number[]) {
     const crate = new Mesh(geometry, crateMaterial(product));
     crate.scale.set(0.12, 0.14, 0.24);
     crate.position.set(x, 0.23, 0);

@@ -1,9 +1,16 @@
 import type { BuildingTypeId } from '../../content/buildings';
 import type { RawProductId } from '../../content/products';
 import type { ZoneKind } from '../../content/zones';
+import {
+  vehicleDrives,
+  vehicleModels,
+  type VehicleDrive,
+  type VehicleModel,
+} from '../../content/vehicleTypes';
 import type { EventBus } from '../core/eventBus';
 import { book } from '../finance/ledger';
 import { buyTruck } from '../vehicles/buyTruck';
+import { disposeTruck } from '../vehicles/fleet';
 import { assignTour } from '../vehicles/truckCommands';
 import { createTour, deleteTour, updateTour, type TourPatch } from '../vehicles/tours';
 import { cancelOrder, createOrder, type OrderInterval } from '../goods/orders';
@@ -56,6 +63,10 @@ export type Command =
   | { type: 'order/create'; product: RawProductId; quantity: number; interval: OrderInterval }
   | { type: 'order/cancel'; orderId: number }
   | { type: 'vehicle/buyTruck' }
+  /** Fahrzeug kaufen oder leasen (T2.5). */
+  | { type: 'vehicle/buy'; model: VehicleModel; drive: VehicleDrive; lease: boolean }
+  /** Verkaufen bzw. Leasing zurückgeben. */
+  | { type: 'vehicle/dispose'; truckId: number }
   /** Tour zuweisen; null = Automatik. */
   | { type: 'vehicle/assignTour'; truckId: number; tourId: number | null }
   /** Touren (T2.1). Halte werden immer als Ganzes geschickt. Ergebnis enthält die neue Id. */
@@ -119,6 +130,19 @@ export function executeCommand(state: GameState, command: Command, bus: EventBus
       const result = buyTruck(state, bus);
       return typeof result === 'string' ? reject(bus, command, result) : { ok: true };
     }
+    case 'vehicle/buy': {
+      if (!vehicleModels.includes(command.model) || !vehicleDrives.includes(command.drive)) {
+        return reject(bus, command, 'unknownType');
+      }
+      const result = buyTruck(state, bus, command.model, command.drive, command.lease === true);
+      return typeof result === 'string'
+        ? reject(bus, command, result)
+        : { ok: true, id: result.id };
+    }
+    case 'vehicle/dispose':
+      return disposeTruck(state, bus, command.truckId)
+        ? { ok: true }
+        : reject(bus, command, 'notFound');
     case 'vehicle/assignTour':
       return assignTour(state, command.truckId, command.tourId)
         ? { ok: true }
