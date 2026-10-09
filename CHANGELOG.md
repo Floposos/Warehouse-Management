@@ -3,6 +3,71 @@
 Pro Version: Was ist neu, Was wurde behoben, So testest du das, Bekannte Probleme.
 Versionen: M0 = 0.1.0, M1 = 0.2.0, … (siehe [ROADMAP.md](ROADMAP.md)).
 
+## 0.3.0 – M2 Flotte & Verkehr (08.10.2026, im Test)
+
+### Was ist neu
+
+- Feinjustierung nach dem M1-Test (Florian, 07.10.2026). Bei Bauen, LKW-Kosten und Tempo gilt die Stufe „Mittel“, Waren- und Exportpreise bleiben unverändert.
+  - Bauen: Straße 500 €/Feld (vorher 200 €), Lieferort A 250 €, B 400 €, C 400 € je Feld (vorher 100/150/150 €), Export-Ausfahrt 50.000 € (vorher 25.000 €).
+  - LKW: Kauf 90.000 € (vorher 60.000 €), 400 € je Tag (vorher 200 €), 1,20 € je km (vorher 0,50 €).
+  - Tempo: LKW 4 Felder/s bei 1x (vorher 5), Auf- und Abladen 3 s (vorher 2 s), C braucht ein Drittel länger je Endprodukt (3 × 3 Felder: 6 s statt 4,5 s).
+
+- Zonen feldweise abreißen (Florian, 08.10.2026): Das Abriss-Werkzeug markiert über einer Zone nur das Feld unter dem Mauszeiger und reißt es ab (Erstattung für dieses Feld). Fällt ein Feld in der Mitte weg, zerfällt die Zone in eigenständige Zonen; der Bestand wird nach Fläche aufgeteilt, was nicht mehr ins Lager passt, geht verloren. Die ganze Zone reißt man im Infofenster mit „Ganze Zone abreißen“ (mit Rückfrage) ab.
+
+- Touren und Wegfarben (T2.1, Florians Wunsch aus dem M1-Test): Touren sind eigene Einträge im neuen Fenster „Touren“ (Knopf oben). Dort legt man Touren an, benennt sie, wählt eine von 10 Farben, bearbeitet die Halte (wie bisher per Liste oder „Orte anklicken“) und löscht sie (ihre LKW fahren dann Automatik). Eine Tour kann von beliebig vielen LKW gefahren werden; im Infofenster des LKW wählt man unter „Fährt“ die Tour oder „Automatik“. Der Weg des gewählten Fahrzeugs erscheint in der Tourfarbe (Automatik und Zulieferer grau), „Alle Wege“ zeigt die Wege aller Fahrzeuge. Jeder eigene LKW trägt einen Farbpunkt in seiner Tourfarbe. Spielstände aus 0.2.x werden umgestellt: Jede bisherige Tour wird zu „Tour 1“, „Tour 2“ … (Spielstand-Version 4).
+
+- Verkehr auf dem Campus (T2.2–T2.4): Fahrzeuge fahren nicht mehr durcheinander hindurch. Je Fahrspur und Feld steht höchstens ein Fahrzeug, wer hinten ist, wartet; Gegenverkehr stört nicht. In T-Stücke und Kreuzungen fährt immer nur ein Fahrzeug ein, und nur, wenn dahinter Platz ist. Wer zuerst darf: Fahrzeuge auf einer Vorfahrtsstraße vor allen anderen, sonst rechts vor links, bei Gleichstand wer am längsten wartet. Vorfahrtsstraßen markiert man unter „Straßen“ → „Vorfahrtsstraße“ (ziehen wie eine Straße, kostenlos, gelbe Markierung); „Vorfahrt entfernen“ nimmt die Markierung weg.
+- Stellplätze am Tor (T2.3): Jeder Ort hat begrenzte Stellplätze (je angefangene 6 Felder Zonenfläche einer, höchstens 8; Export-Ausfahrt 3). Geladen und abgeladen wird nur auf einem Stellplatz (das Fahrzeug steht dann hinter dem Tor in der Zone), weitere Fahrzeuge warten in der Schlange auf der Straße. Das Infofenster zeigt „Stellplätze: belegt / gesamt · n warten“. Zulieferer nutzen dieselben Stellplätze. LKW ohne Aufgabe parken am Straßenrand und blockieren nicht.
+- Stau (T2.4): Steht ein Fahrzeug im Verkehr, sucht es nach 6 Sekunden (bei 1x) einen Umweg und versucht es danach regelmäßig erneut. Nach 20 Sekunden zeigt es ein rotes Ausrufezeichen, und es erscheint eine Meldung. Neu ist der Knopf „Meldungen“ oben (mit Zahl der ungelesenen): Klick auf eine Meldung oder „Hinzeigen“ im Hinweis springt zum Ort und wählt das Fahrzeug aus.
+- Transporter und LKW, Diesel und Elektro, Kaufen und Leasen (T2.5): Der Reiter „Fahrzeuge“ hat oben den Schalter „Kaufen“ / „Leasen“ und vier Einträge: Transporter Diesel, Transporter Elektro, LKW Diesel, LKW Elektro, jeweils mit Kaufpreis bzw. Monatsrate (Tooltip: Ladung, Tages- und Kilometerkosten). Der Transporter ist kürzer, fährt schneller (5,5 Felder/s statt 4), lädt 8 statt 20 Einheiten und kostet 45.000 € (200 € am Tag, 0,70 € je km). Elektro kostet 30 % mehr im Kauf und die Hälfte je km, sonst gleich; er trägt einen grünen Streifen auf dem Dach. Leasing: 12 Monate feste Laufzeit, Monatsrate 3 % des Kaufpreises (erste Rate sofort, dann monatlich unter „Fahrzeuge“), danach verlängert sich der Vertrag von selbst um 12 Monate (Meldung). Das Infofenster zeigt Fahrzeugtyp, Antrieb, Ladung, Besitz (Restwert bzw. Rate und Laufzeitende) und den Knopf „Verkaufen“ bzw. „Leasing zurückgeben“ mit Rückfrage. Verkaufen bringt den Restwert (80 % des Kaufpreises, je Monat 1,5 Prozentpunkte weniger, mindestens 20 %); vorzeitige Rückgabe kostet bis zu 3 Monatsraten (nur so viele, wie noch offen sind). Fahrzeuge heißen jetzt „Transporter 1“, „LKW 1“ … (je Typ nummeriert). Bestehende LKW aus älteren Spielständen werden gekaufte Diesel-LKW. ANNAHME: Transporter-Werte, Elektro-Faktoren und Leasing-Zahlen bis zum Balancing (alles in `src/config/vehicles.ts`).
+- Verschleiß, Werkstatt und Pannen (T2.6): Eigene Fahrzeuge nutzen sich beim Fahren ab (0,4 Prozentpunkte je km). Unter „Zonen/Gebäude“ gibt es die Werkstatt (500 € je Feld, ein Werkstattplatz je angefangene 4 Felder). Fällt ein Fahrzeug unter 40 % Zustand, fährt es nach dem laufenden Auftrag (bei Touren nach dem laufenden Halt) zur nächsten Werkstatt, wird 2 Spielstunden gewartet (800 €) und ist danach wieder bei 100 %. Im Infofenster stehen Zustand mit „Wartung in ca. … km“, Pannen und letzte Wartung, dazu der Knopf „Zur Werkstatt“. Ohne Werkstatt gibt es keine Wartung und einmal die Meldung „braucht eine Wartung, aber es gibt keine erreichbare Werkstatt“. Je schlechter der Zustand, desto eher eine Panne (neu nie, bei 40 % etwa 1,8 % je km): Das Fahrzeug steht 3 Spielstunden mit Rauch und rotem Ausrufezeichen auf der Spur, Abschleppen kostet 1.500 €, es erscheint eine Meldung, und Fahrzeuge dahinter warten oder suchen einen Umweg. Danach fährt es mit 20 Prozentpunkten mehr Zustand weiter. Pannen sind zufällig, aber bei gleichem Spielstand immer gleich. ANNAHME: Schwelle, Dauer und Kosten wie im M2-Plan; Verschleiß, Pannenrisiko und Werkstatt-Baupreis bis zum Balancing (in `src/config/maintenance.ts` und `src/config/zones.ts`).
+- Externer Verkehr und Rushhour (T2.7): Die Eingangsstraße mündet in eine Bundesstraße mit Autos in beiden Richtungen, morgens und abends deutlich mehr. Wer aufs Gelände oder hinaus will, muss sich an der Einfahrt einfädeln: normal 1 Sekunde (bei 1x), in der Rushhour (7–9 und 16–18 Uhr, mit einer Stunde Übergang) etwa 3 Sekunden, und je Richtung fährt immer nur einer. Bei vielen Zulieferern bildet sich dann eine Schlange vor der Einfahrt. Oben neben der Uhr erscheint „Rushhour“. ANNAHME: Zeiten und Faktor wie im M2-Plan, Einfädelzeit bis zum Balancing (`src/config/entrance.ts`).
+- Flottenfenster (T2.8): Knopf „Flotte“ oben öffnet links die Liste aller eigenen Fahrzeuge mit Typ, Tour, Status und Zustand (rot unter 40 % oder bei Panne). Oben filtern (Alle, Transporter, LKW, Wartung fällig, Panne, Wartend) und sortieren (Name, Zustand, Status, Tour). Klick auf den Namen springt zum Fahrzeug und öffnet sein Infofenster. Mit den Kästchen (oder „Alle auswählen“) mehrere Fahrzeuge wählen und gemeinsam einer Tour oder der Automatik zuweisen oder zur Werkstatt schicken. Touren- und Flottenfenster teilen sich den Platz links; Esc schließt.
+- Leistung mit großen Flotten (T2.9): Das Spiel ist auf 300 Fahrzeuge ausgelegt. Alle Fahrzeuge werden gebündelt gezeichnet (statt rund 5.000 nur noch rund 200 Zeichenaufrufe bei 300 Fahrzeugen), ein Simulationsschritt mit 300 Fahrzeugen braucht unter 1 ms (automatischer Lasttest prüft unter 4 ms). Spielstände aus 0.2.x werden auf Version 4 umgestellt: Touren werden eigene Einträge, LKW gekaufte Diesel-LKW in neuem Zustand.
+
+### So testest du das
+
+1. „Touren“ → „Neue Tour“, Halte A (Laden) und B (Abladen) anhängen, Farbe Rot, Name „Früh“. Zwei LKW kaufen und bei beiden unter „Fährt“ „Früh“ wählen: Beide fahren A → B, Weg und Punkt sind rot. Farbe auf Grün: sofort grün. „Alle Wege“: alle Wege sichtbar, Automatik grau.
+1. Eine Kreuzung bauen, an jedem Arm einen Lieferort, fünf LKW kaufen: Sie warten an der Kreuzung nacheinander und fahren ohne Überlappung durch. Eine Straße als „Vorfahrtsstraße“ markieren: Fahrzeuge darauf fahren zuerst.
+1. Kleinen Lieferort A (2 × 2) mit viel Rohware und vier LKW: Nur einer lädt auf dem Stellplatz hinter dem Tor, die anderen stehen davor; im Infofenster „1 / 1 belegt · n warten“.
+1. Eine Stichstraße mit einem LKW verstopfen (z. B. Tor-Zufahrt mit vielen LKW, Zone voll): Nach etwa 20 Sekunden rotes Ausrufezeichen und Meldung „Stau“; „Meldungen“ öffnen, Meldung anklicken: Kamera springt hin.
+1. „Fahrzeuge“ → „Leasen“: Die vier Einträge zeigen „… / Monat“. „Transporter Elektro“ anklicken: kurzer Wagen mit grünem Dachstreifen, Kontostand sinkt um eine Rate. Anklicken: „Transporter 1“, „Transporter, Elektro, lädt 8“, „Geleast … bis <Datum>“. „Leasing zurückgeben“ → Rückfrage nennt die Strafe → bestätigen: Fahrzeug weg, Kasse zeigt die Buchung.
+1. „Kaufen“ → „LKW Diesel“, im Infofenster „Gekauft · Restwert 72.000 €“; „Verkaufen“ bestätigen: Kontostand steigt um den Restwert.
+1. Ein Transporter und ein LKW in der Automatik: Der Transporter ist sichtbar schneller und holt höchstens 8 Einheiten.
+1. Werkstatt 2 × 2 an die Straße bauen (am Mauszeiger „1 Werkstattplatz“). Einen LKW anklicken: „Zustand 100 % · Wartung in ca. 150 km“. „Zur Werkstatt“: Er fährt hin, Status „Wird gewartet“, danach 800 € in der Kasse und „Letzte Wartung“ mit Datum. Ohne Werkstatt sagt der Knopf „Es gibt keine Werkstatt“.
+1. Panne: mehrere LKW über einige Spieltage ohne Werkstatt fahren lassen. Bei einer Panne steht der LKW mit Rauch, Meldung „Panne“, Kasse −1.500 €; nach 3 Spielstunden fährt er weiter.
+1. Bis 7 Uhr laufen lassen: Oben erscheint „Rushhour“, auf der Bundesstraße am Ende der Eingangsstraße fahren mehr Autos. Fünf Lieferungen Rohware A auf einmal bestellen: Die Zulieferer stehen hintereinander vor der Einfahrt und fahren im Abstand von etwa 3 Sekunden herein. Dasselbe mittags: etwa 1 Sekunde Abstand.
+1. Drei Fahrzeuge anschaffen, „Flotte“: drei Zeilen. „Zeigen: Transporter“ filtert, „Sortieren: Zustand“ stellt den schlechtesten nach oben. „Alle auswählen“, „Tour zuweisen …“ → eine Tour: alle fahren sie. Klick auf einen Namen: Kamera springt hin, Infofenster öffnet sich.
+1. Mit vielen Fahrzeugen (z. B. 100 und mehr bei viel Geld) F3 einblenden: Bilder/s bleiben flüssig, Zeichenaufrufe wachsen kaum mit der Zahl der Fahrzeuge.
+1. Einen Spielstand aus 0.2.x laden: Touren erscheinen im Fenster „Touren“, LKW sind „LKW Diesel“, gekauft, 100 % Zustand.
+1. Lieferort A als 5 × 1 aufziehen. „Abriss“ über das mittlere Feld: nur dieses Feld ist markiert, Erstattung für ein Feld. Klick: zwei Zonen „A“ links und rechts.
+1. Eine Zone anklicken, „Ganze Zone abreißen“, Rückfrage mit Erstattung bestätigen: Zone ist weg.
+
+### Was wurde behoben
+
+- Die Kilometerkosten konnten bei krummen Preisen einen Kilometerstand mit Nachkommastellen erzeugen; der Spielstand hätte dann nicht mehr gespeichert werden können. Der Rest wird jetzt ganzzahlig übertragen.
+
+### Bekannte Probleme
+
+- Alle neuen Zahlen (Transporter, Elektro, Leasing, Verschleiß, Pannen, Werkstatt, Einfädelzeit) sind Platzhalter bis zum Balancing (ANNAHME, siehe DESIGN.md).
+- Fahrzeuge heißen jetzt „Transporter n“ bzw. „LKW n“, je Typ nummeriert (ANNAHME).
+- Ein Fahrzeug auf einem Stellplatz lässt sich im Gelände an seiner Zufahrt anklicken, nicht genau an seiner gezeichneten Stelle in der Zone.
+- Die Autos auf der Bundesstraße sind nur Darstellung; sie fahren nie aufs Gelände.
+
+## 0.2.1 – Zonen verschmelzen (07.10.2026, Teil von 0.3.0)
+
+### Was wurde behoben
+
+- Rückmeldung Florian: Wird ein Lieferort direkt neben einen Lieferort derselben Art gebaut, entsteht jetzt keine zweite Zone mehr, sondern die Felder werden Teil der bestehenden Zone (auch L-Formen und mehr). Lager, Verarbeitungsgeschwindigkeit in C, Infofenster und Kisten gelten für die Gesamtfläche. Ein Feld zwischen zwei Zonen verbindet beide zu einer; ihr Bestand wird zusammengezählt. Die Zone behält Nummer und Tor-Seite der größeren bisherigen Zone. LKW-Aufträge und Tour-Halte zeigen danach auf die verbundene Zone. Am Mauszeiger steht beim Aufziehen „wird Teil der angrenzenden Zone“ und das Lager der Gesamtfläche.
+- Spielstände aus 0.2.0 werden automatisch umgestellt (Spielstand-Version 3). Dort schon nebeneinander liegende Zonen bleiben getrennt, bis daneben gebaut wird.
+
+### So testest du das
+
+1. Lieferort A als 3 × 3 aufziehen, dann direkt rechts daneben ein einzelnes Feld Lieferort A: Am Mauszeiger steht „wird Teil der angrenzenden Zone“. Nach dem Bauen gibt es nur ein „A“; ein Klick zeigt „10 Felder“ und Lager 100.
+2. Zwei Lieferorte C mit einem Feld Abstand bauen, das Feld dazwischen ebenfalls als C: eine Zone, Bestand beider bleibt.
+3. Lieferort B direkt neben A: bleiben zwei Zonen (andere Art). Ein Feld nur über Eck: bleibt getrennt.
+4. Einen Spielstand aus 0.2.0 laden: lädt ohne Meldung.
+
 ## 0.2.0 – M1 Bauen & erster Warenfluss (07.10.2026)
 
 ### Was ist neu

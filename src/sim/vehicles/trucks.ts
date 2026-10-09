@@ -1,40 +1,39 @@
 import { vehicleConfig } from '../../config/vehicles';
 import type { EventBus } from '../core/eventBus';
-import { isDayStart } from '../core/gameTime';
 import { book } from '../finance/ledger';
 import { addStock, stockOf } from '../goods/stock';
 import type { GameState } from '../state/gameState';
-import { RoadNetwork } from '../world/roadNetwork';
 import { siteAccess } from '../world/sites';
+import { valuesOf } from './fleet';
 import { dropsFor, findJob } from './truckJobs';
 import { accessOf, drive, goIdle, setRoute, unloadAt } from './truckShared';
 import { stepTourTruck } from './truckTour';
 import type { Truck } from './types';
+import { stepBreakdown } from './upkeep';
+import type { VehicleCtx } from './vehicleCtx';
+import { maybeStartService, stepWorkshop } from './workshop';
 
-/** Eigene LKW: Automatik oder feste Tour; am Tageswechsel die Fahrzeugkosten. */
-export function updateTrucks(state: GameState, bus: EventBus): void {
-  const network = new RoadNetwork(state);
-  for (const v of state.vehicles) {
-    if (v.kind !== 'truck') continue;
-    if (v.mode === 'tour') stepTourTruck(state, bus, network, v);
-    else stepAutoTruck(state, bus, network, v);
-  }
-  if (isDayStart(state.tick)) bookTruckCosts(state, bus);
+/** Ein Schritt eines eigenen LKW: Panne, Werkstatt, sonst feste Tour oder Automatik. */
+export function stepTruck(ctx: VehicleCtx, t: Truck): void {
+  if (stepBreakdown(t) || stepWorkshop(ctx, t) || maybeStartService(ctx, t)) return;
+  if (t.tourId !== null) stepTourTruck(ctx, t);
+  else stepAutoTruck(ctx, t);
 }
 
 /** Automatik: Auftrag suchen, hinfahren, laden, liefern, von vorn. */
-function stepAutoTruck(state: GameState, bus: EventBus, network: RoadNetwork, t: Truck): void {
+function stepAutoTruck(ctx: VehicleCtx, t: Truck): void {
   switch (t.phase) {
     case 'idle':
       if (--t.timer > 0) return;
       t.timer = vehicleConfig.truckIdleCheckTicks;
-      if (t.cargo) deliverCargoElsewhere(state, network, t);
-      else startJob(state, network, t);
+      if (t.cargo) deliverCargoElsewhere(ctx, t);
+      else startJob(ctx, t);
       return;
     case 'toPickup':
     case 'toDropoff': {
-      const result = drive(t, network);
-      if (result === 'blocked') reroute(state, network, t);
+      const siteId = t.phase === 'toPickup' ? t.job?.fromId : t.job?.toId;
+      const result = drive(ctx, t, siteId);
+      if (result === 'blocked') reroute(ctx, t);
       else if (result === 'arrived') {
         t.phase = t.phase === 'toPickup' ? 'loading' : 'unloading';
         t.timer = vehicleConfig.handlingTicks;
@@ -42,69 +41,78 @@ function stepAutoTruck(state: GameState, bus: EventBus, network: RoadNetwork, t:
       return;
     }
     case 'loading':
-      if (--t.timer <= 0) load(state, network, t);
+      if (--t.timer > 0) return;
+      ctx.traffic.leaveBay(t);
+      load(ctx, t);
       return;
     case 'unloading':
-      if (--t.timer <= 0) unload(state, bus, network, t);
+      if (--t.timer > 0) return;
+      ctx.traffic.leaveBay(t);
+      unload(ctx, t);
+      return;
+    default:
       return;
   }
 }
 
-function idleAuto(t: Truck, reason: Parameters<typeof goIdle>[1]): void {
-  goIdle(t, reason);
+function idleAuto(ctx: VehicleCtx, t: Truck, reason: Parameters<typeof goIdle>[2]): void {
+  goIdle(ctx, t, reason);
   if (!t.cargo) t.job = null;
 }
 
-function startJob(state: GameState, network: RoadNetwork, t: Truck): void {
+function startJob(ctx: VehicleCtx, t: Truck): void {
   const position = t.route[0];
   if (!position) return;
-  const planned = findJob(state, network, position);
+  const network = ctx.traffic.network;
+  const planned = findJob(ctx.state, network, position, valuesOf(t).capacity);
   if (planned === null || planned === 'noRoute') {
-    idleAuto(t, planned ?? 'noJob');
+    idleAuto(ctx, t, planned ?? 'noJob');
     return;
   }
   t.job = planned.job;
   if (!setRoute(t, network, planned.target)) {
-    idleAuto(t, 'noRoute');
+    idleAuto(ctx, t, 'noRoute');
     return;
   }
   t.phase = 'toPickup';
   t.idleReason = null;
 }
 
-function reroute(state: GameState, network: RoadNetwork, t: Truck): void {
+function reroute(ctx: VehicleCtx, t: Truck): void {
   const id = t.phase === 'toPickup' ? t.job?.fromId : t.job?.toId;
-  const target = id === undefined ? null : accessOf(state, network, id);
-  if (!target || !setRoute(t, network, target)) idleAuto(t, 'noRoute');
+  const network = ctx.traffic.network;
+  const target = id === undefined ? null : accessOf(ctx.state, network, id);
+  if (!target || !setRoute(t, network, target)) idleAuto(ctx, t, 'noRoute');
 }
 
-function load(state: GameState, network: RoadNetwork, t: Truck): void {
-  const zone = state.zones.find((z) => z.id === t.job?.fromId);
+function load(ctx: VehicleCtx, t: Truck): void {
+  const zone = ctx.state.zones.find((z) => z.id === t.job?.fromId);
   const quantity = zone && t.job ? Math.min(t.job.quantity, stockOf(zone, t.job.product)) : 0;
   if (!zone || !t.job || quantity <= 0) {
-    idleAuto(t, null);
+    idleAuto(ctx, t, null);
     return;
   }
   addStock(zone, t.job.product, -quantity);
   t.cargo = { product: t.job.product, quantity };
   t.job.quantity = quantity;
   t.phase = 'toDropoff';
-  reroute(state, network, t);
+  reroute(ctx, t);
 }
 
-function unload(state: GameState, bus: EventBus, network: RoadNetwork, t: Truck): void {
-  if (t.job) unloadAt(state, bus, t, t.job.toId);
+function unload(ctx: VehicleCtx, t: Truck): void {
+  if (t.job) unloadAt(ctx, t, t.job.toId);
   t.job = null;
-  idleAuto(t, null);
+  idleAuto(ctx, t, null);
   t.timer = 1;
-  if (t.cargo) deliverCargoElsewhere(state, network, t);
+  if (t.cargo) deliverCargoElsewhere(ctx, t);
 }
 
 /** Ladung ohne (gültiges) Ziel: neues Ziel für dieselbe Ware suchen. */
-function deliverCargoElsewhere(state: GameState, network: RoadNetwork, t: Truck): void {
+function deliverCargoElsewhere(ctx: VehicleCtx, t: Truck): void {
   const cargo = t.cargo;
   if (!cargo) return;
-  for (const drop of dropsFor(state, cargo.product)) {
+  const network = ctx.traffic.network;
+  for (const drop of dropsFor(ctx.state, cargo.product)) {
     const access = siteAccess(network, drop.site);
     if (!access) continue;
     const fromId = t.job?.fromId ?? drop.site.id;
@@ -115,17 +123,20 @@ function deliverCargoElsewhere(state: GameState, network: RoadNetwork, t: Truck)
     return;
   }
   t.job = null;
-  goIdle(t, 'noDestination');
+  goIdle(ctx, t, 'noDestination');
 }
 
-/** Tageswechsel: feste Tageskosten und Kilometerkosten je LKW (Kasse: „Fahrzeuge“). */
-function bookTruckCosts(state: GameState, bus: EventBus): void {
-  const milliPerCent =
-    1_000_000 / (vehicleConfig.metersPerField * vehicleConfig.truckCostPerKmCents);
+/** Tageswechsel: Tages- und Kilometerkosten je Fahrzeug nach Typ und Antrieb (Kasse: „Fahrzeuge“). */
+export function bookTruckCosts(state: GameState, bus: EventBus): void {
   for (const t of state.vehicles) {
     if (t.kind !== 'truck') continue;
-    const kmCents = Math.floor(t.odometer / milliPerCent);
-    t.odometer -= kmCents * milliPerCent;
-    book(state.finance, state.tick, bus, 'vehicles', -(vehicleConfig.truckDailyCents + kmCents));
+    const values = valuesOf(t);
+    // Tausendstel Feld × Meter je Feld × Cent je km = Millionstel Cent (1 km = 1000 m).
+    const rate = vehicleConfig.metersPerField * values.costPerKmCents;
+    const micro = t.odometer * rate;
+    const kmCents = Math.floor(micro / 1_000_000);
+    // Rest als ganze Tausendstel Feld übertragen (Spielstand speichert nur ganze Zahlen).
+    t.odometer = Math.floor((micro - kmCents * 1_000_000) / rate);
+    book(state.finance, state.tick, bus, 'vehicles', -(values.dailyCents + kmCents));
   }
 }

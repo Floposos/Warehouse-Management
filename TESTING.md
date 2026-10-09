@@ -41,6 +41,7 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Neigen geht nie unter den Boden, Zoom hat Grenzen, Verschieben bleibt im Gelände.
 - [ ] Linke Maustaste bewegt die Kamera nicht. Rechtsklick öffnet kein Kontextmenü.
 - [ ] F3 blendet die Leistungsanzeige ein und aus; Bilder/s um 60 auf einem normalen Laptop.
+- [ ] Seit 0.3.0: mit 300 Fahrzeugen flüssig; Zeichenaufrufe wachsen kaum mit der Zahl der Fahrzeuge.
 
 ### Zeit, Kopfleiste, Menü, Einstellungen (seit 0.1.0-dev, T0.5)
 
@@ -101,6 +102,8 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Zone über Straße, Gebäude, andere Zone oder den Rand: rot mit Grund.
 - [ ] Jede Zone hat Farbe, Buchstabe und Torbalken; Tor zeigt zu einer angrenzenden Straße, sonst nach Süden.
 - [ ] Ohne Straße vor dem Tor: rotes „!“; Straße an das Tor bauen: „!“ verschwindet; Straße abreißen: „!“ kommt wieder. Straße an einer anderen Seite hilft nicht.
+- [ ] Lieferort direkt neben gleicher Art: wird Teil der Zone (Hinweis am Mauszeiger, ein Buchstabe, Gesamtlager); Zwischenfeld verbindet zwei Zonen; andere Art oder über Eck bleibt getrennt (seit 0.2.1).
+- [ ] Abriss über einer Zone markiert ein Feld; Mittelfeld abreißen teilt die Zone; „Ganze Zone abreißen“ im Infofenster fragt nach (seit 0.3.0).
 - [ ] Export-Ausfahrt nur am Geländerand baubar; Tor zeigt ins Gelände; ohne Straße „!“.
 - [ ] Zone abreißen: ganze Zone weg, Erstattung nach Tagesregel.
 
@@ -117,7 +120,7 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 
 ### Eigene LKW (seit 0.2.0, T1.5)
 
-- [ ] „Fahrzeuge“ → „LKW kaufen“: Hinweis, Kontostand sinkt um den Kaufpreis; ohne Geld Hinweis „Nicht genug Geld“.
+- [ ] „Fahrzeuge“ → „LKW Diesel“ (Kaufen): Hinweis, Kontostand sinkt um den Kaufpreis; ohne Geld Hinweis „Nicht genug Geld“.
 - [ ] Ganze Kette läuft mit 2 LKW von allein: A → B → C → Export, Kontostand steigt über einen Spieltag.
 - [ ] LKW fahren rechts, Ladung als Kisten sichtbar, leer ohne Kisten.
 - [ ] Unter 5 Einheiten fährt kein LKW los; zwei LKW holen nicht dieselbe Ware doppelt.
@@ -125,6 +128,43 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] Ziel während der Fahrt abreißen: LKW sucht mit Ladung ein neues Ziel.
 - [ ] Tageswechsel: Kasse zeigt unter „Fahrzeuge“ Tages- und Kilometerkosten.
 - [ ] Speichern mit LKW unterwegs (beladen), laden: fährt weiter und liefert ab.
+
+### Fahrzeugtypen, Kauf und Leasing (seit 0.3.0, T2.5)
+
+- [ ] „Fahrzeuge“: Schalter „Kaufen“/„Leasen“ ändert die Preise der vier Einträge (Kaufpreis bzw. „/ Monat“); Tooltip nennt Ladung, Tages- und Kilometerkosten.
+- [ ] Transporter ist kürzer als der LKW, Elektro hat einen grünen Dachstreifen; Transporter fährt schneller und lädt höchstens 8.
+- [ ] Ohne Geld: Hinweis „Nicht genug Geld“, kein Fahrzeug.
+- [ ] Infofenster: Typ, Antrieb, Ladung, Besitz (Restwert bzw. Rate und Laufzeitende).
+- [ ] „Verkaufen“ und „Leasing zurückgeben“ fragen nach und nennen den Betrag; danach ist das Fahrzeug weg, Kasse zeigt die Buchung.
+- [ ] Monatswechsel: Leasingrate unter „Fahrzeuge“; nach 12 Monaten Meldung „Leasing läuft weiter“.
+- [ ] Spielstand aus 0.2.x laden: LKW sind gekaufte Diesel-LKW.
+
+### Werkstatt und Pannen (seit 0.3.0, T2.6)
+
+- [ ] „Werkstatt“ unter „Zonen/Gebäude“ aufziehen: Mauszeiger zeigt Werkstattplätze und Kosten; Infofenster zeigt „Werkstattplätze“, kein Lager.
+- [ ] Infofenster eines Fahrzeugs: Zustand mit km bis zur Wartung, Pannen, letzte Wartung.
+- [ ] „Zur Werkstatt“ ohne Werkstatt: Hinweis; mit Werkstatt: fährt nach dem Auftrag hin, „Wird gewartet“, danach 100 % und 800 € in der Kasse.
+- [ ] Zustand unter 40 %: fährt von selbst zur Werkstatt; ohne Werkstatt einmal die Meldung „keine erreichbare Werkstatt“.
+- [ ] Panne: Fahrzeug steht mit Rauch und rotem „!“, Meldung, 1.500 € Abschleppen; Fahrzeuge dahinter warten oder fahren um; nach 3 Spielstunden geht es weiter.
+- [ ] Werkstatt erscheint nicht als Tour-Halt.
+- [ ] Speichern während einer Panne bzw. Wartung und laden: läuft genauso weiter.
+
+### Einfahrt und Rushhour (seit 0.3.0, T2.7)
+
+- [ ] Bundesstraße am Ende der Eingangsstraße mit Autos in beiden Richtungen; 7–9 und 16–18 Uhr dichter.
+- [ ] „Rushhour“ neben der Uhr nur zu diesen Zeiten.
+- [ ] Mehrere Zulieferer gleichzeitig: Sie fädeln einzeln ein, in der Rushhour sichtbar langsamer; hinaus ebenso.
+- [ ] Langer Stau vor der Einfahrt: Meldung „Stau“.
+- [ ] Speichern in der Rushhour mit Schlange vor der Einfahrt, laden: geht genauso weiter.
+
+### Flottenfenster (seit 0.3.0, T2.8)
+
+- [ ] „Flotte“ oben öffnet links die Liste mit Anzahl im Titel; „Touren“ schließt sie und umgekehrt; Esc schließt.
+- [ ] Zeilen zeigen Name, Zustand (rot unter 40 % oder bei Panne), Typ, Tour und Status und aktualisieren sich laufend.
+- [ ] Filter und Sortierung wirken; Auswahl bleibt beim Umsortieren erhalten.
+- [ ] Sammelaktion „Tour zuweisen …“ (auch Automatik) und „Zur Werkstatt“ (ohne Werkstatt Hinweis) für die ausgewählten.
+- [ ] Klick auf einen Namen: Kamera springt hin, Infofenster öffnet sich.
+- [ ] Mit vielen Fahrzeugen (z. B. 300) bleibt das Spiel flüssig, solange das Fenster offen ist.
 
 ### Auswahl und Infofenster (seit 0.2.0, T1.7)
 
@@ -134,10 +174,26 @@ Vor jeder Auslieferung in **Chrome, Edge und Firefox** durchgehen, jeweils als L
 - [ ] LKW: Status mit Grund (keine Aufgabe, kein Weg, kein Ziel, Tour ohne Halte), Ladung, Ziel; blaues Band zeigt den restlichen Weg.
 - [ ] Mit Bauwerkzeug wählt ein Klick nichts aus.
 
-### Feste Touren (seit 0.2.0, T1.5b)
+### Feste Touren (seit 0.2.0, T1.5b; seit 0.3.0 im Fenster „Touren“, T2.1)
 
+- [ ] „Touren“ oben öffnet links das Fenster; „Neue Tour“ legt „Tour n“ mit eigener Farbe an.
 - [ ] Halte per Liste und per „Orte anklicken“ anhängen; Vorschlag für Aktion und Ware ist sinnvoll.
 - [ ] Aktion/Ware ändern, verschieben, entfernen; unpassende Halte werden mit Hinweis abgelehnt.
-- [ ] „Feste Tour“: LKW fährt die Halte der Reihe nach, aktueller Halt hervorgehoben; danach von vorn.
-- [ ] Umschalten zurück auf „Automatik“ mit Ladung an Bord: Ladung wird sinnvoll abgeliefert.
-- [ ] Speichern und Laden: Tour und Betriebsart bleiben erhalten.
+- [ ] Name ändern (Enter) und Farbe wählen: Liste, Weg und Farbpunkt am LKW übernehmen sie sofort.
+- [ ] Im Infofenster eines LKW unter „Fährt“ die Tour wählen; zwei LKW auf derselben Tour fahren beide.
+- [ ] Weg des gewählten LKW in Tourfarbe, Automatik grau; „Alle Wege“ zeigt die Wege aller Fahrzeuge.
+- [ ] Zurück auf „Automatik“ mit Ladung an Bord: Ladung wird sinnvoll abgeliefert.
+- [ ] „Tour löschen“ mit Rückfrage: ihre LKW fahren wieder Automatik.
+- [ ] Spielstand aus 0.2.x laden: bisherige Touren erscheinen als „Tour 1“, „Tour 2“ … mit Farbe.
+- [ ] Speichern und Laden: Touren, Farben und Zuweisungen bleiben erhalten.
+
+### Verkehr (seit 0.3.0, T2.2–T2.4)
+
+- [ ] Zwei LKW hintereinander auf einer Straße: halten Abstand, überholen nicht; Gegenverkehr fährt ungehindert.
+- [ ] Kreuzung mit LKW aus mehreren Richtungen: immer nur einer in der Kreuzung, alle kommen durch.
+- [ ] Ohne Markierung: rechts vor links. „Vorfahrtsstraße“ ziehen: gelbe Markierung, Fahrzeuge darauf fahren zuerst; „Vorfahrt entfernen“ nimmt sie weg.
+- [ ] Kein Fahrzeug bleibt in einer Kreuzung stehen, wenn dahinter kein Platz ist.
+- [ ] Kleine Zone, viele LKW: nur so viele laden wie Stellplätze, die anderen warten davor; Infofenster zeigt belegt/gesamt und wartende.
+- [ ] Fahrzeuge auf Stellplätzen stehen hinter dem Tor in der Zone; LKW ohne Aufgabe parken am Rand.
+- [ ] Stau: nach kurzer Zeit Umweg (wenn es einen gibt); sonst rotes Ausrufezeichen und Meldung; Meldung anklicken springt hin.
+- [ ] Speichern mitten im Stau und laden: läuft genauso weiter.

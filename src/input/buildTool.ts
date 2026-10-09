@@ -1,8 +1,12 @@
+import { baysForArea } from '../sim/traffic/bays';
+import { shapeArea } from '../sim/world/zoneShape';
 import { buildingTypes, type BuildingTypeId } from '../content/buildings';
 import { checkPlaceBuilding, demolishRefund, type BuildRejection } from '../sim/commands/build';
 import type { Command } from '../sim/commands/commands';
+import { priorityTiles } from '../sim/commands/priority';
 import { checkBuildRoad, roadRefundAt } from '../sim/commands/roads';
-import { checkPlaceZone, zoneCapacity } from '../sim/commands/zones';
+import { zoneCellRefund } from '../sim/commands/zoneCells';
+import { checkPlaceZone, neighboursOf, zoneCapacity } from '../sim/commands/zones';
 import type { ZoneKind } from '../content/zones';
 import { accessCell, suggestGate } from '../sim/world/access';
 import { RoadNetwork } from '../sim/world/roadNetwork';
@@ -15,12 +19,14 @@ import { prefersXFirst, roadLine, type Cell } from '../sim/world/roadLine';
 export type BuildTool =
   | { kind: 'place'; buildingType: BuildingTypeId }
   | { kind: 'road' }
+  /** Vorfahrtsstraße markieren (true) bzw. Markierung entfernen (false), T2.2. */
+  | { kind: 'priority'; priority: boolean }
   | { kind: 'zone'; zoneKind: ZoneKind }
   | { kind: 'demolish' };
 
 /** Werkzeuge, die mit gedrückter Maustaste gezogen werden (Strecke bzw. Rechteck). */
 export function isDragTool(tool: BuildTool | null): boolean {
-  return tool?.kind === 'road' || tool?.kind === 'zone';
+  return tool?.kind === 'road' || tool?.kind === 'zone' || tool?.kind === 'priority';
 }
 
 /** Höhe des Geisterbilds eines Straßenfelds. */
@@ -45,18 +51,31 @@ export type BuildPreview =
       command: Command;
     }
   | {
+      kind: 'priority';
+      priority: boolean;
+      /** Straßenfelder auf der Strecke. */
+      cells: Cell[];
+      reason: 'noRoad' | null;
+      command: Command;
+    }
+  | {
       kind: 'zone';
       footprint: Footprint;
       capacity: number;
+      /** Nur Werkstatt: Werkstattplätze statt Lager (T2.6). */
+      bays: number | null;
       costCents: number;
       reason: BuildRejection | null;
       /** Tor-Seite hätte (noch) keine Straße. */
       notConnected: boolean;
+      /** Grenzt an eine Zone gleicher Art und wird mit ihr eins. */
+      merges: boolean;
       command: Command;
     }
   | {
       kind: 'demolish';
-      footprint: Footprint;
+      /** Ein Rechteck; bei verschmolzenen Zonen alle Teile. */
+      footprints: Footprint[];
       height: number;
       refundCents: number;
       command: Command;
@@ -82,6 +101,8 @@ export function previewAt(
       return placePreview(state, tool.buildingType, worldX, worldZ);
     case 'road':
       return roadPreview(state, dragStart ?? cell, cell);
+    case 'priority':
+      return priorityPreview(state, tool.priority, dragStart ?? cell, cell);
     case 'zone':
       return zonePreview(state, tool.zoneKind, dragStart ?? cell, cell);
     case 'demolish':
@@ -122,17 +143,42 @@ function roadPreview(state: GameState, from: Cell, to: Cell): BuildPreview {
   };
 }
 
+function priorityPreview(state: GameState, priority: boolean, from: Cell, to: Cell): BuildPreview {
+  const xFirst = prefersXFirst(from, to);
+  const cells = priorityTiles(state, from, to, xFirst).map(({ x, z }) => ({ x, z }));
+  return {
+    kind: 'priority',
+    priority,
+    cells,
+    reason: cells.length === 0 ? 'noRoad' : null,
+    command: {
+      type: 'road/setPriority',
+      fromX: from.x,
+      fromZ: from.z,
+      toX: to.x,
+      toZ: to.z,
+      xFirst,
+      priority,
+    },
+  };
+}
+
 function zonePreview(state: GameState, kind: ZoneKind, from: Cell, to: Cell): BuildPreview {
   const check = checkPlaceZone(state, kind, from, to);
   const f = check.footprint;
   const network = new RoadNetwork(state);
+  const neighbours = check.ok ? neighboursOf(state, kind, f) : [];
+  const shape = [...neighbours.flatMap((z) => z.parts), f];
+  const gate = neighbours[0]?.gate ?? suggestGate(network, f);
   return {
     kind: 'zone',
     footprint: f,
-    capacity: zoneCapacity(f),
+    capacity: zoneCapacity(shape),
+    bays: kind === 'W' ? baysForArea(kind, shapeArea(shape)) : null,
+    merges: neighbours.length > 0,
     costCents: check.costCents,
     reason: check.ok ? null : check.reason,
-    notConnected: accessCell(network, f, suggestGate(network, f)) === null,
+    notConnected: accessCell(network, shape, gate) === null,
     command: { type: 'zone/place', kind, fromX: from.x, fromZ: from.z, toX: to.x, toZ: to.z },
   };
 }
@@ -142,7 +188,7 @@ function demolishPreview(state: GameState, cell: Cell): BuildPreview {
   if (id === ROAD_CELL) {
     return {
       kind: 'demolish',
-      footprint: { x: cell.x, z: cell.z, width: 1, depth: 1 },
+      footprints: [{ x: cell.x, z: cell.z, width: 1, depth: 1 }],
       height: ROAD_GHOST_HEIGHT,
       refundCents: roadRefundAt(state, cell.x, cell.z) ?? 0,
       command: { type: 'road/demolish', x: cell.x, z: cell.z },
@@ -152,17 +198,18 @@ function demolishPreview(state: GameState, cell: Cell): BuildPreview {
   if (zone) {
     return {
       kind: 'demolish',
-      footprint: { x: zone.x, z: zone.z, width: zone.width, depth: zone.depth },
+      // Entscheidung 08.10.2026: Zonen feldweise abreißen.
+      footprints: [{ x: cell.x, z: cell.z, width: 1, depth: 1 }],
       height: ROAD_GHOST_HEIGHT,
-      refundCents: demolishRefund(state, zone.builtTick, zone.paidCents),
-      command: { type: 'zone/demolish', zoneId: zone.id },
+      refundCents: zoneCellRefund(state, zone, cell.x, cell.z) ?? 0,
+      command: { type: 'zone/demolishCell', zoneId: zone.id, x: cell.x, z: cell.z },
     };
   }
   const building = state.buildings.find((b) => b.id === id);
   if (!building) return { kind: 'nothingToDemolish' };
   return {
     kind: 'demolish',
-    footprint: buildingFootprint(building),
+    footprints: [buildingFootprint(building)],
     height: buildingTypes[building.type].height,
     refundCents: demolishRefund(state, building.builtTick, building.paidCents),
     command: { type: 'build/demolish', buildingId: building.id },

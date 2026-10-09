@@ -53,7 +53,7 @@ export function buildRoad(
   if (!check.ok || check.newCells.length === 0) return check;
   const paid = buildConfig.roadCostPerTileCents;
   for (const c of check.newCells) {
-    state.roads.push({ x: c.x, z: c.z, builtTick: state.tick, paidCents: paid });
+    state.roads.push({ x: c.x, z: c.z, builtTick: state.tick, paidCents: paid, priority: false });
   }
   const mid = check.newCells[Math.floor(check.newCells.length / 2)] ?? from;
   bookBuild(state, bus, -check.costCents, { x: mid.x + 0.5, z: mid.z + 0.5 });

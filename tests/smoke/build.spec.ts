@@ -54,7 +54,7 @@ test('Straße ziehen und ein Feld abreißen', async ({ page }) => {
   await bar.getByRole('button', { name: 'Straßen' }).click();
   await bar.getByRole('button', { name: /je Feld/ }).click();
   await page.mouse.move(start.x, start.y);
-  await expect(tip).toContainText('1 Feld · Kosten: 200 €');
+  await expect(tip).toContainText('1 Feld · Kosten: 500 €');
   await page.mouse.down();
   await page.mouse.move(start.x + 200, start.y + 40, { steps: 5 });
   await expect(tip).toContainText(/\d+ Felder · Kosten/);
@@ -63,7 +63,7 @@ test('Straße ziehen und ein Feld abreißen', async ({ page }) => {
 
   await bar.getByRole('button', { name: 'Abriss' }).click();
   await page.mouse.move(start.x, start.y);
-  await expect(tip).toContainText('Erstattung: 200 €');
+  await expect(tip).toContainText('Erstattung: 500 €');
   expect(problems).toEqual([]);
 });
 

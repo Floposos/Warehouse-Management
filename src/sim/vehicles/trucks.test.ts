@@ -27,7 +27,7 @@ describe('LKW kaufen', () => {
     expect(s.state.finance.balanceCents).toBe(before - vehicleConfig.truckPriceCents);
     expect(s.state.finance.today.expenseCents.vehicles).toBe(vehicleConfig.truckPriceCents);
     expect(t.route[0]).toEqual({ x: -1, z: 61 });
-    expect(t.mode).toBe('auto');
+    expect(t.tourId).toBeNull();
   });
 
   it('ohne genug Geld wird der Kauf abgelehnt', () => {
@@ -134,6 +134,16 @@ describe('Kosten und ganze Kette', () => {
     const cost = before - s.state.finance.balanceCents;
     expect(cost).toBeGreaterThan(vehicleConfig.truckDailyCents);
     expect(cost).toBeLessThan(vehicleConfig.truckDailyCents + 200);
+  });
+
+  it('Kilometerzähler bleibt ganzzahlig (Spielstand), Rest wird übertragen', () => {
+    const s = testWorld();
+    const t = buy(s);
+    t.odometer = 1_234_567;
+    s.run(TICKS_PER_DAY);
+    expect(Number.isInteger(t.odometer)).toBe(true);
+    const rate = vehicleConfig.metersPerField * vehicleConfig.truckCostPerKmCents;
+    expect(t.odometer * rate).toBeLessThan(1_000_000);
   });
 
   it('Rohware → A → B → C → Export: Kasse wächst über zwei Tage', () => {

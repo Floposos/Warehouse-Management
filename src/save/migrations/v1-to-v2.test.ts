@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { buildConfig } from '../../config/build';
 import { describe, expect, it } from 'vitest';
 import { Simulation } from '../../sim/core/simulation';
-import { parseSave } from '../format';
+import { CURRENT_SAVE_VERSION, parseSave } from '../format';
 import { migrateV1ToV2 } from './v1-to-v2';
 
 describe('Migration v1 → v2', () => {
@@ -34,7 +34,7 @@ describe('Migration v1 → v2', () => {
     );
     const result = parseSave(text);
     if (!result.ok) throw new Error(result.error);
-    expect(result.save.saveVersion).toBe(2);
+    expect(result.save.saveVersion).toBe(CURRENT_SAVE_VERSION);
     expect(result.save.state.finance.balanceCents).toBe(99_750_000);
     // Kasse muss nach der Umstellung buchen können.
     const sim = new Simulation(result.save.state);

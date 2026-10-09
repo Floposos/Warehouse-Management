@@ -4,7 +4,13 @@ import { findPath } from './pathfinding';
 import { ENTRANCE, RoadNetwork, roadShape } from './roadNetwork';
 
 function net(cells: [number, number][]): RoadNetwork {
-  const roads: RoadTile[] = cells.map(([x, z]) => ({ x, z, builtTick: 0, paidCents: 0 }));
+  const roads: RoadTile[] = cells.map(([x, z]) => ({
+    x,
+    z,
+    builtTick: 0,
+    paidCents: 0,
+    priority: false,
+  }));
   return new RoadNetwork({ roads });
 }
 

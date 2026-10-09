@@ -1,3 +1,4 @@
+import { isRushHour } from '../../sim/traffic/entrance';
 import { timeConfig, type GameSpeed } from '../../config/time';
 import { formatEuro } from '../../shared/format';
 import { calendarAt } from '../../sim/core/gameTime';
@@ -12,6 +13,9 @@ export interface TopbarActions {
   openMenu(): void;
   openCash(): void;
   openPurchase(): void;
+  openTours(): void;
+  openNotices(): void;
+  openFleet(): void;
 }
 
 /** Kopfleiste: Datum/Uhrzeit, Kontostand, Zeitsteuerung, Menü. Liest nur den Zustand. */
@@ -20,8 +24,11 @@ export class Topbar {
   private readonly clock = el('span', 'topbar-clock');
   private readonly balance: HTMLButtonElement;
   private readonly pauseBadge = el('span', 'topbar-paused', de.hud.paused);
+  private readonly rushBadge = el('span', 'topbar-rush', de.entrance.rush);
   private readonly pauseButton: HTMLButtonElement;
   private readonly speedButtons = new Map<GameSpeed, HTMLButtonElement>();
+  private readonly notices: HTMLButtonElement;
+  private lastNotices = -1;
   private lastClock = '';
   private lastBalance = '';
 
@@ -31,6 +38,9 @@ export class Topbar {
     this.balance.dataset['testid'] = 'balance';
     this.balance.title = de.hud.balanceTitle;
     this.pauseBadge.hidden = true;
+    this.rushBadge.hidden = true;
+    this.rushBadge.title = de.entrance.rushTitle;
+    this.rushBadge.dataset['testid'] = 'rush-badge';
 
     const controls = el('div', 'topbar-speed');
     this.pauseButton = button('⏸', () => actions.togglePause(), 'btn btn-icon');
@@ -46,19 +56,48 @@ export class Topbar {
 
     const purchase = button(de.hud.purchase, () => actions.openPurchase());
     purchase.title = de.purchase.openTitle;
+    const tours = button(de.tours.open, () => actions.openTours());
+    tours.title = de.tours.openTitle;
+    const fleet = button(de.fleetPanel.open, () => actions.openFleet());
+    fleet.title = de.fleetPanel.openTitle;
+    this.notices = button(de.notices.open, () => actions.openNotices());
+    this.notices.title = de.notices.openTitle;
+    this.notices.dataset['testid'] = 'notices-button';
     const menu = button(de.hud.menu, () => actions.openMenu());
     menu.title = de.hud.menuTitle;
-    this.root.append(this.clock, this.pauseBadge, controls, this.balance, purchase, menu);
+    this.root.append(
+      this.clock,
+      this.rushBadge,
+      this.pauseBadge,
+      controls,
+      this.balance,
+      purchase,
+      tours,
+      fleet,
+      this.notices,
+      menu,
+    );
     parent.append(this.root);
   }
 
   /** Pro Bild aufrufen; schreibt nur, wenn sich die Anzeige ändert. */
   update(state: GameState, speed: GameSpeed | 0): void {
     const clock = formatClock(calendarAt(state.tick));
-    if (clock !== this.lastClock) this.clock.textContent = this.lastClock = clock;
+    if (clock !== this.lastClock) {
+      this.clock.textContent = this.lastClock = clock;
+      this.rushBadge.hidden = !isRushHour(state.tick);
+    }
     const balance = formatEuro(state.finance.balanceCents);
     if (balance !== this.lastBalance) this.balance.textContent = this.lastBalance = balance;
     this.showSpeed(speed);
+  }
+
+  /** Zahl ungelesener Meldungen am Knopf „Meldungen“. */
+  setUnread(n: number): void {
+    if (n === this.lastNotices) return;
+    this.lastNotices = n;
+    this.notices.textContent = n > 0 ? de.notices.openCount(n) : de.notices.open;
+    this.notices.classList.toggle('has-unread', n > 0);
   }
 
   private showSpeed(speed: GameSpeed | 0): void {

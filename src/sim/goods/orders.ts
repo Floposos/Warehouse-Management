@@ -10,6 +10,7 @@ import { findPath } from '../world/pathfinding';
 import type { Cell } from '../world/roadLine';
 import { ENTRANCE, RoadNetwork } from '../world/roadNetwork';
 import { outsideLane } from '../vehicles/movement';
+import { vehicleBase } from '../vehicles/types';
 import { freeSpace } from './stock';
 
 export const ORDER_INTERVALS = ['once', 'daily', 'weekly', 'monthly'] as const;
@@ -71,7 +72,7 @@ function findTarget(state: GameState, network: RoadNetwork, order: Order): Targe
   let best: Target | null = null;
   let anyReachable = false;
   for (const zone of zones) {
-    const access = accessCell(network, zone, zone.gate);
+    const access = accessCell(network, zone.parts, zone.gate);
     const path = access ? findPath(network, ENTRANCE, access) : null;
     if (!path) continue;
     anyReachable = true;
@@ -92,10 +93,9 @@ export function dispatchOrder(state: GameState, bus: EventBus, order: Order): Or
   if (state.finance.balanceCents < costCents) return 'noMoney';
   book(state.finance, state.tick, bus, 'rawGoods', -costCents, { x: 0.5, z: ENTRANCE.z + 0.5 });
   state.vehicles.push({
-    id: state.nextId++,
+    // Kommt von außen und fädelt auf der Eingangsstraße ein, sobald dort Platz ist.
+    ...vehicleBase(state.nextId++, [...outsideLane(), ...target.path], true),
     kind: 'supplier',
-    route: [...outsideLane(), ...target.path],
-    progress: 0,
     cargo: { product: order.product, quantity },
     phase: 'toSite',
     targetId: target.zone.id,

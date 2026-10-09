@@ -38,9 +38,16 @@ describe('Bau-Tooltip', () => {
       costCents: 240_000,
       reason: null,
       notConnected: true,
+      merges: false,
+      bays: null as number | null,
       command,
     };
-    expect(buildTipText(zone)).toEqual({
+    expect(buildTipText({ ...zone, bays: 3 })).toEqual({
+      text: '4 × 3 Felder · 3 Werkstattplätze · Kosten: 2.400 €',
+      kind: 'ok',
+      warning: 'Nicht angeschlossen: Straße an das Tor bauen',
+    });
+    expect(buildTipText({ ...zone, bays: null })).toEqual({
       text: '4 × 3 Felder · Lager 120 je Ware · Kosten: 2.400 €',
       kind: 'ok',
       warning: 'Nicht angeschlossen: Straße an das Tor bauen',
@@ -49,7 +56,13 @@ describe('Bau-Tooltip', () => {
 
   it('zeigt beim Abriss die Erstattung', () => {
     expect(
-      buildTipText({ kind: 'demolish', footprint, height: 2, refundCents: 2_500_000, command }),
+      buildTipText({
+        kind: 'demolish',
+        footprints: [footprint],
+        height: 2,
+        refundCents: 2_500_000,
+        command,
+      }),
     ).toEqual({ text: 'Abreißen, Erstattung: 25.000 €', kind: 'ok' });
   });
 });

@@ -8,16 +8,29 @@ export interface Pose {
 
 /** Abstand der Fahrspur von der Straßenmitte (Rechtsverkehr). */
 export const LANE_OFFSET = 0.22;
+/** Abseits geparkt: am rechten Straßenrand. */
+export const PARKED_OFFSET = 0.42;
+
+/** Fahrtrichtungen wie `DIRS` in der Simulation: Nord, Ost, Süd, West. */
+const HEADINGS = [
+  { dx: 0, dz: -1 },
+  { dx: 1, dz: 0 },
+  { dx: 0, dz: 1 },
+  { dx: -1, dz: 0 },
+] as const;
 
 /**
  * Position auf der Route: `progress` Tausendstel Feld von `route[0]` Richtung `route[1]`,
  * plus `extra` Tausendstel (Vorausschau zwischen zwei Schritten), über Feldgrenzen hinweg.
- * Fahrzeuge fahren rechts: Versatz nach rechts zur Fahrtrichtung.
+ * Fahrzeuge fahren rechts: Versatz nach rechts zur Fahrtrichtung. Steht das Fahrzeug am
+ * Ende des Wegs, zeigt es in seine letzte Fahrtrichtung (`heading`).
  */
 export function vehiclePose(
   route: readonly { x: number; z: number }[],
   progress: number,
   extra = 0,
+  heading = 1,
+  offset = LANE_OFFSET,
 ): Pose | null {
   const first = route[0];
   if (!first) return null;
@@ -30,18 +43,17 @@ export function vehiclePose(
   const a = route[index] ?? first;
   const b = route[index + 1];
   if (!b) {
-    const prev = route[index - 1];
-    const dx = prev ? a.x - prev.x : 1;
-    const dz = prev ? a.z - prev.z : 0;
-    return place(a.x, a.z, dx, dz, 0);
+    const prev = index > 0 ? route[index - 1] : undefined;
+    const h = HEADINGS[heading] ?? HEADINGS[1];
+    return place(a.x, a.z, prev ? a.x - prev.x : h.dx, prev ? a.z - prev.z : h.dz, 0, offset);
   }
-  return place(a.x, a.z, b.x - a.x, b.z - a.z, Math.min(1, t / 1000));
+  return place(a.x, a.z, b.x - a.x, b.z - a.z, Math.min(1, t / 1000), offset);
 }
 
-function place(cx: number, cz: number, dx: number, dz: number, t: number): Pose {
+function place(cx: number, cz: number, dx: number, dz: number, t: number, offset: number): Pose {
   return {
-    x: cx + 0.5 + dx * t - dz * LANE_OFFSET,
-    z: cz + 0.5 + dz * t + dx * LANE_OFFSET,
+    x: cx + 0.5 + dx * t - dz * offset,
+    z: cz + 0.5 + dz * t + dx * offset,
     angle: Math.atan2(-dz, dx),
   };
 }

@@ -8,6 +8,7 @@ export const palette = {
   border: 0xf6f1e7,
   road: 0x8d96a3,
   roadMarking: 0xfdfdfd,
+  priorityMarking: 0xf2c230,
   hall: 0xf6e7c8,
   hallTrim: 0xe6cfa3,
   roof: 0xf08a5d,
@@ -26,6 +27,11 @@ export const palette = {
   ownCab: 0xf08a5d,
   truckBody: 0x8d96a3,
   wheel: 0x2c3a4a,
-  routeLine: 0x4f9dde,
+  /** Grüner Dachstreifen der Elektro-Fahrzeuge (T2.5). */
+  electricMark: 0x3ccf6e,
+  /** Rauch über einem Fahrzeug mit Panne (T2.6). */
+  breakdownSmoke: 0x8c8c8c,
+  /** Autos auf der Bundesstraße (T2.7). */
+  externalCars: [0x6b8fd6, 0xe0e4ea, 0xd96a6a, 0x5a6472, 0x8cc08a, 0xf0d070],
   selection: 0x4f9dde,
 } as const;

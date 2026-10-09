@@ -7,7 +7,7 @@ import { CursorTip } from '../ui/hud/cursorTip';
 import { InfoPanel, type InfoContent } from '../ui/hud/info/infoPanel';
 import { siteLabel, truckLabel } from '../ui/hud/info/names';
 import { buildingInfo, zoneInfo } from '../ui/hud/info/siteInfo';
-import type { TourEditor } from '../ui/hud/info/tourEditor';
+import { ToursPanel } from '../ui/hud/tours/toursPanel';
 import { supplierInfo, truckInfo } from '../ui/hud/info/vehicleInfo';
 import { de } from '../ui/texts/de';
 import type { GameSession } from './gameSession';
@@ -24,8 +24,9 @@ export class SelectionController {
   private selection: Selection | null = null;
   private readonly panel: InfoPanel;
   private readonly hoverTip: CursorTip;
-  private editor: TourEditor | null = null;
+  readonly tours: ToursPanel;
   private pickingStops = false;
+  private allRoutes = false;
   private pointer: { x: number; y: number } | null = null;
   private downAt: { x: number; y: number } | null = null;
   private lastRefresh = 0;
@@ -39,6 +40,28 @@ export class SelectionController {
   ) {
     this.panel = new InfoPanel(ui, () => this.select(null));
     this.hoverTip = new CursorTip(ui, 'hover-tip');
+    this.tours = new ToursPanel(
+      ui,
+      (c) => {
+        const result = this.submit(c);
+        this.refresh();
+        return result;
+      },
+      {
+        active: () => this.pickingStops,
+        toggle: () => {
+          this.pickingStops = !this.pickingStops;
+          this.refresh();
+        },
+      },
+      {
+        active: () => this.allRoutes,
+        toggle: () => {
+          this.allRoutes = !this.allRoutes;
+          this.refresh();
+        },
+      },
+    );
     installBuildPointer(canvas, {
       move: (x, y) => (this.pointer = { x, y }),
       down: (x, y) => (this.downAt = { x, y }),
@@ -51,26 +74,44 @@ export class SelectionController {
     return this.selection;
   }
 
-  /** Esc: erst „Orte anklicken“ beenden, dann das Infofenster schließen. True = verbraucht. */
+  /** Esc: erst „Orte anklicken“ beenden, dann Infofenster, dann Touren schließen. True = verbraucht. */
   cancel(): boolean {
     if (this.pickingStops) {
       this.pickingStops = false;
       this.refresh();
       return true;
     }
-    if (!this.selection) return false;
-    this.select(null);
+    if (this.selection) {
+      this.select(null);
+      return true;
+    }
+    if (!this.tours.isOpen) return false;
+    this.tours.close();
     return true;
+  }
+
+  /** Fenster „Touren“ öffnen bzw. schließen (Kopfleiste). */
+  toggleTours(): void {
+    const session = this.session();
+    if (session) this.tours.toggle(session.state);
+  }
+
+  /** Spielstart/Hauptmenü: Touren-Fenster zu, „Alle Wege“ aus. */
+  reset(): void {
+    this.select(null);
+    this.tours.close();
+    this.allRoutes = false;
+  }
+
+  private submit(c: Command): CommandResult {
+    return this.session()?.command(c) ?? { ok: false, reason: 'noSession' };
   }
 
   select(selection: Selection | null): void {
     const session = this.session();
     this.selection = selection;
-    this.pickingStops = false;
-    this.editor = null;
     if (!selection || !session) {
       this.panel.hide();
-      this.renderer.setRouteLine(null, null);
       return;
     }
     const content = this.contentFor(selection, session.state);
@@ -83,7 +124,7 @@ export class SelectionController {
     if (!session) return;
     this.updateHover(session.state);
     const vehicleId = this.selection?.kind === 'vehicle' ? this.selection.id : null;
-    this.renderer.setRouteLine(vehicleId, session.state);
+    this.renderer.setRoutes(vehicleId, this.allRoutes, session.state, now);
     if (now - this.lastRefresh >= REFRESH_MS) {
       this.lastRefresh = now;
       this.refresh();
@@ -92,40 +133,29 @@ export class SelectionController {
 
   private refresh(): void {
     const session = this.session();
-    if (this.selection && session && !this.panel.update(session.state)) this.select(null);
+    if (!session) return;
+    if (this.selection && !this.panel.update(session.state)) this.select(null);
+    this.tours.update(session.state);
   }
 
   private contentFor(selection: Selection, state: GameState): InfoContent | null {
-    const submit = (c: Command): CommandResult =>
-      this.session()?.command(c) ?? { ok: false, reason: 'noSession' };
+    const submit = (c: Command): CommandResult => {
+      const result = this.submit(c);
+      this.refresh();
+      return result;
+    };
     switch (selection.kind) {
       case 'zone':
-        return zoneInfo(selection.id, (c) => {
-          submit(c);
-          this.refresh();
-        });
+        return zoneInfo(selection.id, submit);
       case 'building':
         return buildingInfo(selection.id);
       case 'vehicle': {
         const v = state.vehicles.find((x) => x.id === selection.id);
         if (v?.kind === 'supplier') return supplierInfo(v.id);
-        const info = truckInfo(
-          selection.id,
-          (c) => {
-            const result = submit(c);
-            this.refresh();
-            return result;
-          },
-          {
-            active: () => this.pickingStops,
-            toggle: () => {
-              this.pickingStops = !this.pickingStops;
-              this.refresh();
-            },
-          },
-        );
-        this.editor = info.editor;
-        return info;
+        return truckInfo(selection.id, submit, (tourId) => {
+          const session = this.session();
+          if (session) this.tours.open(session.state, tourId);
+        });
       }
     }
   }
@@ -138,8 +168,9 @@ export class SelectionController {
     const ground = this.renderer.pickGround(x, y);
     if (!session || !ground) return;
     const hit = pickEntity(session.state, ground.x, ground.z);
-    if (this.pickingStops && this.editor) {
-      if (hit && hit.kind !== 'vehicle') this.editor.add(hit.id);
+    const editor = this.tours.activeEditor;
+    if (this.pickingStops && editor) {
+      if (hit && hit.kind !== 'vehicle') editor.add(hit.id);
       return;
     }
     this.select(hit);

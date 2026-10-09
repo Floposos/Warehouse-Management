@@ -1,3 +1,4 @@
+import { shapeArea } from '../world/zoneShape';
 import { productionConfig } from '../../config/production';
 import type { ProductId } from '../../content/products';
 import type { ZoneKind } from '../../content/zones';
@@ -31,9 +32,10 @@ export const recipes: Partial<Record<ZoneKind, Recipe>> = {
 };
 
 /** Zustand einer Zone für Anzeige und Infofenster. */
-export type ZoneStatus = 'working' | 'waitingInput' | 'full' | 'storing';
+export type ZoneStatus = 'working' | 'waitingInput' | 'full' | 'storing' | 'workshop';
 
 export function zoneStatus(zone: Zone): ZoneStatus {
+  if (zone.kind === 'W') return 'workshop';
   const recipe = recipes[zone.kind];
   if (!recipe) return isFull(zone, 'rawA') ? 'full' : 'storing';
   if (isFull(zone, recipe.output)) return 'full';
@@ -45,7 +47,7 @@ export function updateProduction(state: GameState, bus: EventBus): void {
   for (const zone of state.zones) {
     const recipe = recipes[zone.kind];
     if (!recipe || zoneStatus(zone) !== 'working') continue;
-    zone.work += recipe.scalesWithArea ? zone.width * zone.depth : 1;
+    zone.work += recipe.scalesWithArea ? shapeArea(zone.parts) : 1;
     if (zone.work < recipe.work) continue;
     for (const input of recipe.inputs) addStock(zone, input, -1);
     addStock(zone, recipe.output, 1);

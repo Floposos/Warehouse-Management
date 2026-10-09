@@ -33,5 +33,6 @@ export function defaultStop(
     return { siteId, action: 'unload', product: previous.product };
   }
   if (site.kind === 'export') return { siteId, action: 'unload', product: 'final' };
+  if (site.kind === 'W') return null;
   return { siteId, action: 'load', product: OUTPUT[site.kind] };
 }

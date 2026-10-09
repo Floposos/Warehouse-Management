@@ -15,10 +15,10 @@ describe('Zonen aufziehen', () => {
     const start = s.state.finance.balanceCents;
     expect(s.execute(zone('B', 44, 43, 40, 40))).toEqual({ ok: true });
     const placed = s.state.zones[0];
-    expect(placed).toMatchObject({ kind: 'B', x: 40, z: 40, width: 5, depth: 4 });
+    expect(placed).toMatchObject({ kind: 'B', parts: [{ x: 40, z: 40, width: 5, depth: 4 }] });
     expect(placed?.stock).toEqual({ rawA: 0, rawB: 0, combo: 0 });
     expect(s.state.finance.balanceCents).toBe(start - 20 * zoneConfig.costPerFieldCents.B);
-    expect(zoneCapacity({ width: 5, depth: 4 })).toBe(20 * zoneConfig.capacityPerField);
+    expect(zoneCapacity({ x: 0, z: 0, width: 5, depth: 4 })).toBe(20 * zoneConfig.capacityPerField);
   });
 
   it('ein einzelnes Feld genügt (keine Mindestgröße)', () => {

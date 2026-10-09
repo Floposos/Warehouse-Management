@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { TICKS_PER_DAY } from '../sim/core/gameTime';
 import { Simulation } from '../sim/core/simulation';
-import { testWorld, zoneOf } from '../sim/goods/testWorld';
+import { giveTour, testWorld, zoneOf } from '../sim/goods/testWorld';
 import { createSave, parseSave, serializeSave } from './format';
 
 describe('Speichern mitten im Warenfluss', () => {
@@ -13,15 +13,10 @@ describe('Speichern mitten im Warenfluss', () => {
     s.execute({ type: 'vehicle/buyTruck' });
     const tour = s.state.vehicles.at(-1);
     if (!tour) throw new Error('LKW fehlt');
-    s.execute({
-      type: 'vehicle/setTour',
-      truckId: tour.id,
-      stops: [
-        { siteId: zoneOf(s, 'A').id, action: 'load', product: 'rawA' },
-        { siteId: zoneOf(s, 'B').id, action: 'unload', product: 'rawA' },
-      ],
-    });
-    s.execute({ type: 'vehicle/setMode', truckId: tour.id, mode: 'tour' });
+    giveTour(s, tour.id, [
+      { siteId: zoneOf(s, 'A').id, action: 'load', product: 'rawA' },
+      { siteId: zoneOf(s, 'B').id, action: 'unload', product: 'rawA' },
+    ]);
     s.run(TICKS_PER_DAY / 2 + 37);
     expect(s.state.vehicles.some((v) => v.kind === 'truck' && v.phase !== 'idle')).toBe(true);
 

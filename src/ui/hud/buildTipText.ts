@@ -22,15 +22,23 @@ export function buildTipText(preview: BuildPreview): {
         ? { text: `${de.build.reasons[preview.reason]} · ${cost}`, kind: 'error' }
         : { text: cost, kind: 'ok' };
     }
+    case 'priority':
+      return preview.reason
+        ? { text: de.build.priorityNoRoad, kind: 'error' }
+        : { text: de.build.priorityCells(preview.cells.length, preview.priority), kind: 'ok' };
     case 'zone': {
       const f = preview.footprint;
       const cost = formatEuro(preview.costCents);
-      const size = de.build.zoneSize(f.width, f.depth, preview.capacity, cost);
+      const size =
+        preview.bays === null
+          ? de.build.zoneSize(f.width, f.depth, preview.capacity, cost)
+          : de.build.workshopSize(f.width, f.depth, preview.bays, cost);
       if (preview.reason)
         return { text: `${de.build.reasons[preview.reason]} · ${size}`, kind: 'error' };
+      const text = preview.merges ? `${size} · ${de.build.zoneMerges}` : size;
       return preview.notConnected
-        ? { text: size, kind: 'ok', warning: de.build.notConnected }
-        : { text: size, kind: 'ok' };
+        ? { text, kind: 'ok', warning: de.build.notConnected }
+        : { text, kind: 'ok' };
     }
     case 'demolish':
       return { text: de.build.refund(formatEuro(preview.refundCents)), kind: 'ok' };

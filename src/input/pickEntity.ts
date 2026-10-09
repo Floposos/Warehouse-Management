@@ -34,6 +34,6 @@ export function pickEntity(state: GameState, x: number, z: number): Selection | 
   if (best) return { kind: 'vehicle', id: best.id };
   const building = state.buildings.find((b) => inside(buildingFootprint(b), x, z));
   if (building) return { kind: 'building', id: building.id };
-  const zone = state.zones.find((zn) => inside(zn, x, z));
+  const zone = state.zones.find((zn) => zn.parts.some((p) => inside(p, x, z)));
   return zone ? { kind: 'zone', id: zone.id } : null;
 }

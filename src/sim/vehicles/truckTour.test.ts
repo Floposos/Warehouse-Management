@@ -3,7 +3,7 @@ import { goodsConfig } from '../../config/goods';
 import { vehicleConfig } from '../../config/vehicles';
 import { TICKS_PER_DAY } from '../core/gameTime';
 import type { Simulation } from '../core/simulation';
-import { testWorld, zoneOf } from '../goods/testWorld';
+import { giveTour, testWorld, zoneOf } from '../goods/testWorld';
 import type { TourStop, Truck } from './types';
 
 function buy(s: Simulation): Truck {
@@ -30,8 +30,7 @@ describe('Feste Tour', () => {
       { siteId: a.id, action: 'load', product: 'rawA' },
       { siteId: b.id, action: 'unload', product: 'rawA' },
     ];
-    expect(s.execute({ type: 'vehicle/setTour', truckId: t.id, stops }).ok).toBe(true);
-    expect(s.execute({ type: 'vehicle/setMode', truckId: t.id, mode: 'tour' }).ok).toBe(true);
+    giveTour(s, t.id, stops);
     s.run(TICKS_PER_DAY / 3);
     // Mehrere Runden zu je voller Ladung.
     expect(b.stock.rawA).toBeGreaterThanOrEqual(2 * vehicleConfig.truckCapacity);
@@ -43,15 +42,10 @@ describe('Feste Tour', () => {
     const c = zoneOf(s, 'C');
     c.stock.final = 15;
     const t = buy(s);
-    s.execute({
-      type: 'vehicle/setTour',
-      truckId: t.id,
-      stops: [
-        { siteId: c.id, action: 'load', product: 'final' },
-        { siteId: exitId(s), action: 'unload', product: 'final' },
-      ],
-    });
-    s.execute({ type: 'vehicle/setMode', truckId: t.id, mode: 'tour' });
+    giveTour(s, t.id, [
+      { siteId: c.id, action: 'load', product: 'final' },
+      { siteId: exitId(s), action: 'unload', product: 'final' },
+    ]);
     s.run(TICKS_PER_DAY / 4);
     expect(s.state.finance.today.incomeCents.exportRevenue).toBe(
       15 * goodsConfig.exportPriceCents.final,
@@ -61,7 +55,7 @@ describe('Feste Tour', () => {
   it('ohne Halte wartet der LKW mit Grund „keine Tour“', () => {
     const s = testWorld();
     const t = buy(s);
-    s.execute({ type: 'vehicle/setMode', truckId: t.id, mode: 'tour' });
+    giveTour(s, t.id, []);
     s.run(5);
     expect(t.phase).toBe('idle');
     expect(t.idleReason).toBe('noTour');
@@ -70,8 +64,8 @@ describe('Feste Tour', () => {
   it('lehnt unsinnige Halte ab', () => {
     const s = testWorld();
     const t = buy(s);
-    const tour = (stops: TourStop[]) =>
-      s.execute({ type: 'vehicle/setTour', truckId: t.id, stops });
+    const id = giveTour(s, t.id, []);
+    const tour = (stops: TourStop[]) => s.execute({ type: 'tour/update', tourId: id, stops });
     expect(tour([{ siteId: zoneOf(s, 'A').id, action: 'load', product: 'final' }])).toMatchObject({
       ok: false,
       reason: 'invalidStop',
@@ -92,15 +86,10 @@ describe('Feste Tour', () => {
     const a = zoneOf(s, 'A');
     a.stock.rawA = 20;
     const t = buy(s);
-    s.execute({
-      type: 'vehicle/setTour',
-      truckId: t.id,
-      stops: [{ siteId: a.id, action: 'load', product: 'rawA' }],
-    });
-    s.execute({ type: 'vehicle/setMode', truckId: t.id, mode: 'tour' });
+    giveTour(s, t.id, [{ siteId: a.id, action: 'load', product: 'rawA' }]);
     for (let i = 0; i < TICKS_PER_DAY && !t.cargo; i++) s.step();
     expect(t.cargo).toEqual({ product: 'rawA', quantity: 20 });
-    s.execute({ type: 'vehicle/setMode', truckId: t.id, mode: 'auto' });
+    s.execute({ type: 'vehicle/assignTour', truckId: t.id, tourId: null });
     for (let i = 0; i < TICKS_PER_DAY && t.cargo; i++) s.step();
     expect(zoneOf(s, 'B').stock.rawA).toBe(20);
   });

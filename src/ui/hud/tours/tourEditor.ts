@@ -1,10 +1,10 @@
 import type { Command, CommandResult } from '../../../sim/commands/commands';
 import type { GameState } from '../../../sim/state/gameState';
-import type { TourStop, Truck } from '../../../sim/vehicles/types';
+import type { Tour, TourStop } from '../../../sim/vehicles/types';
 import { button, el } from '../../components/dom';
 import { de } from '../../texts/de';
-import { siteLabel, siteOptions } from './names';
-import { defaultStop, productsFor } from './tourDefaults';
+import { siteLabel, siteOptions } from '../info/names';
+import { defaultStop, productsFor } from '../info/tourDefaults';
 
 const ACTIONS: readonly TourStop['action'][] = ['load', 'unload'];
 
@@ -27,8 +27,9 @@ function select(
 }
 
 /**
- * Tour bearbeiten (T1.5b): Halte mit Ort, Aktion und Ware; hinzufügen per Liste oder per
- * Klick ins Gelände, verschieben, entfernen. Jede Änderung schickt die ganze Tour als Befehl.
+ * Halte einer Tour bearbeiten (T1.5b, seit T2.1 je Tour): Ort, Aktion und Ware; hinzufügen
+ * per Liste oder per Klick ins Gelände, verschieben, entfernen. Jede Änderung schickt alle
+ * Halte als Befehl `tour/update`.
  */
 export class TourEditor {
   readonly root = el('div', 'tour-editor');
@@ -41,7 +42,7 @@ export class TourEditor {
   private state: GameState | null = null;
 
   constructor(
-    private readonly truckId: number,
+    private readonly tourId: number,
     private readonly submit: (c: Command) => CommandResult,
     private readonly picking: { active(): boolean; toggle(): void },
   ) {
@@ -55,17 +56,15 @@ export class TourEditor {
     this.root.append(this.list, controls, this.message);
   }
 
-  update(state: GameState, truck: Truck): void {
+  update(state: GameState, tour: Tour): void {
     this.state = state;
     const options = siteOptions(state);
-    const key = JSON.stringify([truck.tour, options]);
+    const key = JSON.stringify([tour.stops, options]);
     if (key !== this.key) {
       this.key = key;
-      this.stops = truck.tour.map((s) => ({ ...s }));
+      this.stops = tour.stops.map((s) => ({ ...s }));
       this.render(state, options);
     }
-    const current = truck.mode === 'tour' ? truck.tourIndex : -1;
-    [...this.list.children].forEach((li, i) => li.classList.toggle('is-current', i === current));
     const active = this.picking.active();
     this.pickButton.textContent = active ? de.info.pickStopsActive : de.info.pickStops;
     this.pickButton.classList.toggle('is-active', active);
@@ -79,10 +78,9 @@ export class TourEditor {
   }
 
   private send(stops: TourStop[]): void {
-    const result = this.submit({ type: 'vehicle/setTour', truckId: this.truckId, stops });
-    const reasons: Record<string, string> = de.info.stopRejected;
+    const result = this.submit({ type: 'tour/update', tourId: this.tourId, stops });
     this.message.hidden = result.ok;
-    if (!result.ok) this.message.textContent = reasons[result.reason] ?? result.reason;
+    if (!result.ok) this.message.textContent = de.tours.rejected[result.reason] ?? result.reason;
   }
 
   private render(state: GameState, options: { id: number; label: string }[]): void {

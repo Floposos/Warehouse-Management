@@ -3,6 +3,7 @@ import { goodsConfig } from '../../config/goods';
 import { productionConfig } from '../../config/production';
 import { sellAtExit } from '../goods/export';
 import { testWorld, zoneOf } from '../goods/testWorld';
+import { shapeArea } from '../world/zoneShape';
 import { zoneStatus } from './production';
 
 describe('Produktkette', () => {
@@ -30,7 +31,7 @@ describe('Produktkette', () => {
   it('C verarbeitet Kombi zum Endprodukt, größere Zone schneller', () => {
     const s = testWorld();
     const c = zoneOf(s, 'C');
-    const area = c.width * c.depth;
+    const area = shapeArea(c.parts);
     c.stock = { combo: 3, final: 0 };
     s.run(Math.ceil((productionConfig.finalWorkPerUnit * 3) / area));
     expect(c.stock).toEqual({ combo: 0, final: 3 });

@@ -1,4 +1,5 @@
 import { Simulation } from '../core/simulation';
+import type { TourStop } from '../vehicles/types';
 import { createInitialState } from '../state/gameState';
 
 /**
@@ -25,4 +26,13 @@ export function zoneOf(s: Simulation, kind: 'A' | 'B' | 'C') {
   const zone = s.state.zones.find((z) => z.kind === kind);
   if (!zone) throw new Error(`Zone ${kind} fehlt`);
   return zone;
+}
+
+/** Legt eine Tour mit diesen Halten an und gibt sie dem LKW (nur für Tests). Liefert die Tour-Id. */
+export function giveTour(s: Simulation, truckId: number, stops: TourStop[]): number {
+  const created = s.execute({ type: 'tour/create', name: 'Test', stops });
+  if (!created.ok || created.id === undefined)
+    throw new Error(`Tour abgelehnt: ${JSON.stringify(created)}`);
+  s.execute({ type: 'vehicle/assignTour', truckId, tourId: created.id });
+  return created.id;
 }

@@ -1,15 +1,21 @@
 import { vehicleConfig } from '../../config/vehicles';
-import type { EventBus } from '../core/eventBus';
 import { sellAtExit } from '../goods/export';
 import { addStock, freeSpace } from '../goods/stock';
 import type { GameState } from '../state/gameState';
+import { driveVehicle, enterBay } from '../traffic/driving';
 import type { Cell } from '../world/roadLine';
 import type { RoadNetwork } from '../world/roadNetwork';
 import { siteAccess, sites } from '../world/sites';
-import { advance, planRoute } from './movement';
+import { valuesOf } from './fleet';
+import { planRoute } from './movement';
 import type { Truck, TruckIdleReason } from './types';
+import { applyWear } from './upkeep';
+import type { VehicleCtx } from './vehicleCtx';
 
-export function goIdle(t: Truck, reason: TruckIdleReason | null): void {
+/** Wartet (abseits geparkt, gibt den Stellplatz frei) und versucht es später erneut. */
+export function goIdle(ctx: VehicleCtx, t: Truck, reason: TruckIdleReason | null): void {
+  ctx.traffic.leaveBay(t);
+  ctx.traffic.park(t);
   t.phase = 'idle';
   t.idleReason = reason;
   t.timer = vehicleConfig.truckIdleCheckTicks;
@@ -42,22 +48,32 @@ export function setRoute(t: Truck, network: RoadNetwork, target: Cell): boolean 
   return true;
 }
 
-/** Fährt weiter und zählt die Strecke. 'blocked' = Straße unterbrochen, neu planen. */
-export function drive(t: Truck, network: RoadNetwork): 'arrived' | 'blocked' | 'driving' {
-  const { arrived, blocked, moved } = advance(t, vehicleConfig.truckSpeed, network);
+/**
+ * Fährt weiter und zählt die Strecke. 'blocked' = Straße unterbrochen, neu planen;
+ * 'arrived' erst, wenn am Ziel `siteId` ein Stellplatz frei ist (sonst Warteschlange).
+ */
+export function drive(
+  ctx: VehicleCtx,
+  t: Truck,
+  siteId: number | undefined,
+): 'arrived' | 'blocked' | 'driving' {
+  const { result, moved } = driveVehicle(ctx, t, valuesOf(t).speed);
   t.odometer += moved;
-  if (blocked) {
+  applyWear(ctx, t, moved);
+  if (result === 'blocked') {
     t.progress = 0;
     return 'blocked';
   }
-  return arrived ? 'arrived' : 'driving';
+  if (result !== 'arrived') return 'driving';
+  return siteId === undefined || enterBay(ctx, t, siteId) ? 'arrived' : 'driving';
 }
 
 /**
  * Lädt am Ort `siteId` ab, so viel passt (Zone) bzw. verkauft alles (Export-Ausfahrt).
  * Leert `t.cargo`, wenn nichts übrig bleibt. Liefert die abgeladene Menge.
  */
-export function unloadAt(state: GameState, bus: EventBus, t: Truck, siteId: number): number {
+export function unloadAt(ctx: VehicleCtx, t: Truck, siteId: number): number {
+  const { state, bus } = ctx;
   const cargo = t.cargo;
   if (!cargo) return 0;
   const zone = state.zones.find((z) => z.id === siteId);

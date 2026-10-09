@@ -5,9 +5,9 @@ Jeder Meilenstein liefert eine spielbare Version als Link und als Download. Nach
 
 | Meilenstein                              | Version | Status  |
 | ---------------------------------------- | ------- | ------- |
-| M0 Grundgerüst                           | 0.1.0   | im Test |
-| M1 Bauen & erster Warenfluss             | 0.2.0   | geplant |
-| M2 Flotte & Verkehr                      | 0.3.0   | geplant |
+| M0 Grundgerüst                           | 0.1.0   | fertig  |
+| M1 Bauen & erster Warenfluss             | 0.2.0   | fertig  |
+| M2 Flotte & Verkehr                      | 0.3.0   | im Test |
 | M3 Produktion & Lager                    | 0.4.0   | geplant |
 | M4 Export                                | 0.5.0   | geplant |
 | M5 Aufträge & Finanzen (inkl. Insolvenz) | 0.6.0   | geplant |
@@ -16,7 +16,7 @@ Jeder Meilenstein liefert eine spielbare Version als Link und als Download. Nach
 | M8 Züge, Kühl-/Gefahrgut, Produktkatalog | 0.9.0   | geplant |
 | M9 Spielmodi & Feinschliff               | 0.10.0  | geplant |
 
-## M0 Grundgerüst (0.1.0) – im Test
+## M0 Grundgerüst (0.1.0) – fertig
 
 Ziel: Hauptmenü, Campus mit Raster, freie Kamera, Test-Halle, laufende Zeit mit Pause/1x/2x/4x, Topbar, Speichern/Laden/Export/Import, Autosave, CI und Auslieferung.
 Ablauf: T0.1 → (T0.2, T0.3, T0.4 parallel) → (T0.5, T0.6a parallel) → T0.6b → T0.7.
@@ -32,7 +32,7 @@ Ablauf: T0.1 → (T0.2, T0.3, T0.4 parallel) → (T0.5, T0.6a parallel) → T0.6
 | T0.6b Speicher-Oberfläche und Autosave               | im Test | Speichern-/Laden-Dialoge mit Rückfragen; Export/Import; Chrome/Edge-Sicherungsdatei; Firefox-Backups + Hinweis alle 30 min; Signal „Gespeichert“                                                              |
 | T0.7 Integration und Abnahme                         | im Test | Checkliste in Chrome, Edge, Firefox; Release v0.1.0 mit ZIP; Meilenstein-Bericht                                                                                                                              |
 
-## M1 Bauen & erster Warenfluss (0.2.0) – im Test
+## M1 Bauen & erster Warenfluss (0.2.0) – fertig
 
 Ablauf: T1.1 → (T1.2, T1.3, T1.6 parallel) → T1.4 → T1.5 → (T1.5b, T1.7 parallel) → T1.8. Vorher Folgefragen (siehe DESIGN.md).
 
@@ -48,9 +48,24 @@ Ablauf: T1.1 → (T1.2, T1.3, T1.6 parallel) → T1.4 → T1.5 → (T1.5b, T1.7 
 | T1.7 Auswahl und Infopanels (fertig)            | Klick wählt aus; Panels für Gebäude (Bestand, Kapazität, Status) und Fahrzeuge (Ladung, Status, Ziel, Route); Tooltip; live                                         |
 | T1.8 Migration und Abnahme (fertig)             | M0-Spielstand lädt (v1 → v2); Speichern mitten im Warenfluss setzt exakt fort; Release v0.2.0                                                                       |
 
-## M2–M9 (Skizze)
+## M2 Flotte & Verkehr (0.3.0) – im Test
 
-- **M2 Flotte & Verkehr:** mehrere Fahrzeuge, Kreuzungsreservierung, Vorfahrt, Ladezonen-Warteschlangen, Stau-Erkennung; Transporter vs. LKW; Kauf und Leasing; Wartung, Verschleiß, Pannen (Ereignis-Grundsystem); Diesel vs. Elektro; externer Verkehr mit Rushhour; Flottenübersicht.
+Plan und Entscheidungen vom 08.10.2026 (12 Fragen, siehe DESIGN.md). Alle Aufgaben als Commits in einem Meilenstein-PR; Florian testet vor dem Merge.
+
+| Aufgabe                                                | Abnahme (Kurzfassung)                                                                                                         |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| T2.1 Fenster „Touren“ und Wegfarben (fertig)           | Touren als eigene Einträge, mehreren LKW zuweisbar, 10 Farben; Weg des gewählten Fahrzeugs, „Alle Wege“; alte Touren migriert |
+| T2.2 Kreuzungen und Vorfahrt (fertig)                  | Ein Fahrzeug je Spur und Feld, Kreuzung exklusiv nur mit Platz dahinter; Vorfahrtsstraßen markieren, sonst rechts vor links   |
+| T2.3 Stellplätze am Tor (fertig)                       | Stellplätze wachsen mit der Zonengröße; Warteschlange davor; Anzeige im Infofenster                                           |
+| T2.4 Stau und Meldungen (fertig)                       | Umweg nach kurzer Wartezeit; Warnsymbol und Meldung; Meldungsliste mit Sprung zum Ort                                         |
+| T2.5 Fahrzeugtypen, Antrieb, Kauf und Leasing (fertig) | Transporter und LKW, Diesel und Elektro (nur Kosten); Leasing mit fester Laufzeit; Verkaufen und Zurückgeben                  |
+| T2.6 Verschleiß, Werkstatt, Pannen (fertig)            | Werkstatt als Zone; Wartung ab 40 %; Pannen blockieren die Spur, Abschleppkosten; eigener Zufallsstrom                        |
+| T2.7 Externer Verkehr und Rushhour (fertig)            | Einfädeln an der Einfahrt, in der Rushhour etwa dreimal so lange; Bundesstraße mit Autos; Hinweis „Rushhour“                  |
+| T2.8 Flottenfenster (fertig)                           | Liste mit Filter und Sortierung, Sprung zum Fahrzeug, Sammelaktionen Tour, Automatik, Werkstatt                               |
+| T2.9 Leistung, Migration, Abnahme (fertig)             | 300 Fahrzeuge: Simulationsschritt unter 4 ms (Lasttest), Fahrzeuge instanziert; Spielstand v4 mit Beispiel; Version 0.3.0     |
+
+## M3–M9 (Skizze)
+
 - **M3 Produktion & Lager:** Hallen mit Innenbereichen, Zonen Wareneingang/Lager/Verpackung/Warenausgang, Lagerkapazitäten, Stufen Lagern/Verpacken/Etikettieren/Qualitätsprüfung, Gabelstapler, Förderbänder.
 - **M4 Export:** Hafen und Flughafen am Rand, Fahrpläne, Verspätungsstrafen, mietbare und erweiterbare Lagerplätze.
 - **M5 Aufträge & Finanzen:** Express-Aufträge, Rahmenverträge, Reputation, Kostenstellen, Kredite, Monatsbericht mit Diagrammen, Insolvenz mit Warnstufen; Campus-Erweiterung (Vorschlag).

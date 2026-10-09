@@ -1,30 +1,26 @@
 import { vehicleConfig } from '../../config/vehicles';
-import type { EventBus } from '../core/eventBus';
 import { addStock, available } from '../goods/stock';
 import type { GameState } from '../state/gameState';
-import type { RoadNetwork } from '../world/roadNetwork';
+import { valuesOf } from './fleet';
+import { tourOf } from './tours';
 import { accessOf, drive, goIdle, setRoute, unloadAt } from './truckShared';
 import type { TourStop, Truck } from './types';
+import type { VehicleCtx } from './vehicleCtx';
 
 /**
  * Feste Tour (T1.5b): Halte der Reihe nach anfahren, je Halt laden oder abladen, nach dem
- * letzten Halt wieder von vorn. ANNAHME: Der LKW wartet nicht auf volle Ladung, er nimmt
- * mit, was da ist, und fährt weiter.
+ * letzten Halt wieder von vorn. Entscheidung 08.10.2026: Der LKW wartet nicht auf volle
+ * Ladung, er nimmt mit, was da ist, und fährt weiter.
  */
-export function stepTourTruck(
-  state: GameState,
-  bus: EventBus,
-  network: RoadNetwork,
-  t: Truck,
-): void {
+export function stepTourTruck(ctx: VehicleCtx, t: Truck): void {
   switch (t.phase) {
     case 'idle':
-      if (--t.timer <= 0) startStop(state, network, t);
+      if (--t.timer <= 0) startStop(ctx, t);
       return;
     case 'toPickup':
     case 'toDropoff': {
-      const result = drive(t, network);
-      if (result === 'blocked') headToStop(state, network, t);
+      const result = drive(ctx, t, currentStop(ctx.state, t)?.siteId);
+      if (result === 'blocked') headToStop(ctx, t);
       else if (result === 'arrived') {
         t.phase = t.phase === 'toPickup' ? 'loading' : 'unloading';
         t.timer = vehicleConfig.handlingTicks;
@@ -34,50 +30,55 @@ export function stepTourTruck(
     case 'loading':
     case 'unloading':
       if (--t.timer > 0) return;
-      handleStop(state, bus, t);
-      t.tourIndex = (t.tourIndex + 1) % Math.max(1, t.tour.length);
+      handleStop(ctx, t);
+      ctx.traffic.leaveBay(t);
+      t.tourIndex = (t.tourIndex + 1) % Math.max(1, tourOf(ctx.state, t)?.stops.length ?? 1);
       t.phase = 'idle';
       t.timer = 1;
+      return;
+    default:
       return;
   }
 }
 
-export function currentStop(t: Truck): TourStop | null {
-  return t.tour[t.tourIndex % Math.max(1, t.tour.length)] ?? null;
+export function currentStop(state: GameState, t: Truck): TourStop | null {
+  const stops = tourOf(state, t)?.stops ?? [];
+  return stops[t.tourIndex % Math.max(1, stops.length)] ?? null;
 }
 
-function startStop(state: GameState, network: RoadNetwork, t: Truck): void {
-  if (t.tour.length === 0) {
-    goIdle(t, 'noTour');
+function startStop(ctx: VehicleCtx, t: Truck): void {
+  if (!currentStop(ctx.state, t)) {
+    goIdle(ctx, t, 'noTour');
     return;
   }
-  headToStop(state, network, t);
+  headToStop(ctx, t);
 }
 
-function headToStop(state: GameState, network: RoadNetwork, t: Truck): void {
-  const stop = currentStop(t);
-  const target = stop ? accessOf(state, network, stop.siteId) : null;
+function headToStop(ctx: VehicleCtx, t: Truck): void {
+  const network = ctx.traffic.network;
+  const stop = currentStop(ctx.state, t);
+  const target = stop ? accessOf(ctx.state, network, stop.siteId) : null;
   if (!stop || !target || !setRoute(t, network, target)) {
-    goIdle(t, 'noRoute');
+    goIdle(ctx, t, 'noRoute');
     return;
   }
   t.phase = stop.action === 'load' ? 'toPickup' : 'toDropoff';
   t.idleReason = null;
 }
 
-function handleStop(state: GameState, bus: EventBus, t: Truck): void {
-  const stop = currentStop(t);
+function handleStop(ctx: VehicleCtx, t: Truck): void {
+  const stop = currentStop(ctx.state, t);
   if (!stop) return;
   if (stop.action === 'unload') {
-    if (t.cargo?.product === stop.product) unloadAt(state, bus, t, stop.siteId);
+    if (t.cargo?.product === stop.product) unloadAt(ctx, t, stop.siteId);
     return;
   }
-  const zone = state.zones.find((z) => z.id === stop.siteId);
+  const zone = ctx.state.zones.find((z) => z.id === stop.siteId);
   if (!zone || (t.cargo && t.cargo.product !== stop.product)) return;
   const loaded = t.cargo?.quantity ?? 0;
   const quantity = Math.min(
-    vehicleConfig.truckCapacity - loaded,
-    available(state, zone, stop.product),
+    valuesOf(t).capacity - loaded,
+    available(ctx.state, zone, stop.product),
   );
   if (quantity <= 0) return;
   addStock(zone, stop.product, -quantity);

@@ -25,7 +25,8 @@
   display: none;
 }
 .buildbar-tab.is-active,
-.buildbar-item.is-active {
+.buildbar-item.is-active,
+.buildbar-switch-btn.is-active {
   background: var(--active);
   border-color: var(--active);
   color: #fff;
@@ -43,6 +44,12 @@
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
   opacity: 0.85;
+}
+.buildbar-switch {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
 }
 .buildbar-empty {
   padding: 6px 10px;

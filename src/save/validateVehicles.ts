@@ -1,7 +1,22 @@
+import {
+  vehicleDrives,
+  vehicleModels,
+  type VehicleDrive,
+  type VehicleModel,
+} from '../content/vehicleTypes';
+import { NOTICE_KINDS, type NoticeKind } from '../sim/events/notices';
 import { isInt, isProduct, isRecord } from './validateShapes';
 
 const SUPPLIER_PHASES = ['toSite', 'handling', 'toExit', 'noRoute'];
-const TRUCK_PHASES = ['idle', 'toPickup', 'loading', 'toDropoff', 'unloading'];
+const TRUCK_PHASES = [
+  'idle',
+  'toPickup',
+  'loading',
+  'toDropoff',
+  'unloading',
+  'toWorkshop',
+  'servicing',
+];
 const IDLE_REASONS = [null, 'noJob', 'noRoute', 'noDestination', 'noTour'];
 
 const isCargo = (c: unknown): boolean =>
@@ -12,6 +27,20 @@ const isJob = (j: unknown): boolean =>
   (isRecord(j) &&
     isProduct(j['product']) &&
     ['fromId', 'toId', 'quantity'].every((k) => isInt(j[k])));
+
+const isLease = (l: unknown): boolean =>
+  l === null ||
+  (isRecord(l) && ['monthlyCents', 'nextPaymentTick', 'endTick'].every((k) => isInt(l[k])));
+
+const intOrNull = (v: unknown): boolean => v === null || isInt(v);
+
+/** Verschleiß, Wartung und Pannen (T2.6). */
+const isUpkeep = (u: unknown): boolean =>
+  isRecord(u) &&
+  ['condition', 'wearRest', 'brokenTicks', 'breakdowns'].every((k) => isInt(u[k])) &&
+  ['lastBreakdownTick', 'lastServiceTick', 'workshopId'].every((k) => intOrNull(u[k])) &&
+  typeof u['serviceRequested'] === 'boolean' &&
+  typeof u['warnedNoWorkshop'] === 'boolean';
 
 const isStop = (s: unknown): boolean =>
   isRecord(s) &&
@@ -25,9 +54,13 @@ function isTruck(v: Record<string, unknown>): boolean {
     ['odometer', 'tourIndex'].every((k) => isInt(v[k])) &&
     isJob(v['job']) &&
     IDLE_REASONS.includes(v['idleReason'] as string | null) &&
-    (v['mode'] === 'auto' || v['mode'] === 'tour') &&
-    Array.isArray(v['tour']) &&
-    (v['tour'] as unknown[]).every(isStop)
+    (v['tourId'] === null || isInt(v['tourId'])) &&
+    vehicleModels.includes(v['model'] as VehicleModel) &&
+    vehicleDrives.includes(v['drive'] as VehicleDrive) &&
+    isInt(v['priceCents']) &&
+    isInt(v['boughtTick']) &&
+    isLease(v['lease']) &&
+    isUpkeep(v['upkeep'])
   );
 }
 
@@ -38,9 +71,28 @@ function isSupplier(v: Record<string, unknown>): boolean {
   );
 }
 
+/** Feste Tour (T2.1). */
+export function isTour(t: unknown): boolean {
+  return (
+    isRecord(t) &&
+    isInt(t['id']) &&
+    typeof t['name'] === 'string' &&
+    isInt(t['color']) &&
+    Array.isArray(t['stops']) &&
+    (t['stops'] as unknown[]).every(isStop)
+  );
+}
+
 /** Zulieferer und eigene LKW. */
 export function isVehicle(v: unknown): boolean {
-  if (!isRecord(v) || !['id', 'progress', 'timer'].every((k) => isInt(v[k]))) return false;
+  if (!isRecord(v) || !['id', 'progress', 'timer', 'waitTicks'].every((k) => isInt(v[k]))) {
+    return false;
+  }
+  const heading = v['heading'];
+  if (!isInt(heading) || heading < 0 || heading > 3 || typeof v['offRoad'] !== 'boolean') {
+    return false;
+  }
+  if (v['bayAt'] !== null && !isInt(v['bayAt'])) return false;
   const route = v['route'];
   const shared =
     Array.isArray(route) &&
@@ -50,4 +102,14 @@ export function isVehicle(v: unknown): boolean {
   if (!shared) return false;
   if (v['kind'] === 'supplier') return isSupplier(v);
   return v['kind'] === 'truck' && isTruck(v);
+}
+
+/** Meldung (T2.4/T2.6). */
+export function isNotice(n: unknown): boolean {
+  return (
+    isRecord(n) &&
+    ['id', 'tick', 'x', 'z'].every((k) => isInt(n[k])) &&
+    NOTICE_KINDS.includes(n['kind'] as NoticeKind) &&
+    (n['vehicleId'] === null || isInt(n['vehicleId']))
+  );
 }

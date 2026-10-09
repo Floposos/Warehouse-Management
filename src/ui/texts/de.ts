@@ -1,5 +1,10 @@
-/** Alle deutschen Oberflächentexte an einer Stelle. */
+import { deFleet } from './deFleet';
+import { deTours } from './deTours';
+
+/** Alle deutschen Oberflächentexte an einer Stelle (große Bereiche in eigenen Dateien). */
 export const de = {
+  tours: deTours,
+  ...deFleet,
   title: 'Logistikum',
   subtitle: 'Logistik-Campus-Manager',
   noWebgl: 'Dein Browser kann leider keine 3D-Grafik (WebGL) anzeigen.',
@@ -112,25 +117,34 @@ export const de = {
       vehicles: 'Fahrzeuge',
       demolish: 'Abriss',
     },
-    truck: 'LKW kaufen',
-    truckTitle: (price: string, daily: string): string =>
-      `LKW kaufen (${price}, dazu ${daily} am Tag und Kilometerkosten). Er erscheint an der Einfahrt und fährt automatisch.`,
-    truckBought: 'LKW gekauft, er fährt an der Einfahrt los.',
-    truckNoMoney: 'Nicht genug Geld für einen LKW.',
     buildings: { testHall: 'Testhalle', exportExit: 'Export-Ausfahrt' },
-    zones: { A: 'Lieferort A', B: 'Lieferort B', C: 'Lieferort C' },
+    zones: { A: 'Lieferort A', B: 'Lieferort B', C: 'Lieferort C', W: 'Werkstatt' },
     zoneItemCost: (cost: string): string => `${cost} je Feld`,
     zoneItemTitle: (name: string): string =>
       `${name} aufziehen: klicken, Rechteck ziehen, loslassen (Größe bestimmt den Lagerplatz)`,
+    workshopItemTitle: (fieldsPerBay: number): string =>
+      `Werkstatt aufziehen: klicken, Rechteck ziehen, loslassen. Fahrzeuge werden hier gewartet; je ${fieldsPerBay} Felder ein Platz.`,
     zoneSize: (w: number, d: number, capacity: number, cost: string): string =>
       `${w} × ${d} Felder · Lager ${capacity} je Ware · Kosten: ${cost}`,
+    workshopSize: (w: number, d: number, bays: number, cost: string): string =>
+      `${w} × ${d} Felder · ${bays} ${bays === 1 ? 'Werkstattplatz' : 'Werkstattplätze'} · Kosten: ${cost}`,
     notConnected: 'Nicht angeschlossen: Straße an das Tor bauen',
+    zoneMerges: 'wird Teil der angrenzenden Zone',
     gate: { N: 'Tor Nord', E: 'Tor Ost', S: 'Tor Süd', W: 'Tor West' },
     road: 'Straße',
     roadItemCost: (cost: string): string => `${cost} je Feld`,
     roadItemTitle: 'Straße ziehen: klicken, ziehen, loslassen (gerade oder mit einem Knick)',
     roadCost: (fields: number, cost: string): string =>
       `${fields} ${fields === 1 ? 'Feld' : 'Felder'} · Kosten: ${cost}`,
+    priority: 'Vorfahrtsstraße',
+    priorityRemove: 'Vorfahrt entfernen',
+    priorityCost: 'kostenlos',
+    priorityTitle:
+      'Vorhandene Straße als Vorfahrtsstraße markieren: ziehen wie eine Straße. Wer darauf fährt, hat an Kreuzungen Vorfahrt; sonst gilt rechts vor links.',
+    priorityRemoveTitle: 'Markierung „Vorfahrtsstraße“ entfernen: über die Straße ziehen',
+    priorityCells: (n: number, on: boolean): string =>
+      `${n} ${n === 1 ? 'Feld' : 'Felder'} ${on ? 'als Vorfahrtsstraße markieren' : 'ohne Vorfahrt'}`,
+    priorityNoRoad: 'Hier ist keine Straße',
     itemTitle: (name: string, cost: string): string => `${name} bauen (${cost})`,
     cost: (cost: string): string => `Kosten: ${cost}`,
     refund: (refund: string): string => `Abreißen, Erstattung: ${refund}`,
@@ -200,9 +214,8 @@ export const de = {
   info: {
     close: 'Infofenster schließen',
     siteName: (kind: string, n: number): string => `${kind} ${n}`,
-    truckName: (n: number): string => `LKW ${n}`,
     supplier: 'Zulieferer',
-    size: (w: number, d: number): string => `${w} × ${d} Felder`,
+    fields: (n: number): string => `${n} ${n === 1 ? 'Feld' : 'Felder'}`,
     stock: 'Lager',
     stockLine: (name: string, n: number, cap: number): string => `${name}: ${n} / ${cap}`,
     status: 'Status',
@@ -211,8 +224,12 @@ export const de = {
       waitingInput: 'Wartet auf Ware',
       full: 'Ausgangslager voll',
       storing: 'Lagert',
+      workshop: 'Werkstatt',
     },
     connected: 'An die Straße angeschlossen',
+    bays: 'Stellplätze',
+    baysLine: (used: number, total: number, queue: number): string =>
+      `${used} / ${total} belegt${queue > 0 ? ` · ${queue} warten` : ''}`,
     gate: 'Tor',
     gateTitle: (side: string): string => `${side}: Tor auf diese Seite legen`,
     exitAccepts: (list: string): string => `Kauft: ${list}`,
@@ -228,6 +245,8 @@ export const de = {
       loading: 'Lädt',
       toDropoff: 'Fährt zum Abladen',
       unloading: 'Lädt ab',
+      toWorkshop: 'Fährt zur Werkstatt',
+      servicing: 'Wird gewartet',
     },
     idleReasons: {
       noJob: 'Wartet: keine Aufgabe',
@@ -242,8 +261,6 @@ export const de = {
       noRoute: 'Wartet: kein Weg',
     },
     mode: 'Betrieb',
-    modes: { auto: 'Automatik', tour: 'Feste Tour' },
-    tour: 'Tour',
     noStops: 'Noch keine Halte. Ort wählen und „Halt hinzufügen“ oder Orte im Gelände anklicken.',
     stop: (n: number): string => `${n}.`,
     actions: { load: 'Laden', unload: 'Abladen' },
@@ -254,11 +271,11 @@ export const de = {
     removeStop: 'Halt entfernen',
     moveUp: 'Halt nach oben',
     current: 'aktueller Halt',
-    stopRejected: {
-      invalidStop: 'Dieser Halt passt nicht zum Ort.',
-      tooManyStops: 'Mehr Halte gehen nicht.',
-    },
     hoverHint: 'Klicken für Details',
+    demolishZone: 'Ganze Zone abreißen',
+    demolishZoneOk: 'Abreißen',
+    demolishZoneConfirm: (refund: string): string =>
+      `Die ganze Zone samt Bestand abreißen? Erstattung: ${refund}. Einzelne Felder reißt du mit dem Abriss-Werkzeug ab.`,
   },
   perf: {
     line: (fps: number, simMsPerTick: number, drawCalls: number): string =>

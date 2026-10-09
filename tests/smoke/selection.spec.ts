@@ -6,7 +6,7 @@ interface TestApp {
     command(c: unknown): { ok: boolean };
     state: {
       zones: { id: number; kind: string; gate: string; stock: Record<string, number> }[];
-      vehicles: { id: number; mode?: string; tour?: unknown[] }[];
+      vehicles: { id: number }[];
     };
   };
   selection: { select(s: { kind: string; id: number } | null): void };
@@ -55,41 +55,22 @@ test('Zone auswählen: Lager, Status und Tor umschalten', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(panel).toBeHidden();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  expect(problems).toEqual([]);
-});
 
-test('LKW auswählen, Tour per Liste anlegen und starten', async ({ page }) => {
-  const problems = collectProblems(page);
-  await page.goto('/');
-  await startNewGame(page);
-  const { a, b, truck } = await setup(page);
-  await select(page, 'vehicle', truck);
-  const panel = page.getByTestId('info-panel');
-  await expect(panel).toContainText('LKW 1');
-  await expect(panel).toContainText('Automatik');
-  await panel.getByLabel('Halt hinzufügen').selectOption(String(a));
-  await panel.getByRole('button', { name: 'Halt hinzufügen' }).click();
-  await panel.getByLabel('Halt hinzufügen').selectOption(String(b));
-  await panel.getByRole('button', { name: 'Halt hinzufügen' }).click();
-  const list = panel.getByTestId('tour-list');
-  await expect(list.locator('li')).toHaveCount(2);
-  await expect(list.locator('li').nth(1)).toContainText('Lieferort B 1');
-  await panel.getByRole('button', { name: 'Feste Tour' }).click();
-  const mode = await page.evaluate(
-    (id) =>
-      (window as unknown as { __logistikum: TestApp }).__logistikum.session.state.vehicles.find(
-        (v) => v.id === id,
-      ),
-    truck,
+  // Ganze Zone abreißen mit Rückfrage.
+  await select(page, 'zone', a);
+  await panel.getByRole('button', { name: 'Ganze Zone abreißen' }).click();
+  await page
+    .getByRole('dialog', { name: 'Ganze Zone abreißen' })
+    .getByRole('button', { name: 'Abreißen' })
+    .click();
+  await expect(panel).toBeHidden();
+  const zones = await page.evaluate(
+    () =>
+      (window as unknown as { __logistikum: TestApp }).__logistikum.session.state.zones.filter(
+        (z) => z.kind === 'A',
+      ).length,
   );
-  expect(mode).toMatchObject({
-    mode: 'tour',
-    tour: [
-      { siteId: a, action: 'load', product: 'rawA' },
-      { siteId: b, action: 'unload', product: 'rawA' },
-    ],
-  });
-  await page.screenshot({ path: 'test-results/selection-truck.png' });
+  expect(zones).toBe(0);
   expect(problems).toEqual([]);
 });
 
